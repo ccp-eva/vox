@@ -52,7 +52,17 @@ const section9 = { min: section8.max, max: (targetPositionRight / 10) * 9 };
 const section10 = { min: section9.max, max: targetPositionRight };
 
 // set target to random place on very right; use template literal to access function's value
-target.setAttribute('transform', `translate(${randomNumber(section10.min, section10.max)}, 0)`);
+// target.setAttribute('transform', `translate(${randomNumber(section10.min, section10.max)}, 0)`);
+
+// TODO target.getBoundingClientRect();
+
+// always first without, then with transform (see few lines above)
+// targetBBox();
+// SVGRect {x: 0.49694061279296875, y: 781.177734375, width: 192.3055419921875, height: 231.29241943359375}
+// SVGRect {x: 0.49694061279296875, y: 781.177734375, width: 192.3055419921875, height: 231.29241943359375}
+// target.getBoundingClientRect();
+// DOMRect {x: 8.074023246765137, y: 124.36293029785156, width: 28.645511627197266, height: 34.45294189453125, top: 124.36293029785156, …}
+// DOMRect {x: 252.37510681152344, y: 124.36293029785156, width: 28.645523071289062, height: 34.45294189453125, top: 124.36293029785156, …}
 
 console.log('target after transforming', target);
 console.log('BBox width', target.getBBox().width);
