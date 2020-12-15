@@ -1,31 +1,87 @@
 import getGazeCoords from './js/getGazeCoords';
+import randomNumber from './js/randomNumber';
 
+// check screen size of user
+const { clientWidth } = document.getElementsByTagName('svg').svg;
+const { clientHeight } = document.getElementsByTagName('svg').svg;
+console.log('client browser size', { clientWidth, clientHeight });
+// TODO find more elegant solution to tell user to view on fullscreen
+if (clientWidth < 900 || clientHeight < 400) alert('Please view on bigger screen!');
+
+// get viewBox size
+const viewBoxWidth = document.getElementsByTagName('svg').svg.getAttribute('viewBox').split(' ')[2];
+const viewBoxHeight = document.getElementsByTagName('svg').svg.getAttribute('viewBox').split(' ')[3];
+console.log('view box size', { viewBoxWidth, viewBoxHeight });
+
+// get agents
+const pig = document.getElementById('pig');
+const monkey = document.getElementById('monkey');
+const sheep = document.getElementById('sheep');
+
+// change which one is visible (right now, only sheep eyes will be manipulated)
+sheep.setAttribute('visibility', 'visible');
+monkey.setAttribute('visibility', 'hidden');
+pig.setAttribute('visibility', 'hidden');
+
+// get target object, play around with positioning
 const target = document.getElementById('balloon');
+console.log('target before transforming', target);
+console.log('BBox width', target.getBBox().width);
+console.log('BBox height', target.getBBox().height);
+console.log('BBox x', target.getBBox().x);
+console.log('BBox y', target.getBBox().y);
 
-const iris_left = document.getElementById('sheep-iris-left');
-const pupil_left = document.getElementById('sheep-pupil-left');
-const eyeline_left = document.getElementById('sheep-eyeline-left');
+// in SVG, balloon is in the far left. so that's our: target.setAttribute('transform', 'translate(0, 0)');
+// get position on the very right of the screen
+const targetPositionRight = viewBoxWidth - target.getBBox().width;
 
-const iris_right = document.getElementById('sheep-iris-right');
-const pupil_right = document.getElementById('sheep-pupil-right');
-const eyeline_right = document.getElementById('sheep-eyeline-right');
+// range of possible values to move the balloon: 0 - targetPositionRight
+// divide this range into ten
+// for each of these ten categories, pick a random number
+const section1 = { min: 0, max: targetPositionRight / 10 };
+const section2 = { min: section1.max, max: (targetPositionRight / 10) * 2 };
+const section3 = { min: section2.max, max: (targetPositionRight / 10) * 3 };
+const section4 = { min: section3.max, max: (targetPositionRight / 10) * 4 };
+const section5 = { min: section4.max, max: (targetPositionRight / 10) * 5 };
+const section6 = { min: section5.max, max: (targetPositionRight / 10) * 6 };
+const section7 = { min: section6.max, max: (targetPositionRight / 10) * 7 };
+const section8 = { min: section7.max, max: (targetPositionRight / 10) * 8 };
+const section9 = { min: section8.max, max: (targetPositionRight / 10) * 9 };
+const section10 = { min: section9.max, max: targetPositionRight };
+
+// set target to random place on very right; use template literal to access function's value
+target.setAttribute('transform', `translate(${randomNumber(section10.min, section10.max)}, 0)`);
+
+console.log('target after transforming', target);
+console.log('BBox width', target.getBBox().width);
+console.log('BBox height', target.getBBox().height);
+console.log('BBox x', target.getBBox().x);
+console.log('BBox y', target.getBBox().y);
+
+const irisLeft = document.getElementById('sheep-iris-left');
+const pupilLeft = document.getElementById('sheep-pupil-left');
+const eyelineLeft = document.getElementById('sheep-eyeline-left');
+
+const irisRight = document.getElementById('sheep-iris-right');
+const pupilRight = document.getElementById('sheep-pupil-right');
+const eyelineRight = document.getElementById('sheep-eyeline-right');
 
 // calculate position for left eye
-const gazeCoords_left = getGazeCoords(target, pupil_left, eyeline_left);
+const gazeCoordsLeft = getGazeCoords(target, pupilLeft, eyelineLeft);
 
 // pupil should be on intersection line / circle
-pupil_left.setAttribute('cx', gazeCoords_left.x);
-pupil_left.setAttribute('cy', gazeCoords_left.y);
+pupilLeft.setAttribute('cx', gazeCoordsLeft.x);
+pupilLeft.setAttribute('cy', gazeCoordsLeft.y);
 // iris too
-iris_left.setAttribute('cx', gazeCoords_left.x);
-iris_left.setAttribute('cy', gazeCoords_left.y);
+irisLeft.setAttribute('cx', gazeCoordsLeft.x);
+irisLeft.setAttribute('cy', gazeCoordsLeft.y);
 
 // calculate position for right eye
-const gazeCoords_right = getGazeCoords(target, pupil_right, eyeline_right);
+const gazeCoordsRight = getGazeCoords(target, pupilRight, eyelineRight);
 
 // pupil should be on intersection line / circle
-pupil_right.setAttribute('cx', gazeCoords_right.x);
-pupil_right.setAttribute('cy', gazeCoords_right.y);
+pupilRight.setAttribute('cx', gazeCoordsRight.x);
+pupilRight.setAttribute('cy', gazeCoordsRight.y);
 // iris too
-iris_right.setAttribute('cx', gazeCoords_right.x);
-iris_right.setAttribute('cy', gazeCoords_right.y);
+irisRight.setAttribute('cx', gazeCoordsRight.x);
+irisRight.setAttribute('cy', gazeCoordsRight.y);
