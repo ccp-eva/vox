@@ -2,8 +2,10 @@ import getGazeCoords from './js/getGazeCoords';
 import randomNumber from './js/randomNumber';
 
 // check screen size of user
-const { clientWidth } = document.getElementsByTagName('svg').svg;
-const { clientHeight } = document.getElementsByTagName('svg').svg;
+// eslint-disable-next-line prefer-destructuring
+const clientWidth = document.getElementsByTagName('svg').svg.clientWidth;
+// eslint-disable-next-line prefer-destructuring
+const clientHeight = document.getElementsByTagName('svg').svg.clientHeight;
 console.log('client browser size', { clientWidth, clientHeight });
 // TODO find more elegant solution to tell user to view on fullscreen
 if (clientWidth < 900 || clientHeight < 400) alert('Please view on bigger screen!');
