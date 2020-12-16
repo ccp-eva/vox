@@ -1,4 +1,4 @@
-# VOX
+# 🦊 VOX
 > VOX (Vectorized Online eXperiments) is an approach to parse an SVG composition and to return an interactive online experiment in your browser. The primary goal is to allow users to compose their experimental design in a GUI with which they are familiar with (e.g., Illustrator).
 
 ## Why SVG?
