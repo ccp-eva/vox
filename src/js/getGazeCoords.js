@@ -10,13 +10,16 @@ export default (target, pupil, eyeline) => {
   const pupilRadius = parseFloat(pupil.getAttribute('r'), 10);
 
   // define max movement value for eye movement
-  const maxEyeMovement = eyeRadius - pupilRadius / 1.2;
+  const maxEyeMovement = eyeRadius - pupilRadius / 1.1;
 
   // define target’s center point, use bounding box
   const targetWidth = target.getBBox().width;
   const targetHeight = target.getBBox().height;
-  const targetX = target.getBBox().x;
-  const targetY = target.getBBox().y;
+  // const targetX = target.getBBox().x;
+  // const targetY = target.getBBox().y;
+  // use viewbox coordinates
+  const targetX = Math.abs(target.getAttribute('viewBox').split(' ')[0]);
+  const targetY = Math.abs(target.getAttribute('viewBox').split(' ')[1]);
 
   const targetCenterX = targetX + targetWidth / 2;
   const targetCenterY = targetY + targetHeight / 2;
