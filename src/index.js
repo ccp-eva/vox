@@ -1,21 +1,21 @@
 import getGazeCoords from './js/getGazeCoords';
 import randomNumber from './js/randomNumber';
 
+// AGENT PUPIL SETTINGS
 // check screen size of user
-// eslint-disable-next-line prefer-destructuring
-const clientWidth = document.getElementsByTagName('svg').svg.clientWidth;
-// eslint-disable-next-line prefer-destructuring
-const clientHeight = document.getElementsByTagName('svg').svg.clientHeight;
+const { clientWidth } = document.getElementById('outer-svg');
+const { clientHeight } = document.getElementById('outer-svg');
 console.log('client browser size', { clientWidth, clientHeight });
 // TODO find more elegant solution to tell user to view on fullscreen
-if (clientWidth < 900 || clientHeight < 400) alert('Please view on bigger screen!');
+if (clientWidth < 600 || clientHeight < 200) alert('Please view on bigger screen!');
 
 // get viewBox size
-const viewBoxWidth = document.getElementsByTagName('svg').svg.getAttribute('viewBox').split(' ')[2];
-const viewBoxHeight = document.getElementsByTagName('svg').svg.getAttribute('viewBox').split(' ')[3];
+const viewBoxWidth = document.getElementById('outer-svg').getAttribute('viewBox').split(' ')[2];
+const viewBoxHeight = document.getElementById('outer-svg').getAttribute('viewBox').split(' ')[3];
 console.log('view box size', { viewBoxWidth, viewBoxHeight });
 
-// get agents
+// get target and agents
+const target = document.getElementById('target');
 const pig = document.getElementById('pig');
 const monkey = document.getElementById('monkey');
 const sheep = document.getElementById('sheep');
@@ -25,22 +25,26 @@ sheep.setAttribute('visibility', 'visible');
 monkey.setAttribute('visibility', 'hidden');
 pig.setAttribute('visibility', 'hidden');
 
-// get target object, play around with positioning
-const target = document.getElementById('balloon');
+// set balloon to very left in grass section
+target.setAttribute('viewBox', '0 -780 1920 1080');
+
 console.log('target before transforming', target);
 console.log('BBox width', target.getBBox().width);
 console.log('BBox height', target.getBBox().height);
 console.log('BBox x', target.getBBox().x);
 console.log('BBox y', target.getBBox().y);
+console.log('abs viewBox x', Math.abs(target.getAttribute('viewBox').split(' ')[0]));
+console.log('abs viewBox y', Math.abs(target.getAttribute('viewBox').split(' ')[1]));
 
-// in SVG, balloon is in the far left. so that's our: target.setAttribute('transform', 'translate(0, 0)');
 // get position on the very right of the screen
 const targetPositionRight = viewBoxWidth - target.getBBox().width;
+console.log('targetPositionRight', targetPositionRight);
 
 // range of possible values to move the balloon: 0 - targetPositionRight
 // divide this range into ten
 // for each of these ten categories, pick a random number
 const section1 = { min: 0, max: targetPositionRight / 10 };
+console.log('section1', section1);
 const section2 = { min: section1.max, max: (targetPositionRight / 10) * 2 };
 const section3 = { min: section2.max, max: (targetPositionRight / 10) * 3 };
 const section4 = { min: section3.max, max: (targetPositionRight / 10) * 4 };
@@ -53,22 +57,18 @@ const section10 = { min: section9.max, max: targetPositionRight };
 
 // set target to random place on very right; use template literal to access function's value
 // target.setAttribute('transform', `translate(${randomNumber(section10.min, section10.max)}, 0)`);
+// WE NEED MINUS! SINCE WE MOVE THE COORDINATE SYSTEM TO THE LEFT
+target.setAttribute('viewBox', `-${randomNumber(section10.min, section10.max)} -780 1920 1080`);
 
-// TODO target.getBoundingClientRect();
-
-// always first without, then with transform (see few lines above)
-// targetBBox();
-// SVGRect {x: 0.49694061279296875, y: 781.177734375, width: 192.3055419921875, height: 231.29241943359375}
-// SVGRect {x: 0.49694061279296875, y: 781.177734375, width: 192.3055419921875, height: 231.29241943359375}
-// target.getBoundingClientRect();
-// DOMRect {x: 8.074023246765137, y: 124.36293029785156, width: 28.645511627197266, height: 34.45294189453125, top: 124.36293029785156, …}
-// DOMRect {x: 252.37510681152344, y: 124.36293029785156, width: 28.645523071289062, height: 34.45294189453125, top: 124.36293029785156, …}
+// target.setAttribute('viewBox', '-1700 -780 1920 1080');
 
 console.log('target after transforming', target);
 console.log('BBox width', target.getBBox().width);
 console.log('BBox height', target.getBBox().height);
 console.log('BBox x', target.getBBox().x);
 console.log('BBox y', target.getBBox().y);
+console.log('abs viewBox x', Math.abs(target.getAttribute('viewBox').split(' ')[0]));
+console.log('abs viewBox y', Math.abs(target.getAttribute('viewBox').split(' ')[1]));
 
 const irisLeft = document.getElementById('sheep-iris-left');
 const pupilLeft = document.getElementById('sheep-pupil-left');
