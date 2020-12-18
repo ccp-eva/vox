@@ -1,5 +1,6 @@
 import getGazeCoords from './js/getGazeCoords';
 import randomNumber from './js/randomNumber';
+import shuffleArray from './js/shuffleArray';
 
 // AGENT PUPIL SETTINGS
 // check screen size of user
@@ -15,36 +16,42 @@ const viewBoxHeight = document.getElementById('outer-svg').getAttribute('viewBox
 console.log('view box size', { viewBoxWidth, viewBoxHeight });
 
 // get target and agents
+// if you change animal agents, then change ID here:
 const target = document.getElementById('target');
 const pig = document.getElementById('pig');
 const monkey = document.getElementById('monkey');
 const sheep = document.getElementById('sheep');
+// and add agent to this list
+const agents = shuffleArray(['pig', 'monkey', 'sheep']);
+console.log('agents', agents);
 
-// change which one is visible (right now, only sheep eyes will be manipulated)
-sheep.setAttribute('visibility', 'visible');
-monkey.setAttribute('visibility', 'hidden');
-pig.setAttribute('visibility', 'hidden');
+// change which one is visible (right now, only first agent)
+eval(agents[0]).setAttribute('visibility', 'visible');
+eval(agents[1]).setAttribute('visibility', 'hidden');
+eval(agents[2]).setAttribute('visibility', 'hidden');
+
+// get middle Y of the grass background
+// take y coordinate of grass + half of the height. Then, subtract half of the balloon height.
+const grassMidY = document.getElementById('grass').getBBox().y + document.getElementById('grass').getBBox().height / 2 - target.getBBox().height / 2;
 
 // set balloon to very left in grass section
-target.setAttribute('viewBox', '0 -780 1920 1080');
+// target.setAttribute('viewBox', `0 -${grassMidY} ${viewBoxWidth} ${viewBoxHeight}`);
 
-console.log('target before transforming', target);
-console.log('BBox width', target.getBBox().width);
-console.log('BBox height', target.getBBox().height);
-console.log('BBox x', target.getBBox().x);
-console.log('BBox y', target.getBBox().y);
-console.log('abs viewBox x', Math.abs(target.getAttribute('viewBox').split(' ')[0]));
-console.log('abs viewBox y', Math.abs(target.getAttribute('viewBox').split(' ')[1]));
+// console.log('target before transforming', target);
+// console.log('BBox width', target.getBBox().width);
+// console.log('BBox height', target.getBBox().height);
+// console.log('BBox x', target.getBBox().x);
+// console.log('BBox y', target.getBBox().y);
+// console.log('abs viewBox x', Math.abs(target.getAttribute('viewBox').split(' ')[0]));
+// console.log('abs viewBox y', Math.abs(target.getAttribute('viewBox').split(' ')[1]));
 
 // get position on the very right of the screen
 const targetPositionRight = viewBoxWidth - target.getBBox().width;
-console.log('targetPositionRight', targetPositionRight);
 
 // range of possible values to move the balloon: 0 - targetPositionRight
 // divide this range into ten
 // for each of these ten categories, pick a random number
 const section1 = { min: 0, max: targetPositionRight / 10 };
-console.log('section1', section1);
 const section2 = { min: section1.max, max: (targetPositionRight / 10) * 2 };
 const section3 = { min: section2.max, max: (targetPositionRight / 10) * 3 };
 const section4 = { min: section3.max, max: (targetPositionRight / 10) * 4 };
@@ -55,45 +62,33 @@ const section8 = { min: section7.max, max: (targetPositionRight / 10) * 8 };
 const section9 = { min: section8.max, max: (targetPositionRight / 10) * 9 };
 const section10 = { min: section9.max, max: targetPositionRight };
 
-// set target to random place on very right; use template literal to access function's value
-// target.setAttribute('transform', `translate(${randomNumber(section10.min, section10.max)}, 0)`);
-// WE NEED MINUS! SINCE WE MOVE THE COORDINATE SYSTEM TO THE LEFT
-target.setAttribute('viewBox', `-${randomNumber(section10.min, section10.max)} -780 1920 1080`);
+const sectionArray = shuffleArray([section1, section2, section3, section4, section5, section6, section7, section8, section9, section10]);
+console.log('sectionArray', sectionArray);
 
-// target.setAttribute('viewBox', '-1700 -780 1920 1080');
+// set target to random place; use template literal to access values
+// WE NEED MINUS! SINCE WE MOVE THE COORDINATE SYSTEM TO THE LEFT / UP in order to let the balloon move right / down
+target.setAttribute('viewBox', `-${randomNumber(sectionArray[0].min, sectionArray[0].max)} -${grassMidY} ${viewBoxWidth} ${viewBoxHeight}`);
 
-console.log('target after transforming', target);
-console.log('BBox width', target.getBBox().width);
-console.log('BBox height', target.getBBox().height);
-console.log('BBox x', target.getBBox().x);
-console.log('BBox y', target.getBBox().y);
-console.log('abs viewBox x', Math.abs(target.getAttribute('viewBox').split(' ')[0]));
-console.log('abs viewBox y', Math.abs(target.getAttribute('viewBox').split(' ')[1]));
+// set eyes of the first agent, the one thats visible
+const irisLeft = document.getElementById(`${agents[0]}-iris-left`);
+const pupilLeft = document.getElementById(`${agents[0]}-pupil-left`);
+const eyelineLeft = document.getElementById(`${agents[0]}-eyeline-left`);
 
-const irisLeft = document.getElementById('sheep-iris-left');
-const pupilLeft = document.getElementById('sheep-pupil-left');
-const eyelineLeft = document.getElementById('sheep-eyeline-left');
+const irisRight = document.getElementById(`${agents[0]}-iris-right`);
+const pupilRight = document.getElementById(`${agents[0]}-pupil-right`);
+const eyelineRight = document.getElementById(`${agents[0]}-eyeline-right`);
 
-const irisRight = document.getElementById('sheep-iris-right');
-const pupilRight = document.getElementById('sheep-pupil-right');
-const eyelineRight = document.getElementById('sheep-eyeline-right');
-
-// calculate position for left eye
+// calculate positions for both eyes
 const gazeCoordsLeft = getGazeCoords(target, pupilLeft, eyelineLeft);
+const gazeCoordsRight = getGazeCoords(target, pupilRight, eyelineRight);
 
 // pupil should be on intersection line / circle
 pupilLeft.setAttribute('cx', gazeCoordsLeft.x);
 pupilLeft.setAttribute('cy', gazeCoordsLeft.y);
-// iris too
-irisLeft.setAttribute('cx', gazeCoordsLeft.x);
-irisLeft.setAttribute('cy', gazeCoordsLeft.y);
-
-// calculate position for right eye
-const gazeCoordsRight = getGazeCoords(target, pupilRight, eyelineRight);
-
-// pupil should be on intersection line / circle
 pupilRight.setAttribute('cx', gazeCoordsRight.x);
 pupilRight.setAttribute('cy', gazeCoordsRight.y);
 // iris too
+irisLeft.setAttribute('cx', gazeCoordsLeft.x);
+irisLeft.setAttribute('cy', gazeCoordsLeft.y);
 irisRight.setAttribute('cx', gazeCoordsRight.x);
 irisRight.setAttribute('cy', gazeCoordsRight.y);
