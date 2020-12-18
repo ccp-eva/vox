@@ -1,6 +1,7 @@
 import getGazeCoords from './js/getGazeCoords';
 import randomNumber from './js/randomNumber';
 import shuffleArray from './js/shuffleArray';
+import sleep from './js/sleep';
 
 // AGENT PUPIL SETTINGS
 // check screen size of user
@@ -47,6 +48,10 @@ const grassMidY = document.getElementById('grass').getBBox().y + document.getEle
 
 // get position on the very right of the screen
 const targetPositionRight = viewBoxWidth - target.getBBox().width;
+const targetPositionMid = viewBoxWidth / 2 - target.getBBox().width / 2;
+
+// put it in middle
+target.setAttribute('viewBox', `-${targetPositionMid} -${grassMidY} ${viewBoxWidth} ${viewBoxHeight}`);
 
 // range of possible values to move the balloon: 0 - targetPositionRight
 // divide this range into ten
@@ -67,28 +72,32 @@ console.log('sectionArray', sectionArray);
 
 // set target to random place; use template literal to access values
 // WE NEED MINUS! SINCE WE MOVE THE COORDINATE SYSTEM TO THE LEFT / UP in order to let the balloon move right / down
-target.setAttribute('viewBox', `-${randomNumber(sectionArray[0].min, sectionArray[0].max)} -${grassMidY} ${viewBoxWidth} ${viewBoxHeight}`);
+// sleep(5000);
 
-// set eyes of the first agent, the one thats visible
-const irisLeft = document.getElementById(`${agents[0]}-iris-left`);
-const pupilLeft = document.getElementById(`${agents[0]}-pupil-left`);
-const eyelineLeft = document.getElementById(`${agents[0]}-eyeline-left`);
+// move balloon after 5 seconds and change eye gaze
+setTimeout(() => {
+  target.setAttribute('viewBox', `-${randomNumber(sectionArray[0].min, sectionArray[0].max)} -${grassMidY} ${viewBoxWidth} ${viewBoxHeight}`);
+  // set eyes of the first agent, the one thats visible
+  const irisLeft = document.getElementById(`${agents[0]}-iris-left`);
+  const pupilLeft = document.getElementById(`${agents[0]}-pupil-left`);
+  const eyelineLeft = document.getElementById(`${agents[0]}-eyeline-left`);
 
-const irisRight = document.getElementById(`${agents[0]}-iris-right`);
-const pupilRight = document.getElementById(`${agents[0]}-pupil-right`);
-const eyelineRight = document.getElementById(`${agents[0]}-eyeline-right`);
+  const irisRight = document.getElementById(`${agents[0]}-iris-right`);
+  const pupilRight = document.getElementById(`${agents[0]}-pupil-right`);
+  const eyelineRight = document.getElementById(`${agents[0]}-eyeline-right`);
 
-// calculate positions for both eyes
-const gazeCoordsLeft = getGazeCoords(target, pupilLeft, eyelineLeft);
-const gazeCoordsRight = getGazeCoords(target, pupilRight, eyelineRight);
+  // calculate positions for both eyes
+  const gazeCoordsLeft = getGazeCoords(target, pupilLeft, eyelineLeft);
+  const gazeCoordsRight = getGazeCoords(target, pupilRight, eyelineRight);
 
-// pupil should be on intersection line / circle
-pupilLeft.setAttribute('cx', gazeCoordsLeft.x);
-pupilLeft.setAttribute('cy', gazeCoordsLeft.y);
-pupilRight.setAttribute('cx', gazeCoordsRight.x);
-pupilRight.setAttribute('cy', gazeCoordsRight.y);
-// iris too
-irisLeft.setAttribute('cx', gazeCoordsLeft.x);
-irisLeft.setAttribute('cy', gazeCoordsLeft.y);
-irisRight.setAttribute('cx', gazeCoordsRight.x);
-irisRight.setAttribute('cy', gazeCoordsRight.y);
+  // pupil should be on intersection line / circle
+  pupilLeft.setAttribute('cx', gazeCoordsLeft.x);
+  pupilLeft.setAttribute('cy', gazeCoordsLeft.y);
+  pupilRight.setAttribute('cx', gazeCoordsRight.x);
+  pupilRight.setAttribute('cy', gazeCoordsRight.y);
+  // iris too
+  irisLeft.setAttribute('cx', gazeCoordsLeft.x);
+  irisLeft.setAttribute('cy', gazeCoordsLeft.y);
+  irisRight.setAttribute('cx', gazeCoordsRight.x);
+  irisRight.setAttribute('cy', gazeCoordsRight.y);
+}, 5000);
