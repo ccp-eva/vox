@@ -1,5 +1,8 @@
-export default (target, newX) => {
-  const oldX = target.getAttribute('cx');
+export default (target, newCoords) => {
+  const oldX = parseFloat(target.getAttribute('cx'));
+  const oldY = parseFloat(target.getAttribute('cy'));
+  const newX = newCoords.x;
+  const newY = newCoords.y;
   // Goes from 0 to 1 (to reach final position)
   // 0.5 stops half way
   let animProgress = 0;
@@ -10,7 +13,9 @@ export default (target, newX) => {
     if (animProgress > 1) { animProgress = 1; }
     // Calculate a new viewBox corresponding to our animation progress
     const nextX = oldX + animProgress * (newX - oldX);
+    const nextY = oldY + animProgress * (newY - oldY);
     target.setAttribute('cx', nextX);
+    target.setAttribute('cy', nextY);
     if (animProgress >= 1) { clearInterval(interval); }
   }, 10);
 };

@@ -2,6 +2,7 @@ import getGazeCoords from './js/getGazeCoords';
 import randomNumber from './js/randomNumber';
 import shuffleArray from './js/shuffleArray';
 import animateViewBox from './js/animateViewBox';
+import animateCoord from './js/animateCoord';
 // import sleep from './js/sleep';
 
 // AGENT PUPIL SETTINGS
@@ -48,8 +49,10 @@ const grassMidY = document.getElementById('grass').getBBox().y + document.getEle
 const targetPositionRight = origViewBoxWidth - target.getBBox().width;
 const targetPositionMid = origViewBoxWidth / 2 - target.getBBox().width / 2;
 
-// put it in middle
-target.setAttribute('viewBox', `-${targetPositionMid} -${grassMidY} ${origViewBoxWidth} ${origViewBoxHeight}`);
+// put it in middle (target needs to be last in the SVG => on top level/foreground)
+const midTargetViewBox = `-${targetPositionMid} -${origViewBoxHeight / 2.35} ${origViewBoxWidth} ${origViewBoxHeight}`;
+target.setAttribute('viewBox', `${midTargetViewBox}`);
+console.log('midTargetViewBox', midTargetViewBox);
 
 // range of possible values to move the balloon: 0 - targetPositionRight
 // divide this range into ten
@@ -69,58 +72,55 @@ const sectionArray = shuffleArray([section1, section2, section3, section4, secti
 console.log('sectionArray', sectionArray);
 
 const newTargetViewBox = `-${randomNumber(sectionArray[0].min, sectionArray[0].max)} -${grassMidY} ${origViewBoxWidth} ${origViewBoxHeight}`;
-animateViewBox(target, origViewBox, newTargetViewBox);
-
-// const newTargetX = -(randomNumber(sectionArray[0].min, sectionArray[0].max));
-// const newTargetY = -grassMidY;
-// const newTargetWidth = origViewBoxWidth;
-// const newTargetHeight = origViewBoxHeight;
-// let animProgress = 0; // Goes from 0 to 1
-// const animStep = 0.02; // Change in animProgress per interval function invocation.
-
-// const interval = setInterval(() => {
-//   animProgress += animStep;
-//   if (animProgress > 1) { animProgress = 1; }
-//   // Calculate a new viewBox corresponding to our animation progress
-//   const nextViewBox = [
-//     origViewBoxX + animProgress * (newTargetX - origViewBoxX),
-//     origViewBoxY + animProgress * (newTargetY - origViewBoxY),
-
-//     origViewBoxWidth + animProgress * (newTargetWidth - origViewBoxWidth),
-//     origViewBoxHeight + animProgress * (newTargetHeight - origViewBoxHeight),
-//   ];
-//   target.setAttribute('viewBox', nextViewBox.join(' '));
-//   if (animProgress >= 1) { clearInterval(interval); }
-// }, 10);
 
 // set target to random place; use template literal to access values
 // WE NEED MINUS! SINCE WE MOVE THE COORDINATE SYSTEM TO THE LEFT / UP in order to let the balloon move right / down
 // sleep(5000);
 
-// // move balloon after 5 seconds and change eye gaze
-// setTimeout(() => {
-//   target.setAttribute('viewBox', `-${randomNumber(sectionArray[0].min, sectionArray[0].max)} -${grassMidY} ${origViewBoxWidth} ${origViewBoxHeight}`);
-//   // set eyes of the first agent, the one thats visible
-//   const irisLeft = document.getElementById(`${agents[0]}-iris-left`);
-//   const pupilLeft = document.getElementById(`${agents[0]}-pupil-left`);
-//   const eyelineLeft = document.getElementById(`${agents[0]}-eyeline-left`);
+// move balloon after 5 seconds and change eye gaze
+setTimeout(() => {
+  // target.setAttribute('viewBox', `-${randomNumber(sectionArray[0].min, sectionArray[0].max)} -${grassMidY} ${origViewBoxWidth} ${origViewBoxHeight}`);
+  animateViewBox(target, midTargetViewBox, newTargetViewBox);
+  // set target viewBox to the value where it just moved
+  target.setAttribute('viewBox', newTargetViewBox);
+  // should be the same values now
+  console.log('newTargetViewBox', newTargetViewBox);
+  console.log('newTargetViewBox', target.getAttribute('viewBox'));
 
-//   const irisRight = document.getElementById(`${agents[0]}-iris-right`);
-//   const pupilRight = document.getElementById(`${agents[0]}-pupil-right`);
-//   const eyelineRight = document.getElementById(`${agents[0]}-eyeline-right`);
+  // set eyes of the first agent, the one thats visible
+  const irisLeft = document.getElementById(`${agents[0]}-iris-left`);
+  const pupilLeft = document.getElementById(`${agents[0]}-pupil-left`);
+  const eyelineLeft = document.getElementById(`${agents[0]}-eyeline-left`);
 
-//   // calculate positions for both eyes
-//   const gazeCoordsLeft = getGazeCoords(target, pupilLeft, eyelineLeft);
-//   const gazeCoordsRight = getGazeCoords(target, pupilRight, eyelineRight);
+  const irisRight = document.getElementById(`${agents[0]}-iris-right`);
+  const pupilRight = document.getElementById(`${agents[0]}-pupil-right`);
+  const eyelineRight = document.getElementById(`${agents[0]}-eyeline-right`);
 
-//   // pupil should be on intersection line / circle
-//   pupilLeft.setAttribute('cx', gazeCoordsLeft.x);
-//   pupilLeft.setAttribute('cy', gazeCoordsLeft.y);
-//   pupilRight.setAttribute('cx', gazeCoordsRight.x);
-//   pupilRight.setAttribute('cy', gazeCoordsRight.y);
-//   // iris too
-//   irisLeft.setAttribute('cx', gazeCoordsLeft.x);
-//   irisLeft.setAttribute('cy', gazeCoordsLeft.y);
-//   irisRight.setAttribute('cx', gazeCoordsRight.x);
-//   irisRight.setAttribute('cy', gazeCoordsRight.y);
-// }, 5000);
+  // calculate positions for both eyes
+  const gazeCoordsLeft = getGazeCoords(target, pupilLeft, eyelineLeft);
+  const gazeCoordsRight = getGazeCoords(target, pupilRight, eyelineRight);
+
+  console.log('OLD pupilLeftCX', pupilLeft.getAttribute('cx'));
+  console.log('NEW CALC pupilLeftNew', gazeCoordsLeft.x);
+
+  // animateEyes(pupilLeft, pupilRight, irisLeft, irisRight, gazeCoordsLeft, gazeCoordsRight);
+  animateCoord(pupilLeft, gazeCoordsLeft);
+  animateCoord(irisLeft, gazeCoordsLeft);
+  animateCoord(pupilRight, gazeCoordsRight);
+  animateCoord(irisRight, gazeCoordsRight);
+
+  // set target viewBox to the value where it just moved
+  // pupil should be on intersection line / circle
+  pupilLeft.setAttribute('cx', gazeCoordsLeft.x);
+  pupilLeft.setAttribute('cy', gazeCoordsLeft.y);
+  pupilRight.setAttribute('cx', gazeCoordsRight.x);
+  pupilRight.setAttribute('cy', gazeCoordsRight.y);
+  // iris too
+  irisLeft.setAttribute('cx', gazeCoordsLeft.x);
+  irisLeft.setAttribute('cy', gazeCoordsLeft.y);
+  irisRight.setAttribute('cx', gazeCoordsRight.x);
+  irisRight.setAttribute('cy', gazeCoordsRight.y);
+
+  // should be the same values now
+  console.log('NEW pupilLeftCX', gazeCoordsLeft.x);
+}, 3000);
