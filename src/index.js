@@ -1,7 +1,8 @@
 import getGazeCoords from './js/getGazeCoords';
 import randomNumber from './js/randomNumber';
 import shuffleArray from './js/shuffleArray';
-import sleep from './js/sleep';
+import animateViewBox from './js/animateViewBox';
+// import sleep from './js/sleep';
 
 // AGENT PUPIL SETTINGS
 // check screen size of user
@@ -9,12 +10,17 @@ const { clientWidth } = document.getElementById('outer-svg');
 const { clientHeight } = document.getElementById('outer-svg');
 console.log('client browser size', { clientWidth, clientHeight });
 // TODO find more elegant solution to tell user to view on fullscreen
-if (clientWidth < 600 || clientHeight < 200) alert('Please view on bigger screen!');
+// if (clientWidth < 600 || clientHeight < 200) alert('Please view on bigger screen!');
 
 // get viewBox size
-const viewBoxWidth = document.getElementById('outer-svg').getAttribute('viewBox').split(' ')[2];
-const viewBoxHeight = document.getElementById('outer-svg').getAttribute('viewBox').split(' ')[3];
-console.log('view box size', { viewBoxWidth, viewBoxHeight });
+const origViewBox = document.getElementById('outer-svg').getAttribute('viewBox');
+const origViewBoxX = parseFloat(origViewBox.split(' ')[0]);
+const origViewBoxY = parseFloat(origViewBox.split(' ')[1]);
+const origViewBoxWidth = parseFloat(origViewBox.split(' ')[2]);
+const origViewBoxHeight = parseFloat(origViewBox.split(' ')[3]);
+console.log('view box size', {
+  origViewBoxX, origViewBoxY, origViewBoxWidth, origViewBoxHeight,
+});
 
 // get target and agents
 // if you change animal agents, then change ID here:
@@ -36,22 +42,14 @@ eval(agents[2]).setAttribute('visibility', 'hidden');
 const grassMidY = document.getElementById('grass').getBBox().y + document.getElementById('grass').getBBox().height / 2 - target.getBBox().height / 2;
 
 // set balloon to very left in grass section
-// target.setAttribute('viewBox', `0 -${grassMidY} ${viewBoxWidth} ${viewBoxHeight}`);
-
-// console.log('target before transforming', target);
-// console.log('BBox width', target.getBBox().width);
-// console.log('BBox height', target.getBBox().height);
-// console.log('BBox x', target.getBBox().x);
-// console.log('BBox y', target.getBBox().y);
-// console.log('abs viewBox x', Math.abs(target.getAttribute('viewBox').split(' ')[0]));
-// console.log('abs viewBox y', Math.abs(target.getAttribute('viewBox').split(' ')[1]));
+// target.setAttribute('viewBox', `0 -${grassMidY} ${origViewBoxWidth} ${origViewBoxHeight}`);
 
 // get position on the very right of the screen
-const targetPositionRight = viewBoxWidth - target.getBBox().width;
-const targetPositionMid = viewBoxWidth / 2 - target.getBBox().width / 2;
+const targetPositionRight = origViewBoxWidth - target.getBBox().width;
+const targetPositionMid = origViewBoxWidth / 2 - target.getBBox().width / 2;
 
 // put it in middle
-target.setAttribute('viewBox', `-${targetPositionMid} -${grassMidY} ${viewBoxWidth} ${viewBoxHeight}`);
+target.setAttribute('viewBox', `-${targetPositionMid} -${grassMidY} ${origViewBoxWidth} ${origViewBoxHeight}`);
 
 // range of possible values to move the balloon: 0 - targetPositionRight
 // divide this range into ten
@@ -70,34 +68,37 @@ const section10 = { min: section9.max, max: targetPositionRight };
 const sectionArray = shuffleArray([section1, section2, section3, section4, section5, section6, section7, section8, section9, section10]);
 console.log('sectionArray', sectionArray);
 
+const newTargetViewBox = `-${randomNumber(sectionArray[0].min, sectionArray[0].max)} -${grassMidY} ${origViewBoxWidth} ${origViewBoxHeight}`;
+animateViewBox(target, origViewBox, newTargetViewBox);
+
 // set target to random place; use template literal to access values
 // WE NEED MINUS! SINCE WE MOVE THE COORDINATE SYSTEM TO THE LEFT / UP in order to let the balloon move right / down
 // sleep(5000);
 
-// move balloon after 5 seconds and change eye gaze
-setTimeout(() => {
-  target.setAttribute('viewBox', `-${randomNumber(sectionArray[0].min, sectionArray[0].max)} -${grassMidY} ${viewBoxWidth} ${viewBoxHeight}`);
-  // set eyes of the first agent, the one thats visible
-  const irisLeft = document.getElementById(`${agents[0]}-iris-left`);
-  const pupilLeft = document.getElementById(`${agents[0]}-pupil-left`);
-  const eyelineLeft = document.getElementById(`${agents[0]}-eyeline-left`);
+// // move balloon after 5 seconds and change eye gaze
+// setTimeout(() => {
+//   target.setAttribute('viewBox', `-${randomNumber(sectionArray[0].min, sectionArray[0].max)} -${grassMidY} ${origViewBoxWidth} ${origViewBoxHeight}`);
+//   // set eyes of the first agent, the one thats visible
+//   const irisLeft = document.getElementById(`${agents[0]}-iris-left`);
+//   const pupilLeft = document.getElementById(`${agents[0]}-pupil-left`);
+//   const eyelineLeft = document.getElementById(`${agents[0]}-eyeline-left`);
 
-  const irisRight = document.getElementById(`${agents[0]}-iris-right`);
-  const pupilRight = document.getElementById(`${agents[0]}-pupil-right`);
-  const eyelineRight = document.getElementById(`${agents[0]}-eyeline-right`);
+//   const irisRight = document.getElementById(`${agents[0]}-iris-right`);
+//   const pupilRight = document.getElementById(`${agents[0]}-pupil-right`);
+//   const eyelineRight = document.getElementById(`${agents[0]}-eyeline-right`);
 
-  // calculate positions for both eyes
-  const gazeCoordsLeft = getGazeCoords(target, pupilLeft, eyelineLeft);
-  const gazeCoordsRight = getGazeCoords(target, pupilRight, eyelineRight);
+//   // calculate positions for both eyes
+//   const gazeCoordsLeft = getGazeCoords(target, pupilLeft, eyelineLeft);
+//   const gazeCoordsRight = getGazeCoords(target, pupilRight, eyelineRight);
 
-  // pupil should be on intersection line / circle
-  pupilLeft.setAttribute('cx', gazeCoordsLeft.x);
-  pupilLeft.setAttribute('cy', gazeCoordsLeft.y);
-  pupilRight.setAttribute('cx', gazeCoordsRight.x);
-  pupilRight.setAttribute('cy', gazeCoordsRight.y);
-  // iris too
-  irisLeft.setAttribute('cx', gazeCoordsLeft.x);
-  irisLeft.setAttribute('cy', gazeCoordsLeft.y);
-  irisRight.setAttribute('cx', gazeCoordsRight.x);
-  irisRight.setAttribute('cy', gazeCoordsRight.y);
-}, 5000);
+//   // pupil should be on intersection line / circle
+//   pupilLeft.setAttribute('cx', gazeCoordsLeft.x);
+//   pupilLeft.setAttribute('cy', gazeCoordsLeft.y);
+//   pupilRight.setAttribute('cx', gazeCoordsRight.x);
+//   pupilRight.setAttribute('cy', gazeCoordsRight.y);
+//   // iris too
+//   irisLeft.setAttribute('cx', gazeCoordsLeft.x);
+//   irisLeft.setAttribute('cy', gazeCoordsLeft.y);
+//   irisRight.setAttribute('cx', gazeCoordsRight.x);
+//   irisRight.setAttribute('cy', gazeCoordsRight.y);
+// }, 5000);
