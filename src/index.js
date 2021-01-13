@@ -103,7 +103,6 @@ setTimeout(() => {
   console.log('OLD pupilLeftCX', pupilLeft.getAttribute('cx'));
   console.log('NEW CALC pupilLeftNew', gazeCoordsLeft.x);
 
-  // animateEyes(pupilLeft, pupilRight, irisLeft, irisRight, gazeCoordsLeft, gazeCoordsRight);
   animateCoord(pupilLeft, gazeCoordsLeft);
   animateCoord(irisLeft, gazeCoordsLeft);
   animateCoord(pupilRight, gazeCoordsRight);
