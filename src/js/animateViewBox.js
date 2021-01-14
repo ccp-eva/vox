@@ -15,8 +15,10 @@ export default (target, oldViewBox, newViewBox) => {
   let animProgress = 0;
   const animStep = 0.02; // Change in animProgress per interval function invocation.
 
-  const interval = setInterval(() => {
+  // recursive function for moving the viewBox
+  function moveViewBox() {
     animProgress += animStep;
+    // stop animation once the new viewBox values are reached
     if (animProgress > 1) { animProgress = 1; }
     // Calculate a new viewBox corresponding to our animation progress
     const nextViewBox = [
@@ -26,6 +28,9 @@ export default (target, oldViewBox, newViewBox) => {
       oldHeight + animProgress * (newHeight - oldHeight),
     ];
     target.setAttribute('viewBox', nextViewBox.join(' '));
-    if (animProgress >= 1) { clearInterval(interval); }
-  }, 10);
+    requestAnimationFrame(moveViewBox);
+  }
+
+  // call recursive function once to start process
+  requestAnimationFrame(moveViewBox);
 };
