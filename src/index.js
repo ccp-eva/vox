@@ -4,6 +4,7 @@ import shuffleArray from './js/shuffleArray';
 import animateViewBox from './js/animateViewBox';
 import animateCoord from './js/animateCoord';
 import showAgent from './js/showAgent';
+import sleep from './js/sleep';
 // import sleep from './js/sleep';
 
 // check screen size of user
@@ -64,52 +65,75 @@ console.log('sectionArray', sectionArray);
 
 // CAUTION: trialCount starts at zero, ie. first trial = 0
 // eslint-disable-next-line prefer-const
-let trialCount = 0;
+// let trialCount = 0;
 const trialNumber = 3;
 
-// show agent of the current trial only, hide the other ones
-showAgent(agents, trialCount);
+// TODO agent list genauso lang wie trialNumber?
+// TODO pick random so viele sections aus sectionArray wie trialNumbers
 
-// define where the target will move
-const newTargetViewBox = `-${randomNumber(sectionArray[trialCount].min, sectionArray[trialCount].max)} -${grassMidY} ${origViewBoxWidth} ${origViewBoxHeight}`;
+// for (let i = 0; i < trialNumber; i++) {
+//   console.log(i);
+// };
 
-// set target to random place; use template literal to access values
-// WE NEED MINUS! SINCE WE MOVE THE COORDINATE SYSTEM TO THE LEFT / UP in order to let the balloon move right / down
+// origEyes + targetMid: heißt, für drei trials hol dir jeweils neu
+// sleep(3000)
+// random newTargetViewBox
+// getGazeCoords
+// animateViewBox
+// animateCoord
+// sleep(3000) bzw. bis response
+// move on to next trial
 
-// move balloon after 5 seconds and change eye gaze
-setTimeout(() => {
-  // target.setAttribute('viewBox', `-${randomNumber(sectionArray[0].min, sectionArray[0].max)} -${grassMidY} ${origViewBoxWidth} ${origViewBoxHeight}`);
-  animateViewBox(target, midTargetViewBox, newTargetViewBox);
-  // set target viewBox to the value where it just moved
-  target.setAttribute('viewBox', newTargetViewBox);
+// for loop runs through, even with setTimeout function
+// therefore, use single scope for each iteration by immediately-invoked function expression (IIFE)
+for (let i = 0; i < trialNumber; i++) {
+  console.log('for', i, agents[i]);
 
-  // set eyes of the first agent, the one thats visible
-  const irisLeft = document.getElementById(`${agents[trialCount]}-iris-left`);
-  const pupilLeft = document.getElementById(`${agents[trialCount]}-pupil-left`);
-  const eyelineLeft = document.getElementById(`${agents[trialCount]}-eyeline-left`);
+  (function (trialCount) {
+    setTimeout(() => {
+      // show agent of the current trial only, hide the other ones
+      showAgent(agents, i);
+      // always start the target in the middle again
+      target.setAttribute('viewBox', `${midTargetViewBox}`);
 
-  const irisRight = document.getElementById(`${agents[trialCount]}-iris-right`);
-  const pupilRight = document.getElementById(`${agents[trialCount]}-pupil-right`);
-  const eyelineRight = document.getElementById(`${agents[trialCount]}-eyeline-right`);
+      // set eyes of the first agent, the one thats visible
+      const irisLeft = document.getElementById(`${agents[trialCount]}-iris-left`);
+      const pupilLeft = document.getElementById(`${agents[trialCount]}-pupil-left`);
+      const eyelineLeft = document.getElementById(`${agents[trialCount]}-eyeline-left`);
 
-  // calculate positions for both eyes
-  const gazeCoordsLeft = getGazeCoords(target, pupilLeft, eyelineLeft);
-  const gazeCoordsRight = getGazeCoords(target, pupilRight, eyelineRight);
+      const irisRight = document.getElementById(`${agents[trialCount]}-iris-right`);
+      const pupilRight = document.getElementById(`${agents[trialCount]}-pupil-right`);
+      const eyelineRight = document.getElementById(`${agents[trialCount]}-eyeline-right`);
 
-  animateCoord(pupilLeft, gazeCoordsLeft);
-  animateCoord(irisLeft, gazeCoordsLeft);
-  animateCoord(pupilRight, gazeCoordsRight);
-  animateCoord(irisRight, gazeCoordsRight);
+      // define where the target will move; use template literal to access values
+      // WE NEED MINUS! SINCE WE MOVE THE COORDINATE SYSTEM TO THE LEFT / UP in order to let the balloon move right / down
+      const newTargetViewBox = `-${randomNumber(sectionArray[trialCount].min, sectionArray[trialCount].max)} -${grassMidY} ${origViewBoxWidth} ${origViewBoxHeight}`;
 
-  // set target viewBox to the value where it just moved
-  // pupil should be on intersection line / circle
-  pupilLeft.setAttribute('cx', gazeCoordsLeft.x);
-  pupilLeft.setAttribute('cy', gazeCoordsLeft.y);
-  pupilRight.setAttribute('cx', gazeCoordsRight.x);
-  pupilRight.setAttribute('cy', gazeCoordsRight.y);
-  // iris too
-  irisLeft.setAttribute('cx', gazeCoordsLeft.x);
-  irisLeft.setAttribute('cy', gazeCoordsLeft.y);
-  irisRight.setAttribute('cx', gazeCoordsRight.x);
-  irisRight.setAttribute('cy', gazeCoordsRight.y);
-}, 3000);
+      // target.setAttribute('viewBox', `-${randomNumber(sectionArray[0].min, sectionArray[0].max)} -${grassMidY} ${origViewBoxWidth} ${origViewBoxHeight}`);
+      animateViewBox(target, midTargetViewBox, newTargetViewBox);
+      // set target viewBox to the value where it just moved
+      target.setAttribute('viewBox', newTargetViewBox);
+
+      // calculate positions for both eyes (AFTER target viewBox value has changed)
+      const gazeCoordsLeft = getGazeCoords(target, pupilLeft, eyelineLeft);
+      const gazeCoordsRight = getGazeCoords(target, pupilRight, eyelineRight);
+
+      animateCoord(pupilLeft, gazeCoordsLeft);
+      animateCoord(irisLeft, gazeCoordsLeft);
+      animateCoord(pupilRight, gazeCoordsRight);
+      animateCoord(irisRight, gazeCoordsRight);
+
+      // set target viewBox to the value where it just moved
+      // pupil should be on intersection line / circle
+      pupilLeft.setAttribute('cx', gazeCoordsLeft.x);
+      pupilLeft.setAttribute('cy', gazeCoordsLeft.y);
+      pupilRight.setAttribute('cx', gazeCoordsRight.x);
+      pupilRight.setAttribute('cy', gazeCoordsRight.y);
+      // iris too
+      irisLeft.setAttribute('cx', gazeCoordsLeft.x);
+      irisLeft.setAttribute('cy', gazeCoordsLeft.y);
+      irisRight.setAttribute('cx', gazeCoordsRight.x);
+      irisRight.setAttribute('cy', gazeCoordsRight.y);
+    }, i * 5000);
+  }(i));
+}
