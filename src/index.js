@@ -10,6 +10,7 @@ import animateCoord from './js/animateCoord';
 const { clientWidth } = document.getElementById('outer-svg');
 const { clientHeight } = document.getElementById('outer-svg');
 console.log('client browser size', { clientWidth, clientHeight });
+// TODO document.body.clientHeight
 // TODO find more elegant solution to tell user to view on fullscreen
 // if (clientWidth < 600 || clientHeight < 200) alert('Please view on bigger screen!');
 
