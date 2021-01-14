@@ -34,10 +34,18 @@ const sheep = document.getElementById('sheep');
 const agents = shuffleArray(['pig', 'monkey', 'sheep']);
 console.log('agents', agents);
 
-// change which one is visible (right now, only first agent)
-eval(agents[0]).setAttribute('visibility', 'visible');
-eval(agents[1]).setAttribute('visibility', 'hidden');
-eval(agents[2]).setAttribute('visibility', 'hidden');
+// eslint-disable-next-line prefer-const
+// CAUTION: trialCount starts at zero, ie. first trial = 0
+const trialCount = 2;
+
+// show only the agent whose turn it is
+for (let i = 0; i < agents.length; i++) {
+  if (trialCount === i) {
+    eval(agents[i]).setAttribute('visibility', 'visible');
+  } else {
+    eval(agents[i]).setAttribute('visibility', 'hidden');
+  }
+}
 
 // get middle Y of the grass background
 // take y coordinate of grass + half of the height. Then, subtract half of the balloon height.
@@ -89,13 +97,13 @@ setTimeout(() => {
   console.log('newTargetViewBox', target.getAttribute('viewBox'));
 
   // set eyes of the first agent, the one thats visible
-  const irisLeft = document.getElementById(`${agents[0]}-iris-left`);
-  const pupilLeft = document.getElementById(`${agents[0]}-pupil-left`);
-  const eyelineLeft = document.getElementById(`${agents[0]}-eyeline-left`);
+  const irisLeft = document.getElementById(`${agents[trialCount]}-iris-left`);
+  const pupilLeft = document.getElementById(`${agents[trialCount]}-pupil-left`);
+  const eyelineLeft = document.getElementById(`${agents[trialCount]}-eyeline-left`);
 
-  const irisRight = document.getElementById(`${agents[0]}-iris-right`);
-  const pupilRight = document.getElementById(`${agents[0]}-pupil-right`);
-  const eyelineRight = document.getElementById(`${agents[0]}-eyeline-right`);
+  const irisRight = document.getElementById(`${agents[trialCount]}-iris-right`);
+  const pupilRight = document.getElementById(`${agents[trialCount]}-pupil-right`);
+  const eyelineRight = document.getElementById(`${agents[trialCount]}-eyeline-right`);
 
   // calculate positions for both eyes
   const gazeCoordsLeft = getGazeCoords(target, pupilLeft, eyelineLeft);
