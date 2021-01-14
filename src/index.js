@@ -3,18 +3,17 @@ import randomNumber from './js/randomNumber';
 import shuffleArray from './js/shuffleArray';
 import animateViewBox from './js/animateViewBox';
 import animateCoord from './js/animateCoord';
+import showAgent from './js/showAgent';
 // import sleep from './js/sleep';
 
-// AGENT PUPIL SETTINGS
 // check screen size of user
-const { clientWidth } = document.getElementById('outer-svg');
-const { clientHeight } = document.getElementById('outer-svg');
+const { clientWidth } = document.body;
+const { clientHeight } = document.body;
 console.log('client browser size', { clientWidth, clientHeight });
-// TODO document.body.clientHeight
 // TODO find more elegant solution to tell user to view on fullscreen
 // if (clientWidth < 600 || clientHeight < 200) alert('Please view on bigger screen!');
 
-// get viewBox size
+// get viewBox size from whole SVG
 const origViewBox = document.getElementById('outer-svg').getAttribute('viewBox');
 const origViewBoxX = parseFloat(origViewBox.split(' ')[0]);
 const origViewBoxY = parseFloat(origViewBox.split(' ')[1]);
@@ -25,45 +24,28 @@ console.log('view box size', {
 });
 
 // get target and agents
-// if you change animal agents, then change ID here:
+// if you change animal agents, then change ID here...
 const target = document.getElementById('target');
 const pig = document.getElementById('pig');
 const monkey = document.getElementById('monkey');
 const sheep = document.getElementById('sheep');
-// and add agent to this list
+// ...and add agent to this list
 const agents = shuffleArray(['pig', 'monkey', 'sheep']);
 console.log('agents', agents);
-
-// eslint-disable-next-line prefer-const
-// CAUTION: trialCount starts at zero, ie. first trial = 0
-const trialCount = 2;
-
-// show only the agent whose turn it is
-for (let i = 0; i < agents.length; i++) {
-  if (trialCount === i) {
-    eval(agents[i]).setAttribute('visibility', 'visible');
-  } else {
-    eval(agents[i]).setAttribute('visibility', 'hidden');
-  }
-}
 
 // get middle Y of the grass background
 // take y coordinate of grass + half of the height. Then, subtract half of the balloon height.
 const grassMidY = document.getElementById('grass').getBBox().y + document.getElementById('grass').getBBox().height / 2 - target.getBBox().height / 2;
 
-// set balloon to very left in grass section
-// target.setAttribute('viewBox', `0 -${grassMidY} ${origViewBoxWidth} ${origViewBoxHeight}`);
-
 // get position on the very right of the screen
 const targetPositionRight = origViewBoxWidth - target.getBBox().width;
 const targetPositionMid = origViewBoxWidth / 2 - target.getBBox().width / 2;
 
-// put it in middle (target needs to be last in the SVG => on top level/foreground)
+// put target in middle (target needs to be last in the SVG => on top level/foreground)
 const midTargetViewBox = `-${targetPositionMid} -${origViewBoxHeight / 2.35} ${origViewBoxWidth} ${origViewBoxHeight}`;
 target.setAttribute('viewBox', `${midTargetViewBox}`);
-console.log('midTargetViewBox', midTargetViewBox);
 
-// range of possible values to move the balloon: 0 - targetPositionRight
+// range of possible values to move the target: 0 - targetPositionRight
 // divide this range into ten
 // for each of these ten categories, pick a random number
 const section1 = { min: 0, max: targetPositionRight / 10 };
@@ -80,11 +62,19 @@ const section10 = { min: section9.max, max: targetPositionRight };
 const sectionArray = shuffleArray([section1, section2, section3, section4, section5, section6, section7, section8, section9, section10]);
 console.log('sectionArray', sectionArray);
 
-const newTargetViewBox = `-${randomNumber(sectionArray[0].min, sectionArray[0].max)} -${grassMidY} ${origViewBoxWidth} ${origViewBoxHeight}`;
+// CAUTION: trialCount starts at zero, ie. first trial = 0
+// eslint-disable-next-line prefer-const
+let trialCount = 0;
+const trialNumber = 3;
+
+// show agent of the current trial only, hide the other ones
+showAgent(agents, trialCount);
+
+// define where the target will move
+const newTargetViewBox = `-${randomNumber(sectionArray[trialCount].min, sectionArray[trialCount].max)} -${grassMidY} ${origViewBoxWidth} ${origViewBoxHeight}`;
 
 // set target to random place; use template literal to access values
 // WE NEED MINUS! SINCE WE MOVE THE COORDINATE SYSTEM TO THE LEFT / UP in order to let the balloon move right / down
-// sleep(5000);
 
 // move balloon after 5 seconds and change eye gaze
 setTimeout(() => {
@@ -92,9 +82,6 @@ setTimeout(() => {
   animateViewBox(target, midTargetViewBox, newTargetViewBox);
   // set target viewBox to the value where it just moved
   target.setAttribute('viewBox', newTargetViewBox);
-  // should be the same values now
-  console.log('newTargetViewBox', newTargetViewBox);
-  console.log('newTargetViewBox', target.getAttribute('viewBox'));
 
   // set eyes of the first agent, the one thats visible
   const irisLeft = document.getElementById(`${agents[trialCount]}-iris-left`);
@@ -108,9 +95,6 @@ setTimeout(() => {
   // calculate positions for both eyes
   const gazeCoordsLeft = getGazeCoords(target, pupilLeft, eyelineLeft);
   const gazeCoordsRight = getGazeCoords(target, pupilRight, eyelineRight);
-
-  console.log('OLD pupilLeftCX', pupilLeft.getAttribute('cx'));
-  console.log('NEW CALC pupilLeftNew', gazeCoordsLeft.x);
 
   animateCoord(pupilLeft, gazeCoordsLeft);
   animateCoord(irisLeft, gazeCoordsLeft);
@@ -128,7 +112,4 @@ setTimeout(() => {
   irisLeft.setAttribute('cy', gazeCoordsLeft.y);
   irisRight.setAttribute('cx', gazeCoordsRight.x);
   irisRight.setAttribute('cy', gazeCoordsRight.y);
-
-  // should be the same values now
-  console.log('NEW pupilLeftCX', gazeCoordsLeft.x);
 }, 3000);
