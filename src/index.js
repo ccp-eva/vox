@@ -138,61 +138,154 @@ const trialNumber = 3;
 //   }(i));
 // }
 
+// function pause(ms) {
+//   return new Promise((resolve) => setTimeout(resolve, ms));
+// }
+
+// showAgent(agents, 0);
+
+// async function testrun() {
+//   for (let trialCount = 0; trialCount < trialNumber; trialCount++) {
+//     setTimeout(() => {
+//       // show agent of the current trial only, hide the other ones
+//       showAgent(agents, trialCount);
+//       // always start the target in the middle again
+//       target.setAttribute('viewBox', `${midTargetViewBox}`);
+
+//       // set eyes of the first agent, the one thats visible
+//       const irisLeft = document.getElementById(`${agents[trialCount]}-iris-left`);
+//       const pupilLeft = document.getElementById(`${agents[trialCount]}-pupil-left`);
+//       const eyelineLeft = document.getElementById(`${agents[trialCount]}-eyeline-left`);
+
+//       const irisRight = document.getElementById(`${agents[trialCount]}-iris-right`);
+//       const pupilRight = document.getElementById(`${agents[trialCount]}-pupil-right`);
+//       const eyelineRight = document.getElementById(`${agents[trialCount]}-eyeline-right`);
+
+//       // define where the target will move; use template literal to access values
+//       // WE NEED MINUS! SINCE WE MOVE THE COORDINATE SYSTEM TO THE LEFT / UP in order to let the balloon move right / down
+//       const newTargetViewBox = `-${randomNumber(sectionArray[trialCount].min, sectionArray[trialCount].max)} -${grassMidY} ${origViewBoxWidth} ${origViewBoxHeight}`;
+
+//       // target.setAttribute('viewBox', `-${randomNumber(sectionArray[0].min, sectionArray[0].max)} -${grassMidY} ${origViewBoxWidth} ${origViewBoxHeight}`);
+//       animateViewBox(target, midTargetViewBox, newTargetViewBox);
+//       // set target viewBox to the value where it just moved
+//       target.setAttribute('viewBox', newTargetViewBox);
+
+//       // calculate positions for both eyes (AFTER target viewBox value has changed)
+//       const gazeCoordsLeft = getGazeCoords(target, pupilLeft, eyelineLeft);
+//       const gazeCoordsRight = getGazeCoords(target, pupilRight, eyelineRight);
+
+//       animateCoord(pupilLeft, gazeCoordsLeft);
+//       animateCoord(irisLeft, gazeCoordsLeft);
+//       animateCoord(pupilRight, gazeCoordsRight);
+//       animateCoord(irisRight, gazeCoordsRight);
+
+//       // set target viewBox to the value where it just moved
+//       // pupil should be on intersection line / circle
+//       pupilLeft.setAttribute('cx', gazeCoordsLeft.x);
+//       pupilLeft.setAttribute('cy', gazeCoordsLeft.y);
+//       pupilRight.setAttribute('cx', gazeCoordsRight.x);
+//       pupilRight.setAttribute('cy', gazeCoordsRight.y);
+//       // iris too
+//       irisLeft.setAttribute('cx', gazeCoordsLeft.x);
+//       irisLeft.setAttribute('cy', gazeCoordsLeft.y);
+//       irisRight.setAttribute('cx', gazeCoordsRight.x);
+//       irisRight.setAttribute('cy', gazeCoordsRight.y);
+//     }, 2000);
+//     await pause(2000);
+//   }
+// }
+
+// testrun();
+
 function pause(ms) {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
-showAgent(agents, 0);
-
-async function testrun() {
-  for (let trialCount = 0; trialCount < trialNumber; trialCount++) {
-    setTimeout(() => {
-      // show agent of the current trial only, hide the other ones
-      showAgent(agents, trialCount);
-      // always start the target in the middle again
-      target.setAttribute('viewBox', `${midTargetViewBox}`);
-
-      // set eyes of the first agent, the one thats visible
-      const irisLeft = document.getElementById(`${agents[trialCount]}-iris-left`);
-      const pupilLeft = document.getElementById(`${agents[trialCount]}-pupil-left`);
-      const eyelineLeft = document.getElementById(`${agents[trialCount]}-eyeline-left`);
-
-      const irisRight = document.getElementById(`${agents[trialCount]}-iris-right`);
-      const pupilRight = document.getElementById(`${agents[trialCount]}-pupil-right`);
-      const eyelineRight = document.getElementById(`${agents[trialCount]}-eyeline-right`);
-
-      // define where the target will move; use template literal to access values
-      // WE NEED MINUS! SINCE WE MOVE THE COORDINATE SYSTEM TO THE LEFT / UP in order to let the balloon move right / down
-      const newTargetViewBox = `-${randomNumber(sectionArray[trialCount].min, sectionArray[trialCount].max)} -${grassMidY} ${origViewBoxWidth} ${origViewBoxHeight}`;
-
-      // target.setAttribute('viewBox', `-${randomNumber(sectionArray[0].min, sectionArray[0].max)} -${grassMidY} ${origViewBoxWidth} ${origViewBoxHeight}`);
-      animateViewBox(target, midTargetViewBox, newTargetViewBox);
-      // set target viewBox to the value where it just moved
-      target.setAttribute('viewBox', newTargetViewBox);
-
-      // calculate positions for both eyes (AFTER target viewBox value has changed)
-      const gazeCoordsLeft = getGazeCoords(target, pupilLeft, eyelineLeft);
-      const gazeCoordsRight = getGazeCoords(target, pupilRight, eyelineRight);
-
-      animateCoord(pupilLeft, gazeCoordsLeft);
-      animateCoord(irisLeft, gazeCoordsLeft);
-      animateCoord(pupilRight, gazeCoordsRight);
-      animateCoord(irisRight, gazeCoordsRight);
-
-      // set target viewBox to the value where it just moved
-      // pupil should be on intersection line / circle
-      pupilLeft.setAttribute('cx', gazeCoordsLeft.x);
-      pupilLeft.setAttribute('cy', gazeCoordsLeft.y);
-      pupilRight.setAttribute('cx', gazeCoordsRight.x);
-      pupilRight.setAttribute('cy', gazeCoordsRight.y);
-      // iris too
-      irisLeft.setAttribute('cx', gazeCoordsLeft.x);
-      irisLeft.setAttribute('cy', gazeCoordsLeft.y);
-      irisRight.setAttribute('cx', gazeCoordsRight.x);
-      irisRight.setAttribute('cy', gazeCoordsRight.y);
-    }, 2000);
-    await pause(2000);
-  }
+function startTrial(agents, trialCount) {
+  return new Promise((resolve) => {
+    // show agent of the current trial only, hide the other ones
+    showAgent(agents, trialCount);
+    // always start the target in the middle again
+    target.setAttribute('viewBox', midTargetViewBox);
+    console.log('in startTrial: ', midTargetViewBox);
+    resolve('end of startTrial');
+  });
 }
 
-testrun();
+// TODO might need to add target as function argument
+function changeGaze(agents, trialCount) {
+  return new Promise((resolve) => {
+    console.log('in changeGaze1: ', target.getAttribute('viewBox'));
+    target.setAttribute('viewBox', midTargetViewBox);
+    console.log('in changeGaze2: ', target.getAttribute('viewBox'));
+
+    // get IDs of eye
+    const irisLeft = document.getElementById(`${agents[trialCount]}-iris-left`);
+    const pupilLeft = document.getElementById(`${agents[trialCount]}-pupil-left`);
+    const eyelineLeft = document.getElementById(`${agents[trialCount]}-eyeline-left`);
+    const irisRight = document.getElementById(`${agents[trialCount]}-iris-right`);
+    const pupilRight = document.getElementById(`${agents[trialCount]}-pupil-right`);
+    const eyelineRight = document.getElementById(`${agents[trialCount]}-eyeline-right`);
+
+    // define where the target will move; use template literal to access values
+    // WE NEED MINUS! SINCE WE MOVE THE COORDINATE SYSTEM TO THE LEFT / UP in order to let the balloon move right / down
+    // eslint-disable-next-line max-len
+    const newTargetViewBox = `-${randomNumber(sectionArray[trialCount].min, sectionArray[trialCount].max)} -${grassMidY} ${origViewBoxWidth} ${origViewBoxHeight}`;
+
+    // eslint-disable-next-line max-len
+    // target.setAttribute('viewBox', `-${randomNumber(sectionArray[0].min, sectionArray[0].max)} -${grassMidY} ${origViewBoxWidth} ${origViewBoxHeight}`);
+    console.log('changeGaze before animate: ', target.getAttribute('viewBox'));
+    animateViewBox(target, midTargetViewBox, newTargetViewBox);
+    console.log('changeGaze after animate: ', target.getAttribute('viewBox'));
+
+    // set target viewBox to the value where it just moved
+    target.setAttribute('viewBox', newTargetViewBox);
+    console.log('changeGaze after setting to new: ', target.getAttribute('viewBox'));
+
+    // calculate positions for both eyes (AFTER target viewBox value has changed)
+    const gazeCoordsLeft = getGazeCoords(target, pupilLeft, eyelineLeft);
+    const gazeCoordsRight = getGazeCoords(target, pupilRight, eyelineRight);
+
+    animateCoord(pupilLeft, gazeCoordsLeft);
+    animateCoord(irisLeft, gazeCoordsLeft);
+    animateCoord(pupilRight, gazeCoordsRight);
+    animateCoord(irisRight, gazeCoordsRight);
+
+    // set target viewBox to the value where it just moved
+    // should be on intersection line / circle
+    pupilLeft.setAttribute('cx', gazeCoordsLeft.x);
+    pupilLeft.setAttribute('cy', gazeCoordsLeft.y);
+    pupilRight.setAttribute('cx', gazeCoordsRight.x);
+    pupilRight.setAttribute('cy', gazeCoordsRight.y);
+    irisLeft.setAttribute('cx', gazeCoordsLeft.x);
+    irisLeft.setAttribute('cy', gazeCoordsLeft.y);
+    irisRight.setAttribute('cx', gazeCoordsRight.x);
+    irisRight.setAttribute('cy', gazeCoordsRight.y);
+
+    resolve('end of changeGaze');
+  });
+}
+// origEyes + targetMid: heißt, für drei trials hol dir jeweils neu
+// sleep(3000)
+// random newTargetViewBox
+// getGazeCoords
+// animateViewBox
+// animateCoord
+// sleep(3000) bzw. bis response
+// move on to next trial
+async function runAllTrials(agents) {
+  for (let trialCount = 0; trialCount < trialNumber; trialCount++) {
+    await startTrial(agents, trialCount);
+    console.log('after await startTrial: ', target.getAttribute('viewBox'));
+
+    // TODO hier geht's schief.
+    // im zweiten durchgang ist hier dann nicht mehr mid sondern new targetviewbox
+    await pause(2000);
+    console.log('after await pause 1: ', target.getAttribute('viewBox'));
+    await changeGaze(agents, trialCount);
+    console.log('after await changeGaze: ', target.getAttribute('viewBox'));
+    await pause(2000);
+    console.log('after await pause 2: ', target.getAttribute('viewBox'));
+  }
+}
+runAllTrials(agents);
