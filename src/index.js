@@ -41,11 +41,8 @@ const targets = shuffleArray([ballonBlue, ballonRed, ballonYellow, ballonGreen])
 console.log('targets', targets);
 
 const hedge = document.getElementById('hedge');
+const trialType = ['fam', 'test', 'test'];
 // TODO create variable for trial type
-// then do sth like this:
-// if (trialType === 'fam') {
-//   hedge.setAttribute('visibility', 'hidden');
-// }
 
 // get middle Y of the hedge background
 // take y coordinate of hedge + half of the height. Then, subtract half of the balloon height.
@@ -95,6 +92,15 @@ function startTrial(agents, trialCount) {
     // show agent and target of the current trial only, hide the other ones
     showElement(agents, trialCount);
     showElement(targets, trialCount);
+
+    // TODO function needed for this? or okay here?
+    // depending on trial type, show or hide hedge
+    if (trialType[trialCount] === 'fam') {
+      hedge.setAttribute('visibility', 'hidden');
+    } else {
+      hedge.setAttribute('visibility', 'visible');
+    }
+
     // always start the target in the middle again
     targets[trialCount].setAttribute('viewBox', `${midTargetViewBox}`);
     resolve('end of startTrial');
