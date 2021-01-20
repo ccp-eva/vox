@@ -4,8 +4,7 @@ import shuffleArray from './js/shuffleArray';
 import animateViewBox from './js/animateViewBox';
 import animateCoord from './js/animateCoord';
 import showElement from './js/showElement';
-import sleep from './js/sleep';
-// import sleep from './js/sleep';
+import divideWithRemainder from './js/divideWithRemainder';
 
 // check screen size of user
 const { clientWidth } = document.body;
@@ -29,33 +28,93 @@ console.log('viewbox size', {
 const pig = document.getElementById('pig');
 const monkey = document.getElementById('monkey');
 const sheep = document.getElementById('sheep');
-const agents = shuffleArray([pig, monkey, sheep]);
-console.log('agents', agents);
-
-const ballonBlue = document.getElementById('balloon-blue');
-const ballonRed = document.getElementById('balloon-red');
-const ballonYellow = document.getElementById('balloon-yellow');
-const ballonGreen = document.getElementById('balloon-green');
 // NOTE: we believe that all target objects are the same size here!!
-const targets = shuffleArray([ballonBlue, ballonRed, ballonYellow, ballonGreen]);
+const balloonBlue = document.getElementById('balloon-blue');
+const balloonRed = document.getElementById('balloon-red');
+const balloonYellow = document.getElementById('balloon-yellow');
+const balloonGreen = document.getElementById('balloon-green');
+// let targets = shuffleArray([balloonBlue, balloonRed, balloonYellow, balloonGreen]);
+// get position on the very right (as constraint) and mid of the screen
+const targetPositionRight = origViewBoxWidth - balloonBlue.getBBox().width;
+const targetPositionMid = origViewBoxWidth / 2 - balloonBlue.getBBox().width / 2;
+const midTargetViewBox = `-${targetPositionMid} -${origViewBoxHeight / 2.8} ${origViewBoxWidth} ${origViewBoxHeight}`;
+
+// get hedge and middle Y of it
+const hedge = document.getElementById('hedge');
+// take y coordinate of hedge + half of the height. Then, subtract half of the balloon height.
+const hedgeMidY = hedge.getBBox().y + hedge.getBBox().height / 2 - balloonBlue.getBBox().height / 2;
+
+// trialType saves whether we want to display hedge (test) or not (fam)
+// first new Array() number specifies how many fam trials, second how many test trials
+// instead of trialNumber: trialType.length specifies our number of trials!
+const trialType = [].concat(new Array(1).fill('fam'), new Array(3).fill('test'));
+
+// create trials
+// variable that saves how many animal agents we have
+const agentsNr = 3;
+
+// calculate how many times each agent should be repeated, based on trialNumber
+const agentsDiv = divideWithRemainder(trialType.length, agentsNr);
+
+// repeat each agent as often as just calculated. then shuffle the array for randomization.
+let agentsChar = shuffleArray([].concat(new Array(agentsDiv.quotient).fill('pig'), new Array(agentsDiv.quotient).fill('sheep'), new Array(agentsDiv.quotient).fill('monkey')));
+
+// if our trialNumber is not divisable by number of agents, put random agents for remainder number
+if (agentsDiv.remainder > 0) {
+  // create random array with agents
+  const agentsTmp = shuffleArray(['pig', 'sheep', 'monkey']);
+  // keep only as many entries in array as we need (remove rest)
+  for (let i = 0; i < (agentsNr - agentsDiv.remainder); i++) {
+    agentsTmp.splice(i, 1);
+  }
+  agentsChar = agentsChar.concat(agentsTmp);
+}
+
+// save the SVG objects by ids in agents array
+let agents = [];
+for (let i = 0; i < agentsChar.length; i++) {
+  agents = agents.concat(eval(agentsChar[i]));
+}
+
+// SAME FOR TARGET
+// variable that saves how many animal agents we have
+const targetsNr = 4;
+
+// calculate how many times each agent should be repeated, based on trialNumber
+const targetsDiv = divideWithRemainder(trialType.length, targetsNr);
+
+// repeat each agent as often as just calculated. then shuffle the array for randomization.
+let targetsChar = shuffleArray([].concat(new Array(targetsDiv.quotient).fill('balloonRed'), new Array(targetsDiv.quotient).fill('balloonBlue'), new Array(targetsDiv.quotient).fill('balloonYellow'), new Array(targetsDiv.quotient).fill('balloonGreen')));
+
+// if our trialNumber is not divisable by number of agents, put random agents for remainder number
+if (targetsDiv.remainder > 0) {
+  // create random array with agents
+  const targetsTmp = shuffleArray(['balloonRed', 'balloonBlue', 'balloonYellow', 'balloonGreen']);
+  // keep only as many entries in array as we need (remove rest)
+  for (let i = 0; i < (targetsNr - targetsDiv.remainder); i++) {
+    targetsTmp.splice(i, 1);
+  }
+  targetsChar = targetsChar.concat(targetsTmp);
+}
+
+let targets = [];
+// save the SVG objects by ids in agents array
+for (let i = 0; i < targetsChar.length; i++) {
+  targets = targets.concat(eval(targetsChar[i]));
+}
 console.log('targets', targets);
 
-const hedge = document.getElementById('hedge');
-const trialType = ['fam', 'test', 'test'];
-// TODO create variable for trial type
+// TODO check whether all starts at 0 or 1?
+// problem with the agents that appear twice. because we set them invisible and visible? in startTrial!
+// we need to save original eye location and set them back there!!
+// TODO hide all balloons and agents in the beginning, then only show relevants.
+// otherwise problem for 4 balloons but only 3 trials
+console.log('agents', agents);
 
-// get middle Y of the hedge background
-// take y coordinate of hedge + half of the height. Then, subtract half of the balloon height.
-const hedgeMidY = hedge.getBBox().y + hedge.getBBox().height / 2 - targets[0].getBBox().height / 2;
+// eslint-disable-next-line prefer-template
+// console.log(JSON.parse('[' + agents.join() + ']'));
 
-// get position on the very right of the screen
-const targetPositionRight = origViewBoxWidth - targets[0].getBBox().width;
-const targetPositionMid = origViewBoxWidth / 2 - targets[0].getBBox().width / 2;
-
-// put target in middle (target needs to be last in the SVG => on top level/foreground)
-const midTargetViewBox = `-${targetPositionMid} -${origViewBoxHeight / 2.8} ${origViewBoxWidth} ${origViewBoxHeight}`;
-targets[0].setAttribute('viewBox', `${midTargetViewBox}`);
-
+// TODO function for this?
 // range of possible values to move the target: 0 - targetPositionRight
 // divide this range into ten
 // for each of these ten categories, pick a random number
@@ -72,11 +131,6 @@ const section10 = { min: section9.max, max: targetPositionRight };
 
 const sectionArray = shuffleArray([section1, section2, section3, section4, section5, section6, section7, section8, section9, section10]);
 console.log('sectionArray', sectionArray);
-
-// CAUTION: trialCount starts at zero, ie. first trial = 0
-// eslint-disable-next-line prefer-const
-// let trialCount = 0;
-const trialNumber = 3;
 
 // TODO agent list genauso lang wie trialNumber?
 // TODO pick random so viele sections aus sectionArray wie trialNumbers
@@ -97,7 +151,7 @@ function startTrial(agents, trialCount) {
     // depending on trial type, show or hide hedge
     if (trialType[trialCount] === 'fam') {
       hedge.setAttribute('visibility', 'hidden');
-    } else {
+    } else if (trialType[trialCount] === 'test') {
       hedge.setAttribute('visibility', 'visible');
     }
 
@@ -157,7 +211,8 @@ function changeGaze(agents, trialCount) {
 
 // order of events with breaks inbetween
 async function runAllTrials(agents) {
-  for (let trialCount = 0; trialCount < trialNumber; trialCount++) {
+  // CAUTION: trialCount start at zero, ie. first trial = 0 (because we need first element in array, that's at position 0)
+  for (let trialCount = 0; trialCount < trialType.length; trialCount++) {
     await startTrial(agents, trialCount);
     await pause(2000);
     await changeGaze(agents, trialCount);
