@@ -34,9 +34,14 @@ console.log('viewbox size', {
 const pig = document.getElementById('pig');
 const monkey = document.getElementById('monkey');
 const sheep = document.getElementById('sheep');
-const agentsNames = ['pig', 'monkey', 'sheep'];
+
+// hide all in beginning
+[pig, monkey, sheep].forEach((agent) => {
+  agent.setAttribute('visibility', 'hidden');
+});
 
 // save the original position of the eyes of agents
+const agentsNames = ['pig', 'monkey', 'sheep'];
 const eyeCenters = [];
 for (let i = 0; i < agentsNames.length; i++) {
   eyeCenters[`${agentsNames[i]}`] = {
@@ -52,6 +57,11 @@ const balloonRed = document.getElementById('balloon-red');
 const balloonYellow = document.getElementById('balloon-yellow');
 const balloonGreen = document.getElementById('balloon-green');
 
+// hide all in beginning
+[balloonBlue, balloonRed, balloonYellow, balloonGreen].forEach((target) => {
+  target.setAttribute('visibility', 'hidden');
+});
+
 // get position on the very right (as constraint) and mid of the screen
 const targetPositionRight = origViewBoxWidth - balloonBlue.getBBox().width;
 const targetPositionMid = origViewBoxWidth / 2 - balloonBlue.getBBox().width / 2;
@@ -64,10 +74,6 @@ const hedgeMidY = hedge.getBBox().y + hedge.getBBox().height / 2 - balloonBlue.g
 
 // ---------------------------------------------------------------------------------------------------------------------
 // TRIAL NUMBER & RANDOMIZATION
-//
-// TODO if trials < 4 then some balloons are still visible in the corner
-// TODO agent list genauso lang wie trialNumber?
-// TODO pick random so viele sections aus sectionArray wie trialNumbers
 // ---------------------------------------------------------------------------------------------------------------------
 // trialType saves whether we want to display hedge (test) or not (fam)
 // first new Array() number specifies how many fam trials, second how many test trials
@@ -96,6 +102,7 @@ let agents = [];
 for (let i = 0; i < agentsChar.length; i++) {
   agents = agents.concat(eval(agentsChar[i]));
 }
+console.log('agents', agents);
 
 // SAME FOR TARGET
 const targetsNr = 4;
@@ -116,15 +123,11 @@ for (let i = 0; i < targetsChar.length; i++) {
 }
 console.log('targets', targets);
 
-// we need to save original eye location and set them back there!!
-// TODO hide all balloons and agents in the beginning, then only show relevants.
-// otherwise problem for 4 balloons but only 3 trials
-console.log('agents', agents);
-
 // ---------------------------------------------------------------------------------------------------------------------
 // CALCULATE POSITIONS OF TARGET
 
 // TODO function for this?
+// TODO pick random so viele sections aus sectionArray wie trialNumbers
 // ---------------------------------------------------------------------------------------------------------------------
 // range of possible values to move the target: 0 - targetPositionRight. divide this range into ten
 // for each of these ten categories, pick a random number for each trial
@@ -152,13 +155,12 @@ function pause(ms) {
 // ---------------------------------------------------------------------------------------------------------------------
 // FUNCTION FOR BEGINNING NEW TRIAL (back to starting point)
 //
-// TODO function needed for showing/hiding hede? or okay here?
+// TODO function needed for showing/hiding hedge? or okay here?
+// TODO set pupils to center again!!!
 // ---------------------------------------------------------------------------------------------------------------------
 function startTrial(agents, trialCount) {
   return new Promise((resolve) => {
     const currentAgent = `${agents[trialCount].getAttribute('id')}`;
-    console.log('currentAgent', currentAgent);
-    console.log(`eyeCenters.${currentAgent}.right.x`, eval(`eyeCenters.${currentAgent}.right.x`));
 
     const pupilLeft = document.getElementById(`${currentAgent}-pupil-left`);
     const pupilRight = document.getElementById(`${currentAgent}-pupil-right`);
@@ -227,14 +229,15 @@ function changeGaze(agents, trialCount) {
     animateCoord(irisLeft, gazeCoordsLeft);
     animateCoord(pupilRight, gazeCoordsRight);
     animateCoord(irisRight, gazeCoordsRight);
-    pupilLeft.setAttribute('cx', gazeCoordsLeft.x);
-    pupilLeft.setAttribute('cy', gazeCoordsLeft.y);
-    pupilRight.setAttribute('cx', gazeCoordsRight.x);
-    pupilRight.setAttribute('cy', gazeCoordsRight.y);
-    irisLeft.setAttribute('cx', gazeCoordsLeft.x);
-    irisLeft.setAttribute('cy', gazeCoordsLeft.y);
-    irisRight.setAttribute('cx', gazeCoordsRight.x);
-    irisRight.setAttribute('cy', gazeCoordsRight.y);
+    // TODO not really necessary? BUT WE DO NEED IT FOR TARGET!
+    // pupilLeft.setAttribute('cx', gazeCoordsLeft.x);
+    // pupilLeft.setAttribute('cy', gazeCoordsLeft.y);
+    // pupilRight.setAttribute('cx', gazeCoordsRight.x);
+    // pupilRight.setAttribute('cy', gazeCoordsRight.y);
+    // irisLeft.setAttribute('cx', gazeCoordsLeft.x);
+    // irisLeft.setAttribute('cy', gazeCoordsLeft.y);
+    // irisRight.setAttribute('cx', gazeCoordsRight.x);
+    // irisRight.setAttribute('cy', gazeCoordsRight.y);
 
     resolve('end of changeGaze');
   });
