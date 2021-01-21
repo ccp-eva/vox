@@ -5,6 +5,7 @@ import animateViewBox from './js/animateViewBox';
 import animateCoord from './js/animateCoord';
 import showElement from './js/showElement';
 import divideWithRemainder from './js/divideWithRemainder';
+import getEyeCenter from './js/getEyeCenter';
 
 // check screen size of user
 const { clientWidth } = document.body;
@@ -28,6 +29,25 @@ console.log('viewbox size', {
 const pig = document.getElementById('pig');
 const monkey = document.getElementById('monkey');
 const sheep = document.getElementById('sheep');
+
+const agentNames = ['pig', 'monkey', 'sheep'];
+// save the original position of the eyes of agents
+const eyeCenters = [];
+// for (let i = 0; i < agentNames.length; i++) {
+//   eyeCenters[`${agentNames[i]}Left`] = getEyeCenter(document.getElementById(`${agentNames[i]}-pupil-left`));
+//   eyeCenters[`${agentNames[i]}Right`] = getEyeCenter(document.getElementById(`${agentNames[i]}-pupil-right`));
+// }
+
+for (let i = 0; i < agentNames.length; i++) {
+  eyeCenters[`${agentNames[i]}`] = {
+    left: getEyeCenter(document.getElementById(`${agentNames[i]}-pupil-left`)),
+    right: getEyeCenter(document.getElementById(`${agentNames[i]}-pupil-right`)),
+  };
+}
+
+console.log(eyeCenters);
+console.log(eyeCenters.pig.right.x);
+
 // NOTE: we believe that all target objects are the same size here!!
 const balloonBlue = document.getElementById('balloon-blue');
 const balloonRed = document.getElementById('balloon-red');
@@ -47,7 +67,7 @@ const hedgeMidY = hedge.getBBox().y + hedge.getBBox().height / 2 - balloonBlue.g
 // trialType saves whether we want to display hedge (test) or not (fam)
 // first new Array() number specifies how many fam trials, second how many test trials
 // instead of trialNumber: trialType.length specifies our number of trials!
-const trialType = [].concat(new Array(1).fill('fam'), new Array(3).fill('test'));
+const trialType = [].concat(new Array(1).fill('fam'), new Array(5).fill('test'));
 
 // create trials
 // variable that saves how many animal agents we have
@@ -143,6 +163,25 @@ function pause(ms) {
 // function for setting everything to start state
 function startTrial(agents, trialCount) {
   return new Promise((resolve) => {
+    const currentAgent = `${agents[trialCount].getAttribute('id')}`;
+    console.log('currentAgent', currentAgent);
+    console.log(`eyeCenters.${currentAgent}.right.x`, eval(`eyeCenters.${currentAgent}.right.x`));
+
+    const pupilLeft = document.getElementById(`${currentAgent}-pupil-left`);
+    const pupilRight = document.getElementById(`${currentAgent}-pupil-right`);
+    const irisLeft = document.getElementById(`${currentAgent}-iris-left`);
+    const irisRight = document.getElementById(`${currentAgent}-iris-right`);
+
+    pupilLeft.setAttribute('cx', eval(`eyeCenters.${currentAgent}.left.x`));
+    pupilLeft.setAttribute('cy', eval(`eyeCenters.${currentAgent}.left.y`));
+    pupilRight.setAttribute('cx', eval(`eyeCenters.${currentAgent}.right.x`));
+    pupilRight.setAttribute('cy', eval(`eyeCenters.${currentAgent}.right.y`));
+
+    irisLeft.setAttribute('cx', eval(`eyeCenters.${currentAgent}.left.x`));
+    irisLeft.setAttribute('cy', eval(`eyeCenters.${currentAgent}.left.y`));
+    irisRight.setAttribute('cx', eval(`eyeCenters.${currentAgent}.right.x`));
+    irisRight.setAttribute('cy', eval(`eyeCenters.${currentAgent}.right.y`));
+
     // show agent and target of the current trial only, hide the other ones
     showElement(agents, trialCount);
     showElement(targets, trialCount);
@@ -165,14 +204,15 @@ function startTrial(agents, trialCount) {
 // TODO might need to add target as function argument
 function changeGaze(agents, trialCount) {
   return new Promise((resolve) => {
+    const currentAgent = `${agents[trialCount].getAttribute('id')}`;
     // get IDs of eye
     // TODO ${agents[trialCount].getAttribute('id')} for just getting 'pig' necessary?!
-    const irisLeft = document.getElementById(`${agents[trialCount].getAttribute('id')}-iris-left`);
-    const pupilLeft = document.getElementById(`${agents[trialCount].getAttribute('id')}-pupil-left`);
-    const eyelineLeft = document.getElementById(`${agents[trialCount].getAttribute('id')}-eyeline-left`);
-    const irisRight = document.getElementById(`${agents[trialCount].getAttribute('id')}-iris-right`);
-    const pupilRight = document.getElementById(`${agents[trialCount].getAttribute('id')}-pupil-right`);
-    const eyelineRight = document.getElementById(`${agents[trialCount].getAttribute('id')}-eyeline-right`);
+    const pupilLeft = document.getElementById(`${currentAgent}-pupil-left`);
+    const pupilRight = document.getElementById(`${currentAgent}-pupil-right`);
+    const irisLeft = document.getElementById(`${currentAgent}-iris-left`);
+    const irisRight = document.getElementById(`${currentAgent}-iris-right`);
+    const eyelineLeft = document.getElementById(`${currentAgent}-eyeline-left`);
+    const eyelineRight = document.getElementById(`${currentAgent}-eyeline-right`);
 
     // define where the target will move; use template literal to access values
     // WE NEED MINUS! SINCE WE MOVE THE COORDINATE SYSTEM TO THE LEFT / UP in order to let the balloon move right / down
