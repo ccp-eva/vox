@@ -7,6 +7,10 @@ import showElement from './js/showElement';
 import divideWithRemainder from './js/divideWithRemainder';
 import getEyeCenter from './js/getEyeCenter';
 
+// TODO nach animieren wieder zurück in die mitte animieren
+// TODO response logging umrechnen von user auf svg größe
+// TODO balloon flugbahn erst mittig runter, bis nicht mehr sichtbar, dann losfliegen
+
 // ---------------------------------------------------------------------------------------------------------------------
 // SVG & SCREEN SIZE
 
@@ -18,11 +22,11 @@ const { clientHeight } = document.body;
 console.log('client browser size', { clientWidth, clientHeight });
 
 // get viewBox size from whole SVG
-const origViewBox = document.getElementById('outer-svg').getAttribute('viewBox');
-const origViewBoxX = parseFloat(origViewBox.split(' ')[0]);
-const origViewBoxY = parseFloat(origViewBox.split(' ')[1]);
-const origViewBoxWidth = parseFloat(origViewBox.split(' ')[2]);
-const origViewBoxHeight = parseFloat(origViewBox.split(' ')[3]);
+const outerSVG = document.getElementById('outer-svg');
+const origViewBoxX = parseFloat(outerSVG.getAttribute('viewBox').split(' ')[0]);
+const origViewBoxY = parseFloat(outerSVG.getAttribute('viewBox').split(' ')[1]);
+const origViewBoxWidth = parseFloat(outerSVG.getAttribute('viewBox').split(' ')[2]);
+const origViewBoxHeight = parseFloat(outerSVG.getAttribute('viewBox').split(' ')[3]);
 console.log('viewbox size', {
   origViewBoxX, origViewBoxY, origViewBoxWidth, origViewBoxHeight,
 });
@@ -30,6 +34,9 @@ console.log('viewbox size', {
 // ---------------------------------------------------------------------------------------------------------------------
 // GET ALL RELEVANT ELEMENTS IN SVG
 // ---------------------------------------------------------------------------------------------------------------------
+const button = document.getElementById('button');
+button.setAttribute('visibility', 'hidden');
+
 // if you change animal agents or targets, then change ID here...
 const pig = document.getElementById('pig');
 const monkey = document.getElementById('monkey');
@@ -50,6 +57,12 @@ for (let i = 0; i < agentsNames.length; i++) {
   };
 }
 console.log('eyeCenters', eyeCenters);
+// BOTH NOTATIONS WORK!
+console.log(eyeCenters.pig.left.x);
+// eslint-disable-next-line dot-notation
+console.log(eyeCenters['pig'].left.x);
+// eslint-disable-next-line dot-notation
+console.log(eyeCenters[`${agentsNames[0]}`].left.x);
 
 // NOTE: we believe that all target objects are the same size here!!
 const balloonBlue = document.getElementById('balloon-blue');
@@ -78,50 +91,57 @@ const hedgeMidY = hedge.getBBox().y + hedge.getBBox().height / 2 - balloonBlue.g
 // trialType saves whether we want to display hedge (test) or not (fam)
 // first new Array() number specifies how many fam trials, second how many test trials
 // instead of trialNumber: trialType.length specifies our number of trials!
-const trialType = [].concat(new Array(1).fill('fam'), new Array(2).fill('test'));
+const famNr = 4;
+const testNr = 0;
+const trialType = [].concat(new Array(famNr).fill('fam'), new Array(testNr).fill('test'));
 
 // calculate how many times each agent should be repeated, based on trialNumber
 const agentsDiv = divideWithRemainder(trialType.length, agentsNames.length);
 
-// repeat each agent as often as just calculated. then shuffle the array for randomization.
-let agentsChar = shuffleArray([].concat(new Array(agentsDiv.quotient).fill('pig'), new Array(agentsDiv.quotient).fill('sheep'), new Array(agentsDiv.quotient).fill('monkey')));
+let agents = shuffleArray([]
+  .concat(new Array(agentsDiv.quotient).fill(pig),
+    new Array(agentsDiv.quotient).fill(sheep),
+    new Array(agentsDiv.quotient).fill(monkey)));
 
-// if our trialNumber is not divisable by number of agents, put random agents for remainder number
+// if our trialNumber is not divisable by number of agents, put random agents for remainder number:
+// create random array with agents
+// keep only as many entries in array as we need (remove rest)
+// combine with list of repeated agents
 if (agentsDiv.remainder > 0) {
-  // create random array with agents
-  const agentsTmp = shuffleArray(['pig', 'sheep', 'monkey']);
-  // keep only as many entries in array as we need (remove rest)
-  for (let i = 0; i < (agentsNames.length - agentsDiv.remainder); i++) {
-    agentsTmp.splice(i, 1);
-  }
-  agentsChar = agentsChar.concat(agentsTmp);
-}
-
-// save the SVG objects by ids in agents array
-let agents = [];
-for (let i = 0; i < agentsChar.length; i++) {
-  agents = agents.concat(eval(agentsChar[i]));
+  const agentsTmp = shuffleArray([pig, sheep, monkey]);
+  agentsTmp.splice(0, agentsTmp.length - agentsDiv.remainder);
+  agents = agents.concat(agentsTmp);
 }
 console.log('agents', agents);
+// eslint-disable-next-line dot-notation
+console.log('eyeagents', eyeCenters[`${agents[0].getAttribute('id')}`].left.x);
 
 // SAME FOR TARGET
-const targetsNr = 4;
+const targetsNr = 4; // here, save number of balloons
 const targetsDiv = divideWithRemainder(trialType.length, targetsNr);
-let targetsChar = shuffleArray([].concat(new Array(targetsDiv.quotient).fill('balloonRed'), new Array(targetsDiv.quotient).fill('balloonBlue'), new Array(targetsDiv.quotient).fill('balloonYellow'), new Array(targetsDiv.quotient).fill('balloonGreen')));
+console.log('targetsDiv', targetsDiv);
+
+let targets = shuffleArray([]
+  .concat(new Array(targetsDiv.quotient).fill(balloonRed),
+    new Array(targetsDiv.quotient).fill(balloonBlue),
+    new Array(targetsDiv.quotient).fill(balloonYellow),
+    new Array(targetsDiv.quotient).fill(balloonGreen)));
 
 if (targetsDiv.remainder > 0) {
-  const targetsTmp = shuffleArray(['balloonRed', 'balloonBlue', 'balloonYellow', 'balloonGreen']);
-  for (let i = 0; i < (targetsNr - targetsDiv.remainder); i++) {
-    targetsTmp.splice(i, 1);
-  }
-  targetsChar = targetsChar.concat(targetsTmp);
-}
-
-let targets = [];
-for (let i = 0; i < targetsChar.length; i++) {
-  targets = targets.concat(eval(targetsChar[i]));
+  const targetsTmp = shuffleArray([balloonRed, balloonBlue, balloonYellow, balloonGreen]);
+  targetsTmp.splice(0, targetsTmp.length - targetsDiv.remainder);
+  targets = targets.concat(targetsTmp);
 }
 console.log('targets', targets);
+
+// ---------------------------------------------------------------------------------------------------------------------
+// EVENTLISTENER
+// ---------------------------------------------------------------------------------------------------------------------
+function buttonClick(event) {
+  // eslint-disable-next-line max-len
+  console.log(`offsetX: ${event.offsetX}, offsetY: ${event.offsetY}, clientX: ${event.clientX}, clientY: ${event.clientY}`);
+}
+outerSVG.addEventListener('click', buttonClick);
 
 // ---------------------------------------------------------------------------------------------------------------------
 // CALCULATE POSITIONS OF TARGET
@@ -142,6 +162,7 @@ const section8 = { min: section7.max, max: (targetPositionRight / 10) * 8 };
 const section9 = { min: section8.max, max: (targetPositionRight / 10) * 9 };
 const section10 = { min: section9.max, max: targetPositionRight };
 
+// eslint-disable-next-line max-len
 const sectionArray = shuffleArray([section1, section2, section3, section4, section5, section6, section7, section8, section9, section10]);
 console.log('sectionArray', sectionArray);
 
@@ -161,25 +182,40 @@ function pause(ms) {
 function startTrial(agents, trialCount) {
   return new Promise((resolve) => {
     const currentAgent = `${agents[trialCount].getAttribute('id')}`;
+    console.log('currentAgent', currentAgent);
+
+    // show agent and target of the current trial only, hide the other ones
+    showElement(agents, trialCount);
+    showElement(targets, trialCount);
 
     const pupilLeft = document.getElementById(`${currentAgent}-pupil-left`);
     const pupilRight = document.getElementById(`${currentAgent}-pupil-right`);
     const irisLeft = document.getElementById(`${currentAgent}-iris-left`);
     const irisRight = document.getElementById(`${currentAgent}-iris-right`);
 
-    pupilLeft.setAttribute('cx', eval(`eyeCenters.${currentAgent}.left.x`));
-    pupilLeft.setAttribute('cy', eval(`eyeCenters.${currentAgent}.left.y`));
-    pupilRight.setAttribute('cx', eval(`eyeCenters.${currentAgent}.right.x`));
-    pupilRight.setAttribute('cy', eval(`eyeCenters.${currentAgent}.right.y`));
+    const midEyeLeft = { x: eyeCenters[`${agents[trialCount].getAttribute('id')}`].left.x, y: eyeCenters[`${agents[trialCount].getAttribute('id')}`].left.y };
+    const midEyeRight = { x: eyeCenters[`${agents[trialCount].getAttribute('id')}`].right.x, y: eyeCenters[`${agents[trialCount].getAttribute('id')}`].right.y };
 
-    irisLeft.setAttribute('cx', eval(`eyeCenters.${currentAgent}.left.x`));
-    irisLeft.setAttribute('cy', eval(`eyeCenters.${currentAgent}.left.y`));
-    irisRight.setAttribute('cx', eval(`eyeCenters.${currentAgent}.right.x`));
-    irisRight.setAttribute('cy', eval(`eyeCenters.${currentAgent}.right.y`));
+    console.log('eyeCenters', midEyeLeft);
 
-    // show agent and target of the current trial only, hide the other ones
-    showElement(agents, trialCount);
-    showElement(targets, trialCount);
+    animateCoord(pupilLeft, midEyeLeft);
+    animateCoord(irisLeft, midEyeLeft);
+    animateCoord(pupilRight, midEyeRight);
+    animateCoord(irisRight, midEyeRight);
+
+    // console.log('vor setzen', pupilLeft.getAttribute('cx'));
+    // console.log('Ziel: eyeCenterLeftx', eyeCenters[`${agents[trialCount].getAttribute('id')}`].left.x);
+    // pupilLeft.setAttribute('cx', eyeCenters[`${agents[trialCount].getAttribute('id')}`].left.x);
+    // console.log('nach setzen getAttribute', pupilLeft.getAttribute('cx'));
+    // console.log('nach setzen object', pupilLeft);
+
+    // pupilLeft.setAttribute('cy', eyeCenters[`${agents[trialCount].getAttribute('id')}`].left.y);
+    // pupilRight.setAttribute('cx', eyeCenters[`${agents[trialCount].getAttribute('id')}`].right.x);
+    // pupilRight.setAttribute('cy', eyeCenters[`${agents[trialCount].getAttribute('id')}`].right.y);
+    // irisLeft.setAttribute('cx', eyeCenters[`${agents[trialCount].getAttribute('id')}`].left.x);
+    // irisLeft.setAttribute('cy', eyeCenters[`${agents[trialCount].getAttribute('id')}`].left.y);
+    // irisRight.setAttribute('cx', eyeCenters[`${agents[trialCount].getAttribute('id')}`].right.x);
+    // irisRight.setAttribute('cy', eyeCenters[`${agents[trialCount].getAttribute('id')}`].right.y);
 
     // depending on trial type, show or hide hedge
     if (trialType[trialCount] === 'fam') {
@@ -250,9 +286,9 @@ async function runAllTrials(agents) {
   // CAUTION: trialCount start at zero, ie. first trial = 0 (because we need first element in array, that's at position 0)
   for (let trialCount = 0; trialCount < trialType.length; trialCount++) {
     await startTrial(agents, trialCount);
-    await pause(2000);
+    await pause(1000);
     await changeGaze(agents, trialCount);
-    await pause(2000);
+    await pause(1000);
   }
 }
 runAllTrials(agents);
