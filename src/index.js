@@ -7,8 +7,8 @@ import showElement from './js/showElement';
 import divideWithRemainder from './js/divideWithRemainder';
 import getEyeCenter from './js/getEyeCenter';
 import setEyeCenter from './js/setEyeCenter';
+import setTargetCenter from './js/setTargetCenter';
 
-// TODO nach animieren wieder zurück in die mitte animieren
 // TODO response logging umrechnen von user auf svg größe
 // TODO balloon flugbahn erst mittig runter, bis nicht mehr sichtbar, dann losfliegen
 
@@ -58,12 +58,12 @@ for (let i = 0; i < agentsNames.length; i++) {
   };
 }
 console.log('eyeCenters', eyeCenters);
-// BOTH NOTATIONS WORK!
-console.log(eyeCenters.pig.left.x);
-// eslint-disable-next-line dot-notation
-console.log(eyeCenters['pig'].left.x);
-// eslint-disable-next-line dot-notation
-console.log(eyeCenters[`${agentsNames[0]}`].left.x);
+// DIFFERENT NOTATIONS; ALL WORK!
+// console.log(eyeCenters.pig.left.x);
+// // eslint-disable-next-line dot-notation
+// console.log(eyeCenters['pig'].left.x);
+// // eslint-disable-next-line dot-notation
+// console.log(eyeCenters[`${agentsNames[0]}`].left.x);
 
 // NOTE: we believe that all target objects are the same size here!!
 const balloonBlue = document.getElementById('balloon-blue');
@@ -92,7 +92,7 @@ const hedgeMidY = hedge.getBBox().y + hedge.getBBox().height / 2 - balloonBlue.g
 // trialType saves whether we want to display hedge (test) or not (fam)
 // first new Array() number specifies how many fam trials, second how many test trials
 // instead of trialNumber: trialType.length specifies our number of trials!
-const famNr = 4;
+const famNr = 5;
 const testNr = 0;
 const trialType = [].concat(new Array(famNr).fill('fam'), new Array(testNr).fill('test'));
 
@@ -114,13 +114,10 @@ if (agentsDiv.remainder > 0) {
   agents = agents.concat(agentsTmp);
 }
 console.log('agents', agents);
-// eslint-disable-next-line dot-notation
-console.log('eyeagents', eyeCenters[`${agents[0].getAttribute('id')}`].left.x);
 
 // SAME FOR TARGET
 const targetsNr = 4; // here, save number of balloons
 const targetsDiv = divideWithRemainder(trialType.length, targetsNr);
-console.log('targetsDiv', targetsDiv);
 
 let targets = shuffleArray([]
   .concat(new Array(targetsDiv.quotient).fill(balloonRed),
@@ -183,7 +180,6 @@ function pause(ms) {
 function startTrial(agents, trialCount) {
   return new Promise((resolve) => {
     const currentAgent = `${agents[trialCount].getAttribute('id')}`;
-    console.log('currentAgent', currentAgent);
 
     // show agent and target of the current trial only, hide the other ones
     showElement(agents, trialCount);
@@ -194,29 +190,28 @@ function startTrial(agents, trialCount) {
     const irisLeft = document.getElementById(`${currentAgent}-iris-left`);
     const irisRight = document.getElementById(`${currentAgent}-iris-right`);
 
-    const midEyeLeft = { x: eyeCenters[`${agents[trialCount].getAttribute('id')}`].left.x, y: eyeCenters[`${agents[trialCount].getAttribute('id')}`].left.y };
-    const midEyeRight = { x: eyeCenters[`${agents[trialCount].getAttribute('id')}`].right.x, y: eyeCenters[`${agents[trialCount].getAttribute('id')}`].right.y };
+    // get the center/ middle position of eye of currentAgent
+    const midEyeLeft = { x: eyeCenters[`${currentAgent}`].left.x, y: eyeCenters[`${currentAgent}`].left.y };
+    const midEyeRight = { x: eyeCenters[`${currentAgent}`].right.x, y: eyeCenters[`${currentAgent}`].right.y };
 
-    console.log('eyeCenters', midEyeLeft);
+    // set target to center
+    setTargetCenter(targets[trialCount], midTargetViewBox);
+    targets[trialCount].setAttribute('viewBox', midTargetViewBox);
 
+    // set eyes to center
     setEyeCenter(pupilLeft, midEyeLeft);
-    setEyeCenter(irisLeft, midEyeLeft);
     setEyeCenter(pupilRight, midEyeRight);
+    setEyeCenter(irisLeft, midEyeLeft);
     setEyeCenter(irisRight, midEyeRight);
 
-    // console.log('vor setzen', pupilLeft.getAttribute('cx'));
-    // console.log('Ziel: eyeCenterLeftx', eyeCenters[`${agents[trialCount].getAttribute('id')}`].left.x);
-    // pupilLeft.setAttribute('cx', eyeCenters[`${agents[trialCount].getAttribute('id')}`].left.x);
-    // console.log('nach setzen getAttribute', pupilLeft.getAttribute('cx'));
-    // console.log('nach setzen object', pupilLeft);
-
-    // pupilLeft.setAttribute('cy', eyeCenters[`${agents[trialCount].getAttribute('id')}`].left.y);
-    // pupilRight.setAttribute('cx', eyeCenters[`${agents[trialCount].getAttribute('id')}`].right.x);
-    // pupilRight.setAttribute('cy', eyeCenters[`${agents[trialCount].getAttribute('id')}`].right.y);
-    // irisLeft.setAttribute('cx', eyeCenters[`${agents[trialCount].getAttribute('id')}`].left.x);
-    // irisLeft.setAttribute('cy', eyeCenters[`${agents[trialCount].getAttribute('id')}`].left.y);
-    // irisRight.setAttribute('cx', eyeCenters[`${agents[trialCount].getAttribute('id')}`].right.x);
-    // irisRight.setAttribute('cy', eyeCenters[`${agents[trialCount].getAttribute('id')}`].right.y);
+    pupilLeft.setAttribute('cx', midEyeLeft.x);
+    pupilLeft.setAttribute('cy', midEyeLeft.y);
+    pupilRight.setAttribute('cx', midEyeLeft.x);
+    pupilRight.setAttribute('cy', midEyeLeft.y);
+    irisLeft.setAttribute('cx', midEyeLeft.x);
+    irisLeft.setAttribute('cy', midEyeLeft.y);
+    irisRight.setAttribute('cx', midEyeLeft.x);
+    irisRight.setAttribute('cy', midEyeLeft.y);
 
     // depending on trial type, show or hide hedge
     if (trialType[trialCount] === 'fam') {
@@ -254,7 +249,8 @@ function changeGaze(agents, trialCount) {
     const newTargetViewBox = `-${randomNumber(sectionArray[trialCount].min, sectionArray[trialCount].max)} -${hedgeMidY} ${origViewBoxWidth} ${origViewBoxHeight}`;
 
     // animate target and set target viewBox to the value where it just moved
-    animateViewBox(targets[trialCount], midTargetViewBox, newTargetViewBox);
+    // animateViewBox(targets[trialCount], midTargetViewBox, newTargetViewBox);
+    animateViewBox(targets[trialCount], newTargetViewBox);
     targets[trialCount].setAttribute('viewBox', newTargetViewBox);
 
     // calculate positions for both eyes (AFTER target viewBox value has changed)
@@ -263,18 +259,18 @@ function changeGaze(agents, trialCount) {
 
     // animate eyes and set eye viewBoxes to the value where it just moved
     animateCoord(pupilLeft, gazeCoordsLeft);
-    animateCoord(irisLeft, gazeCoordsLeft);
     animateCoord(pupilRight, gazeCoordsRight);
+    animateCoord(irisLeft, gazeCoordsLeft);
     animateCoord(irisRight, gazeCoordsRight);
-    // TODO not really necessary? BUT WE DO NEED IT FOR TARGET!
-    // pupilLeft.setAttribute('cx', gazeCoordsLeft.x);
-    // pupilLeft.setAttribute('cy', gazeCoordsLeft.y);
-    // pupilRight.setAttribute('cx', gazeCoordsRight.x);
-    // pupilRight.setAttribute('cy', gazeCoordsRight.y);
-    // irisLeft.setAttribute('cx', gazeCoordsLeft.x);
-    // irisLeft.setAttribute('cy', gazeCoordsLeft.y);
-    // irisRight.setAttribute('cx', gazeCoordsRight.x);
-    // irisRight.setAttribute('cy', gazeCoordsRight.y);
+
+    pupilLeft.setAttribute('cx', gazeCoordsLeft.x);
+    pupilLeft.setAttribute('cy', gazeCoordsLeft.y);
+    pupilRight.setAttribute('cx', gazeCoordsRight.x);
+    pupilRight.setAttribute('cy', gazeCoordsRight.y);
+    irisLeft.setAttribute('cx', gazeCoordsLeft.x);
+    irisLeft.setAttribute('cy', gazeCoordsLeft.y);
+    irisRight.setAttribute('cx', gazeCoordsRight.x);
+    irisRight.setAttribute('cy', gazeCoordsRight.y);
 
     resolve('end of changeGaze');
   });

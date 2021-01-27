@@ -1,4 +1,3 @@
-// https://stackoverflow.com/questions/46060518/animating-attribute-values-with-javascript-zooming-in-the-svg-viewbox
 export default (target, newViewBox) => {
   const oldX = parseFloat(target.getAttribute('viewBox').split(' ')[0]);
   const oldY = parseFloat(target.getAttribute('viewBox').split(' ')[1]);
@@ -10,22 +9,13 @@ export default (target, newViewBox) => {
   const newWidth = parseFloat(newViewBox.split(' ')[2]);
   const newHeight = parseFloat(newViewBox.split(' ')[3]);
 
-  // Goes from 0 to 1 (to reach final position)
-  // 0.5 stops half way
-  let animProgress = 0;
-  const animStep = 0.02; // Change in animProgress per interval function invocation.
-
   // recursive function for moving the viewBox
   function moveViewBox() {
-    animProgress += animStep;
-    // stop animation once the new viewBox values are reached
-    if (animProgress > 1) { animProgress = 1; }
-    // Calculate a new viewBox corresponding to our animation progress
     const nextViewBox = [
-      oldX + animProgress * (newX - oldX),
-      oldY + animProgress * (newY - oldY),
-      oldWidth + animProgress * (newWidth - oldWidth),
-      oldHeight + animProgress * (newHeight - oldHeight),
+      oldX + (newX - oldX),
+      oldY + (newY - oldY),
+      oldWidth + (newWidth - oldWidth),
+      oldHeight + (newHeight - oldHeight),
     ];
     target.setAttribute('viewBox', nextViewBox.join(' '));
     requestAnimationFrame(moveViewBox);
