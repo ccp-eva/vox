@@ -8,8 +8,8 @@ import divideWithRemainder from './js/divideWithRemainder';
 import getEyeCenter from './js/getEyeCenter';
 import setEyeCenter from './js/setEyeCenter';
 import setTargetCenter from './js/setTargetCenter';
+import clickDistanceFromTarget from './js/clickDistanceFromTarget';
 
-// TODO response logging umrechnen von user auf svg größe
 // TODO balloon flugbahn flüssig animieren
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -99,7 +99,7 @@ const hedgeMidY = hedge.getBBox().y + hedge.getBBox().height / 2 - balloonBlue.g
 // first new Array() number specifies how many fam trials, second how many test trials
 // instead of trialNumber: trialType.length specifies our number of trials!
 const famNr = 1;
-const testNr = 0;
+const testNr = 1;
 const trialType = [].concat(new Array(famNr).fill('fam'), new Array(testNr).fill('test'));
 
 // calculate how many times each agent should be repeated, based on trialNumber
@@ -139,41 +139,6 @@ if (targetsDiv.remainder > 0) {
 console.log('targets', targets);
 
 // ---------------------------------------------------------------------------------------------------------------------
-// EVENTLISTENER
-// ---------------------------------------------------------------------------------------------------------------------
-const windowScaling = { width: origViewBoxWidth / offsetWidth, height: origViewBoxHeight / offsetHeight };
-console.log('sanity check: 1920 - 1080?', offsetWidth * windowScaling.width, offsetHeight * windowScaling.height);
-
-function buttonClick(event) {
-  console.log('');
-
-  // eslint-disable-next-line max-len
-  const clickCoords = {
-    x: windowScaling.width * event.offsetX,
-    y: windowScaling.height * event.offsetY,
-  };
-  console.log('clickCoords : ', clickCoords);
-
-  // clicked on target?
-  const targetCenterX = parseFloat(targets[0].getAttribute('viewBox').split(' ')[0]);
-  const targetCenterY = parseFloat(targets[0].getAttribute('viewBox').split(' ')[1]);
-
-  const targetHit = {
-    x: -(targetCenterX - targets[0].getBBox().width / 2),
-    y: -(targetCenterY - targets[0].getBBox().height / 2),
-  };
-
-  console.log('targetHit', targetHit);
-
-  const clickDeviation = {
-    x: Math.abs(targetHit.x - clickCoords.x),
-    y: Math.abs(targetHit.y - clickCoords.y),
-  };
-  console.log('distance from target', clickDeviation);
-}
-outerSVG.addEventListener('click', buttonClick);
-
-// ---------------------------------------------------------------------------------------------------------------------
 // CALCULATE POSITIONS OF TARGET
 
 // TODO function for this?
@@ -195,6 +160,18 @@ const section10 = { min: section9.max, max: targetPositionRight };
 // eslint-disable-next-line max-len
 const sectionArray = shuffleArray([section1, section2, section3, section4, section5, section6, section7, section8, section9, section10]);
 console.log('sectionArray', sectionArray);
+
+// ---------------------------------------------------------------------------------------------------------------------
+// EVENTLISTENER
+// ---------------------------------------------------------------------------------------------------------------------
+const doClick = (event) => clickDistanceFromTarget(event, targets[0], outerSVG);
+outerSVG.addEventListener('click', doClick);
+
+// when SVG is clicked, then do something
+// TODO use this to go to next trial!
+outerSVG.onclick = () => {
+  console.log('click logged!');
+};
 
 // ---------------------------------------------------------------------------------------------------------------------
 // FUNCTION FOR BREAK
@@ -284,12 +261,10 @@ function changeGaze(agents, trialCount) {
     // if fam: how whole path of target. if test: let balloon hide first
     if (trialType[trialCount] === 'fam') {
       // BACK TO RANDOM: next two lines
-      // animateViewBox(targets[trialCount], targetViewBoxRandom);
-      // targets[trialCount].setAttribute('viewBox', targetViewBoxRandom);
-      animateViewBox(targets[trialCount], targetViewBoxCenter);
-      targets[trialCount].setAttribute('viewBox', targetViewBoxCenter);
+      animateViewBox(targets[trialCount], targetViewBoxRandom);
+      targets[trialCount].setAttribute('viewBox', targetViewBoxRandom);
     } else if (trialType[trialCount] === 'test') {
-      animateViewBox(targets[trialCount], targetViewBoxHidden);
+      animateViewBox(targets[trialCount], targetViewBoxRandom);
       targets[trialCount].setAttribute('viewBox', targetViewBoxRandom);
     }
 
