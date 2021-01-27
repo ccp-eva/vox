@@ -139,6 +139,15 @@ if (targetsDiv.remainder > 0) {
 console.log('targets', targets);
 
 // ---------------------------------------------------------------------------------------------------------------------
+<<<<<<< HEAD
+=======
+// EVENTLISTENER
+// ---------------------------------------------------------------------------------------------------------------------
+const doClick = (event) => clickDistanceFromTarget(event, targets[0], outerSVG);
+outerSVG.addEventListener('click', doClick);
+
+// ---------------------------------------------------------------------------------------------------------------------
+>>>>>>> 033beb83210264b7d0404c59d4c03d66bd5a636f
 // CALCULATE POSITIONS OF TARGET
 
 // TODO function for this?
