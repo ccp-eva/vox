@@ -79,7 +79,13 @@ const balloonGreen = document.getElementById('balloon-green');
 // get position on the very right (as constraint) and mid of the screen
 const targetPositionRight = origViewBoxWidth - balloonBlue.getBBox().width;
 const targetPositionMid = origViewBoxWidth / 2 - balloonBlue.getBBox().width / 2;
-const midTargetViewBox = `-${targetPositionMid} -${origViewBoxHeight / 2.8} ${origViewBoxWidth} ${origViewBoxHeight}`;
+// eslint-disable-next-line max-len
+const targetViewBoxCenter = `-${targetPositionMid} -${origViewBoxHeight / 2.8} ${origViewBoxWidth} ${origViewBoxHeight}`;
+
+// calculate from which coordinates the balloons are hidden behind the hedge
+const hedgeback = document.getElementById('hedgeback');
+// eslint-disable-next-line max-len
+const targetViewBoxHidden = `-${targetPositionMid} -${origViewBoxHeight - hedgeback.getAttribute('height')} ${origViewBoxWidth} ${origViewBoxHeight}`;
 
 // get hedge and middle Y of it
 const hedge = document.getElementById('hedge');
@@ -92,8 +98,8 @@ const hedgeMidY = hedge.getBBox().y + hedge.getBBox().height / 2 - balloonBlue.g
 // trialType saves whether we want to display hedge (test) or not (fam)
 // first new Array() number specifies how many fam trials, second how many test trials
 // instead of trialNumber: trialType.length specifies our number of trials!
-const famNr = 5;
-const testNr = 0;
+const famNr = 1;
+const testNr = 1;
 const trialType = [].concat(new Array(famNr).fill('fam'), new Array(testNr).fill('test'));
 
 // calculate how many times each agent should be repeated, based on trialNumber
@@ -195,8 +201,8 @@ function startTrial(agents, trialCount) {
     const midEyeRight = { x: eyeCenters[`${currentAgent}`].right.x, y: eyeCenters[`${currentAgent}`].right.y };
 
     // set target to center
-    setTargetCenter(targets[trialCount], midTargetViewBox);
-    targets[trialCount].setAttribute('viewBox', midTargetViewBox);
+    setTargetCenter(targets[trialCount], targetViewBoxCenter);
+    targets[trialCount].setAttribute('viewBox', targetViewBoxCenter);
 
     // set eyes to center
     setEyeCenter(pupilLeft, midEyeLeft);
@@ -221,7 +227,7 @@ function startTrial(agents, trialCount) {
     }
 
     // always start the target in the middle again
-    targets[trialCount].setAttribute('viewBox', `${midTargetViewBox}`);
+    targets[trialCount].setAttribute('viewBox', `${targetViewBoxCenter}`);
     resolve('end of startTrial');
   });
 }
@@ -249,9 +255,14 @@ function changeGaze(agents, trialCount) {
     const newTargetViewBox = `-${randomNumber(sectionArray[trialCount].min, sectionArray[trialCount].max)} -${hedgeMidY} ${origViewBoxWidth} ${origViewBoxHeight}`;
 
     // animate target and set target viewBox to the value where it just moved
-    // animateViewBox(targets[trialCount], midTargetViewBox, newTargetViewBox);
-    animateViewBox(targets[trialCount], newTargetViewBox);
-    targets[trialCount].setAttribute('viewBox', newTargetViewBox);
+    // if fam: how whole path of target. if test: let balloon hide first
+    if (trialType[trialCount] === 'fam') {
+      animateViewBox(targets[trialCount], newTargetViewBox);
+      targets[trialCount].setAttribute('viewBox', newTargetViewBox);
+    } else if (trialType[trialCount] === 'test') {
+      animateViewBox(targets[trialCount], targetViewBoxHidden);
+      targets[trialCount].setAttribute('viewBox', newTargetViewBox);
+    }
 
     // calculate positions for both eyes (AFTER target viewBox value has changed)
     const gazeCoordsLeft = getGazeCoords(targets[trialCount], pupilLeft, eyelineLeft);
