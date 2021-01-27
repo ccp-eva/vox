@@ -10,7 +10,7 @@ import setEyeCenter from './js/setEyeCenter';
 import setTargetCenter from './js/setTargetCenter';
 
 // TODO response logging umrechnen von user auf svg größe
-// TODO balloon flugbahn erst mittig runter, bis nicht mehr sichtbar, dann losfliegen
+// TODO balloon flugbahn flüssig animieren
 
 // ---------------------------------------------------------------------------------------------------------------------
 // SVG & SCREEN SIZE
@@ -18,9 +18,9 @@ import setTargetCenter from './js/setTargetCenter';
 // TODO find more elegant solution to tell user to view on fullscreen
 // if (clientWidth < 600 || clientHeight < 200) alert('Please view on bigger screen!');
 // ---------------------------------------------------------------------------------------------------------------------
-const { clientWidth } = document.body;
-const { clientHeight } = document.body;
-console.log('client browser size', { clientWidth, clientHeight });
+const { offsetWidth } = document.body;
+const { offsetHeight } = document.body;
+console.log('client browser size', { offsetWidth, offsetHeight });
 
 // get viewBox size from whole SVG
 const outerSVG = document.getElementById('outer-svg');
@@ -99,7 +99,7 @@ const hedgeMidY = hedge.getBBox().y + hedge.getBBox().height / 2 - balloonBlue.g
 // first new Array() number specifies how many fam trials, second how many test trials
 // instead of trialNumber: trialType.length specifies our number of trials!
 const famNr = 1;
-const testNr = 1;
+const testNr = 0;
 const trialType = [].concat(new Array(famNr).fill('fam'), new Array(testNr).fill('test'));
 
 // calculate how many times each agent should be repeated, based on trialNumber
@@ -141,9 +141,20 @@ console.log('targets', targets);
 // ---------------------------------------------------------------------------------------------------------------------
 // EVENTLISTENER
 // ---------------------------------------------------------------------------------------------------------------------
+const windowScaling = { width: origViewBoxWidth / offsetWidth, height: origViewBoxHeight / offsetHeight };
+console.log('sanity check: 1920 - 1080?', offsetWidth * windowScaling.width, offsetHeight * windowScaling.height);
+
 function buttonClick(event) {
+  console.log('client', document.body.clientWidth, document.body.clientHeight);
+  console.log('offset', document.body.offsetWidth, document.body.offsetHeight);
+
   // eslint-disable-next-line max-len
-  console.log(`offsetX: ${event.offsetX}, offsetY: ${event.offsetY}, clientX: ${event.clientX}, clientY: ${event.clientY}`);
+  console.log(`offsetX: ${event.offsetX}, offsetY: ${event.offsetY}`,
+    `clientX: ${event.clientX}, clientY: ${event.clientY}`);
+  // eslint-disable-next-line max-len
+  console.log(`scale offsetX: ${windowScaling.width * event.offsetX}, scale offsetY: ${windowScaling.height * event.offsetY}`);
+  // eslint-disable-next-line max-len
+  console.log(`scale CLIENTX: ${windowScaling.width * event.clientX}, scale CLIENTY: ${windowScaling.height * event.clientY}`);
 }
 outerSVG.addEventListener('click', buttonClick);
 
