@@ -145,16 +145,31 @@ const windowScaling = { width: origViewBoxWidth / offsetWidth, height: origViewB
 console.log('sanity check: 1920 - 1080?', offsetWidth * windowScaling.width, offsetHeight * windowScaling.height);
 
 function buttonClick(event) {
-  console.log('client', document.body.clientWidth, document.body.clientHeight);
-  console.log('offset', document.body.offsetWidth, document.body.offsetHeight);
+  console.log('');
 
   // eslint-disable-next-line max-len
-  console.log(`offsetX: ${event.offsetX}, offsetY: ${event.offsetY}`,
-    `clientX: ${event.clientX}, clientY: ${event.clientY}`);
-  // eslint-disable-next-line max-len
-  console.log(`scale offsetX: ${windowScaling.width * event.offsetX}, scale offsetY: ${windowScaling.height * event.offsetY}`);
-  // eslint-disable-next-line max-len
-  console.log(`scale CLIENTX: ${windowScaling.width * event.clientX}, scale CLIENTY: ${windowScaling.height * event.clientY}`);
+  const clickCoords = {
+    x: windowScaling.width * event.offsetX,
+    y: windowScaling.height * event.offsetY,
+  };
+  console.log('clickCoords : ', clickCoords);
+
+  // clicked on target?
+  const targetCenterX = parseFloat(targets[0].getAttribute('viewBox').split(' ')[0]);
+  const targetCenterY = parseFloat(targets[0].getAttribute('viewBox').split(' ')[1]);
+
+  const targetHit = {
+    x: -(targetCenterX - targets[0].getBBox().width / 2),
+    y: -(targetCenterY - targets[0].getBBox().height / 2),
+  };
+
+  console.log('targetHit', targetHit);
+
+  const clickDeviation = {
+    x: Math.abs(targetHit.x - clickCoords.x),
+    y: Math.abs(targetHit.y - clickCoords.y),
+  };
+  console.log('distance from target', clickDeviation);
 }
 outerSVG.addEventListener('click', buttonClick);
 
@@ -263,16 +278,19 @@ function changeGaze(agents, trialCount) {
     // define where the target will move
     // WE NEED MINUS! SINCE WE MOVE THE COORDINATE SYSTEM TO THE LEFT / UP in order to let the balloon move right / down
     // eslint-disable-next-line max-len
-    const newTargetViewBox = `-${randomNumber(sectionArray[trialCount].min, sectionArray[trialCount].max)} -${hedgeMidY} ${origViewBoxWidth} ${origViewBoxHeight}`;
+    const targetViewBoxRandom = `-${randomNumber(sectionArray[trialCount].min, sectionArray[trialCount].max)} -${hedgeMidY} ${origViewBoxWidth} ${origViewBoxHeight}`;
 
     // animate target and set target viewBox to the value where it just moved
     // if fam: how whole path of target. if test: let balloon hide first
     if (trialType[trialCount] === 'fam') {
-      animateViewBox(targets[trialCount], newTargetViewBox);
-      targets[trialCount].setAttribute('viewBox', newTargetViewBox);
+      // BACK TO RANDOM: next two lines
+      // animateViewBox(targets[trialCount], targetViewBoxRandom);
+      // targets[trialCount].setAttribute('viewBox', targetViewBoxRandom);
+      animateViewBox(targets[trialCount], targetViewBoxCenter);
+      targets[trialCount].setAttribute('viewBox', targetViewBoxCenter);
     } else if (trialType[trialCount] === 'test') {
       animateViewBox(targets[trialCount], targetViewBoxHidden);
-      targets[trialCount].setAttribute('viewBox', newTargetViewBox);
+      targets[trialCount].setAttribute('viewBox', targetViewBoxRandom);
     }
 
     // calculate positions for both eyes (AFTER target viewBox value has changed)
