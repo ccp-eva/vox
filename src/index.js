@@ -6,6 +6,7 @@ import animateCoord from './js/animateCoord';
 import showElement from './js/showElement';
 import divideWithRemainder from './js/divideWithRemainder';
 import getEyeCenter from './js/getEyeCenter';
+import setEyeCenter from './js/setEyeCenter';
 
 // TODO nach animieren wieder zurück in die mitte animieren
 // TODO response logging umrechnen von user auf svg größe
@@ -198,10 +199,10 @@ function startTrial(agents, trialCount) {
 
     console.log('eyeCenters', midEyeLeft);
 
-    animateCoord(pupilLeft, midEyeLeft);
-    animateCoord(irisLeft, midEyeLeft);
-    animateCoord(pupilRight, midEyeRight);
-    animateCoord(irisRight, midEyeRight);
+    setEyeCenter(pupilLeft, midEyeLeft);
+    setEyeCenter(irisLeft, midEyeLeft);
+    setEyeCenter(pupilRight, midEyeRight);
+    setEyeCenter(irisRight, midEyeRight);
 
     // console.log('vor setzen', pupilLeft.getAttribute('cx'));
     // console.log('Ziel: eyeCenterLeftx', eyeCenters[`${agents[trialCount].getAttribute('id')}`].left.x);
