@@ -58,12 +58,6 @@ for (let i = 0; i < agentsNames.length; i++) {
   };
 }
 console.log('eyeCenters', eyeCenters);
-// DIFFERENT NOTATIONS; ALL WORK!
-// console.log(eyeCenters.pig.left.x);
-// // eslint-disable-next-line dot-notation
-// console.log(eyeCenters['pig'].left.x);
-// // eslint-disable-next-line dot-notation
-// console.log(eyeCenters[`${agentsNames[0]}`].left.x);
 
 // NOTE: we believe that all target objects are the same size here!!
 const balloonBlue = document.getElementById('balloon-blue');
@@ -281,42 +275,9 @@ async function changeGaze(agents, trialCount) {
 // ---------------------------------------------------------------------------------------------------------------------
 // SPECIFY ORDER OF EVENTS
 // ---------------------------------------------------------------------------------------------------------------------
-// OLD WORKING CODE
-// async function runAllTrials(agents) {
-// // CAUTION: trialCount start at zero, ie. first trial = 0
-// // (because we need first element in array, that's at position 0)
-//   for (let trialCount = 0; trialCount < trialType.length; trialCount++) {
-//     await startTrial(agents, trialCount);
-//     await pause(1000);
-//     await changeGaze(agents, trialCount);
-//     await pause(2000);
-//   }
-// }
-// runAllTrials(agents);
-
-//---------------------------------------------------
-
-// OLD: SIMILAR BUT TWO ASYNC FUNCTIONS
-// async function runSingleTrial(agents, trialCount) {
-//   // CAUTION: trialCount start at zero, ie. first trial = 0
-//   // (because we need first element in array, that's at position 0)
-//   await startTrial(agents, trialCount);
-//   await pause(1000);
-//   await changeGaze(agents, trialCount);
-//   await pause(2000);
-// }
-
-// async function runAllTrials(agents) {
-//   for (let trialCount = 0; trialCount < trialType.length; trialCount++) {
-//     await runSingleTrial(agents, trialCount);
-//   }
-// }
-// runAllTrials(agents);
-
-// ---------------------------------------------------------------------------------------------------------------------
-
 // https://stackoverflow.com/questions/51374649/using-async-functions-to-await-user-input-from-onclick
 let nrClicks = 0;
+let endExperiment = false;
 let next = false; // this is to be changed on user input
 outerSVG.onclick = () => { next = true; };
 
@@ -329,11 +290,18 @@ async function runTrial(agents, trialCount) {
   await startTrial(agents, trialCount);
   await pause(1000);
   await changeGaze(agents, trialCount);
-
+  const t0 = new Date().getTime();
   await waitForClick();
+
+  const responseTime = new Date().getTime() - t0;
+  console.log('waited for ', responseTime);
+
   nrClicks += 1;
   console.log(`user has clicked ${nrClicks} time(s)`);
 
+  if (trialCount + 1 === trialType.length) {
+    endExperiment = true;
+  }
   // recursion anchor
   if (trialCount + 1 < trialType.length) {
     runTrial(agents, trialCount + 1);
@@ -343,3 +311,5 @@ async function runTrial(agents, trialCount) {
 // CAUTION: trialCount start at zero, ie. first trial = 0
 // (because we need first element in array, that's at position 0)
 runTrial(agents, 0);
+
+if (endExperiment === true) console.log('DONE!!');
