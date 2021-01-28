@@ -99,7 +99,7 @@ const hedgeMidY = hedge.getBBox().y + hedge.getBBox().height / 2 - balloonBlue.g
 // first new Array() number specifies how many fam trials, second how many test trials
 // instead of trialNumber: trialType.length specifies our number of trials!
 const famNr = 1;
-const testNr = 1;
+const testNr = 2;
 const trialType = [].concat(new Array(famNr).fill('fam'), new Array(testNr).fill('test'));
 
 // calculate how many times each agent should be repeated, based on trialNumber
@@ -166,16 +166,10 @@ console.log('sectionArray', sectionArray);
 const doClick = (event) => clickDistanceFromTarget(event, targets[0], outerSVG);
 outerSVG.addEventListener('click', doClick);
 
-// when SVG is clicked, then do something
-// TODO use this to go to next trial!
-outerSVG.onclick = () => {
-  console.log('click logged!');
-};
-
 // ---------------------------------------------------------------------------------------------------------------------
 // FUNCTION FOR BREAK
 // ---------------------------------------------------------------------------------------------------------------------
-function pause(ms) {
+async function pause(ms) {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
@@ -183,55 +177,52 @@ function pause(ms) {
 // FUNCTION FOR BEGINNING NEW TRIAL (back to starting point)
 //
 // TODO function needed for showing/hiding hedge? or okay here?
-// TODO set pupils to center again!!!
 // ---------------------------------------------------------------------------------------------------------------------
-function startTrial(agents, trialCount) {
-  return new Promise((resolve) => {
-    const currentAgent = `${agents[trialCount].getAttribute('id')}`;
+// NOTE: async functions return promise, so we can wait for them (await)
+async function startTrial(agents, trialCount) {
+  const currentAgent = `${agents[trialCount].getAttribute('id')}`;
 
-    // show agent and target of the current trial only, hide the other ones
-    showElement(agents, trialCount);
-    showElement(targets, trialCount);
+  // show agent and target of the current trial only, hide the other ones
+  showElement(agents, trialCount);
+  showElement(targets, trialCount);
 
-    const pupilLeft = document.getElementById(`${currentAgent}-pupil-left`);
-    const pupilRight = document.getElementById(`${currentAgent}-pupil-right`);
-    const irisLeft = document.getElementById(`${currentAgent}-iris-left`);
-    const irisRight = document.getElementById(`${currentAgent}-iris-right`);
+  const pupilLeft = document.getElementById(`${currentAgent}-pupil-left`);
+  const pupilRight = document.getElementById(`${currentAgent}-pupil-right`);
+  const irisLeft = document.getElementById(`${currentAgent}-iris-left`);
+  const irisRight = document.getElementById(`${currentAgent}-iris-right`);
 
-    // get the center/ middle position of eye of currentAgent
-    const midEyeLeft = { x: eyeCenters[`${currentAgent}`].left.x, y: eyeCenters[`${currentAgent}`].left.y };
-    const midEyeRight = { x: eyeCenters[`${currentAgent}`].right.x, y: eyeCenters[`${currentAgent}`].right.y };
+  // get the center/ middle position of eye of currentAgent
+  const midEyeLeft = { x: eyeCenters[`${currentAgent}`].left.x, y: eyeCenters[`${currentAgent}`].left.y };
+  const midEyeRight = { x: eyeCenters[`${currentAgent}`].right.x, y: eyeCenters[`${currentAgent}`].right.y };
 
-    // set target to center
-    setTargetCenter(targets[trialCount], targetViewBoxCenter);
-    targets[trialCount].setAttribute('viewBox', targetViewBoxCenter);
+  // set target to center
+  setTargetCenter(targets[trialCount], targetViewBoxCenter);
+  targets[trialCount].setAttribute('viewBox', targetViewBoxCenter);
 
-    // set eyes to center
-    setEyeCenter(pupilLeft, midEyeLeft);
-    setEyeCenter(pupilRight, midEyeRight);
-    setEyeCenter(irisLeft, midEyeLeft);
-    setEyeCenter(irisRight, midEyeRight);
+  // set eyes to center
+  setEyeCenter(pupilLeft, midEyeLeft);
+  setEyeCenter(pupilRight, midEyeRight);
+  setEyeCenter(irisLeft, midEyeLeft);
+  setEyeCenter(irisRight, midEyeRight);
 
-    pupilLeft.setAttribute('cx', midEyeLeft.x);
-    pupilLeft.setAttribute('cy', midEyeLeft.y);
-    pupilRight.setAttribute('cx', midEyeLeft.x);
-    pupilRight.setAttribute('cy', midEyeLeft.y);
-    irisLeft.setAttribute('cx', midEyeLeft.x);
-    irisLeft.setAttribute('cy', midEyeLeft.y);
-    irisRight.setAttribute('cx', midEyeLeft.x);
-    irisRight.setAttribute('cy', midEyeLeft.y);
+  pupilLeft.setAttribute('cx', midEyeLeft.x);
+  pupilLeft.setAttribute('cy', midEyeLeft.y);
+  pupilRight.setAttribute('cx', midEyeLeft.x);
+  pupilRight.setAttribute('cy', midEyeLeft.y);
+  irisLeft.setAttribute('cx', midEyeLeft.x);
+  irisLeft.setAttribute('cy', midEyeLeft.y);
+  irisRight.setAttribute('cx', midEyeLeft.x);
+  irisRight.setAttribute('cy', midEyeLeft.y);
 
-    // depending on trial type, show or hide hedge
-    if (trialType[trialCount] === 'fam') {
-      hedge.setAttribute('visibility', 'hidden');
-    } else if (trialType[trialCount] === 'test') {
-      hedge.setAttribute('visibility', 'visible');
-    }
+  // depending on trial type, show or hide hedge
+  if (trialType[trialCount] === 'fam') {
+    hedge.setAttribute('visibility', 'hidden');
+  } else if (trialType[trialCount] === 'test') {
+    hedge.setAttribute('visibility', 'visible');
+  }
 
-    // always start the target in the middle again
-    targets[trialCount].setAttribute('viewBox', `${targetViewBoxCenter}`);
-    resolve('end of startTrial');
-  });
+  // always start the target in the middle again
+  targets[trialCount].setAttribute('viewBox', `${targetViewBoxCenter}`);
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -240,67 +231,115 @@ function startTrial(agents, trialCount) {
 // TODO might need to add target as function argument
 // TODO ${agents[trialCount].getAttribute('id')} for just getting 'pig' necessary?!
 // ---------------------------------------------------------------------------------------------------------------------
-function changeGaze(agents, trialCount) {
-  return new Promise((resolve) => {
-    const currentAgent = `${agents[trialCount].getAttribute('id')}`;
-    // get IDs of eye
-    const pupilLeft = document.getElementById(`${currentAgent}-pupil-left`);
-    const pupilRight = document.getElementById(`${currentAgent}-pupil-right`);
-    const irisLeft = document.getElementById(`${currentAgent}-iris-left`);
-    const irisRight = document.getElementById(`${currentAgent}-iris-right`);
-    const eyelineLeft = document.getElementById(`${currentAgent}-eyeline-left`);
-    const eyelineRight = document.getElementById(`${currentAgent}-eyeline-right`);
+// NOTE: async functions return promise, so we can wait for them (await)
+async function changeGaze(agents, trialCount) {
+  const currentAgent = `${agents[trialCount].getAttribute('id')}`;
+  // get IDs of eye
+  const pupilLeft = document.getElementById(`${currentAgent}-pupil-left`);
+  const pupilRight = document.getElementById(`${currentAgent}-pupil-right`);
+  const irisLeft = document.getElementById(`${currentAgent}-iris-left`);
+  const irisRight = document.getElementById(`${currentAgent}-iris-right`);
+  const eyelineLeft = document.getElementById(`${currentAgent}-eyeline-left`);
+  const eyelineRight = document.getElementById(`${currentAgent}-eyeline-right`);
 
-    // define where the target will move
-    // WE NEED MINUS! SINCE WE MOVE THE COORDINATE SYSTEM TO THE LEFT / UP in order to let the balloon move right / down
-    // eslint-disable-next-line max-len
-    const targetViewBoxRandom = `-${randomNumber(sectionArray[trialCount].min, sectionArray[trialCount].max)} -${hedgeMidY} ${origViewBoxWidth} ${origViewBoxHeight}`;
+  // define where the target will move
+  // WE NEED MINUS! SINCE WE MOVE THE COORDINATE SYSTEM TO THE LEFT / UP in order to let the balloon move right / down
+  // eslint-disable-next-line max-len
+  const targetViewBoxRandom = `-${randomNumber(sectionArray[trialCount].min, sectionArray[trialCount].max)} -${hedgeMidY} ${origViewBoxWidth} ${origViewBoxHeight}`;
 
-    // animate target and set target viewBox to the value where it just moved
-    // if fam: how whole path of target. if test: let balloon hide first
-    if (trialType[trialCount] === 'fam') {
-      // BACK TO RANDOM: next two lines
-      animateViewBox(targets[trialCount], targetViewBoxRandom);
-      targets[trialCount].setAttribute('viewBox', targetViewBoxRandom);
-    } else if (trialType[trialCount] === 'test') {
-      animateViewBox(targets[trialCount], targetViewBoxRandom);
-      targets[trialCount].setAttribute('viewBox', targetViewBoxRandom);
-    }
+  // animate target and set target viewBox to the value where it just moved
+  // if fam: how whole path of target. if test: let balloon hide first
+  if (trialType[trialCount] === 'fam') {
+    // BACK TO RANDOM: next two lines
+    animateViewBox(targets[trialCount], targetViewBoxRandom);
+    targets[trialCount].setAttribute('viewBox', targetViewBoxRandom);
+  } else if (trialType[trialCount] === 'test') {
+    animateViewBox(targets[trialCount], targetViewBoxRandom);
+    targets[trialCount].setAttribute('viewBox', targetViewBoxRandom);
+  }
 
-    // calculate positions for both eyes (AFTER target viewBox value has changed)
-    const gazeCoordsLeft = getGazeCoords(targets[trialCount], pupilLeft, eyelineLeft);
-    const gazeCoordsRight = getGazeCoords(targets[trialCount], pupilRight, eyelineRight);
+  // calculate positions for both eyes (AFTER target viewBox value has changed)
+  const gazeCoordsLeft = getGazeCoords(targets[trialCount], pupilLeft, eyelineLeft);
+  const gazeCoordsRight = getGazeCoords(targets[trialCount], pupilRight, eyelineRight);
 
-    // animate eyes and set eye viewBoxes to the value where it just moved
-    animateCoord(pupilLeft, gazeCoordsLeft);
-    animateCoord(pupilRight, gazeCoordsRight);
-    animateCoord(irisLeft, gazeCoordsLeft);
-    animateCoord(irisRight, gazeCoordsRight);
+  // animate eyes and set eye viewBoxes to the value where it just moved
+  animateCoord(pupilLeft, gazeCoordsLeft);
+  animateCoord(pupilRight, gazeCoordsRight);
+  animateCoord(irisLeft, gazeCoordsLeft);
+  animateCoord(irisRight, gazeCoordsRight);
 
-    pupilLeft.setAttribute('cx', gazeCoordsLeft.x);
-    pupilLeft.setAttribute('cy', gazeCoordsLeft.y);
-    pupilRight.setAttribute('cx', gazeCoordsRight.x);
-    pupilRight.setAttribute('cy', gazeCoordsRight.y);
-    irisLeft.setAttribute('cx', gazeCoordsLeft.x);
-    irisLeft.setAttribute('cy', gazeCoordsLeft.y);
-    irisRight.setAttribute('cx', gazeCoordsRight.x);
-    irisRight.setAttribute('cy', gazeCoordsRight.y);
-
-    resolve('end of changeGaze');
-  });
+  pupilLeft.setAttribute('cx', gazeCoordsLeft.x);
+  pupilLeft.setAttribute('cy', gazeCoordsLeft.y);
+  pupilRight.setAttribute('cx', gazeCoordsRight.x);
+  pupilRight.setAttribute('cy', gazeCoordsRight.y);
+  irisLeft.setAttribute('cx', gazeCoordsLeft.x);
+  irisLeft.setAttribute('cy', gazeCoordsLeft.y);
+  irisRight.setAttribute('cx', gazeCoordsRight.x);
+  irisRight.setAttribute('cy', gazeCoordsRight.y);
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
 // SPECIFY ORDER OF EVENTS
 // ---------------------------------------------------------------------------------------------------------------------
-async function runAllTrials(agents) {
-  // CAUTION: trialCount start at zero, ie. first trial = 0
-  // (because we need first element in array, that's at position 0)
-  for (let trialCount = 0; trialCount < trialType.length; trialCount++) {
-    await startTrial(agents, trialCount);
-    await pause(1000);
-    await changeGaze(agents, trialCount);
-    await pause(1000);
+// OLD WORKING CODE
+// async function runAllTrials(agents) {
+// // CAUTION: trialCount start at zero, ie. first trial = 0
+// // (because we need first element in array, that's at position 0)
+//   for (let trialCount = 0; trialCount < trialType.length; trialCount++) {
+//     await startTrial(agents, trialCount);
+//     await pause(1000);
+//     await changeGaze(agents, trialCount);
+//     await pause(2000);
+//   }
+// }
+// runAllTrials(agents);
+
+//---------------------------------------------------
+
+// OLD: SIMILAR BUT TWO ASYNC FUNCTIONS
+// async function runSingleTrial(agents, trialCount) {
+//   // CAUTION: trialCount start at zero, ie. first trial = 0
+//   // (because we need first element in array, that's at position 0)
+//   await startTrial(agents, trialCount);
+//   await pause(1000);
+//   await changeGaze(agents, trialCount);
+//   await pause(2000);
+// }
+
+// async function runAllTrials(agents) {
+//   for (let trialCount = 0; trialCount < trialType.length; trialCount++) {
+//     await runSingleTrial(agents, trialCount);
+//   }
+// }
+// runAllTrials(agents);
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+// https://stackoverflow.com/questions/51374649/using-async-functions-to-await-user-input-from-onclick
+let nrClicks = 0;
+let next = false; // this is to be changed on user input
+outerSVG.onclick = () => { next = true; };
+
+async function waitForClick() {
+  while (next === false) await pause(50); // pause script but avoid browser to freeze ;)
+  next = false; // reset var
+}
+
+async function runTrial(agents, trialCount) {
+  await startTrial(agents, trialCount);
+  await pause(1000);
+  await changeGaze(agents, trialCount);
+
+  await waitForClick();
+  nrClicks += 1;
+  console.log(`user has clicked ${nrClicks} time(s)`);
+
+  // recursion anchor
+  if (trialCount + 1 < trialType.length) {
+    runTrial(agents, trialCount + 1);
   }
 }
-runAllTrials(agents);
+
+// CAUTION: trialCount start at zero, ie. first trial = 0
+// (because we need first element in array, that's at position 0)
+runTrial(agents, 0);
