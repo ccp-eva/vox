@@ -140,7 +140,6 @@ console.log('targets', targets);
 
 // ---------------------------------------------------------------------------------------------------------------------
 // CALCULATE POSITIONS OF TARGET
-
 // TODO function for this?
 // TODO pick random so viele sections aus sectionArray wie trialNumbers
 // ---------------------------------------------------------------------------------------------------------------------
@@ -295,7 +294,8 @@ function changeGaze(agents, trialCount) {
 // SPECIFY ORDER OF EVENTS
 // ---------------------------------------------------------------------------------------------------------------------
 async function runAllTrials(agents) {
-  // CAUTION: trialCount start at zero, ie. first trial = 0 (because we need first element in array, that's at position 0)
+  // CAUTION: trialCount start at zero, ie. first trial = 0
+  // (because we need first element in array, that's at position 0)
   for (let trialCount = 0; trialCount < trialType.length; trialCount++) {
     await startTrial(agents, trialCount);
     await pause(1000);
