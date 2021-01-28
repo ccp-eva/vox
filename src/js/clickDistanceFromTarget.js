@@ -5,15 +5,14 @@ export default (event, target, outerSVG) => {
   const origViewBoxHeight = parseFloat(outerSVG.getAttribute('viewBox').split(' ')[3]);
 
   const windowScaling = { width: origViewBoxWidth / offsetWidth, height: origViewBoxHeight / offsetHeight };
-  console.log('sanity check: 1920 - 1080?', offsetWidth * windowScaling.width, offsetHeight * windowScaling.height);
-  console.log('');
 
   // eslint-disable-next-line max-len
   const clickCoords = {
     x: windowScaling.width * event.offsetX,
     y: windowScaling.height * event.offsetY,
   };
-  console.log('clickCoords : ', clickCoords);
+  console.log('');
+  console.log('clickCoords', clickCoords);
 
   // clicked on target?
   const targetCenterX = parseFloat(target.getAttribute('viewBox').split(' ')[0]);
