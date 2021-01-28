@@ -1,4 +1,4 @@
-export default (event, target, outerSVG) => {
+export default (event, target, outerSVG, responseLog) => {
   const { offsetWidth } = document.body;
   const { offsetHeight } = document.body;
   const origViewBoxWidth = parseFloat(outerSVG.getAttribute('viewBox').split(' ')[2]);
@@ -28,5 +28,5 @@ export default (event, target, outerSVG) => {
     x: Math.abs(targetHit.x - clickCoords.x),
     y: Math.abs(targetHit.y - clickCoords.y),
   };
-  console.log('distance from target', clickDeviation);
+  responseLog.push(clickDeviation);
 };
