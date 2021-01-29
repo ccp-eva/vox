@@ -6,7 +6,6 @@ export default (event, target, outerSVG, responseLog) => {
 
   const windowScaling = { width: origViewBoxWidth / offsetWidth, height: origViewBoxHeight / offsetHeight };
 
-  // eslint-disable-next-line max-len
   const clickCoords = {
     x: windowScaling.width * event.offsetX,
     y: windowScaling.height * event.offsetY,
@@ -14,10 +13,10 @@ export default (event, target, outerSVG, responseLog) => {
   console.log('');
   console.log('clickCoords', clickCoords);
 
-  // clicked on target?
   const targetCenterX = parseFloat(target.getAttribute('viewBox').split(' ')[0]);
   const targetCenterY = parseFloat(target.getAttribute('viewBox').split(' ')[1]);
 
+  // clicked on target?
   const targetHit = {
     x: -(targetCenterX - target.getBBox().width / 2),
     y: -(targetCenterY - target.getBBox().height / 2),
