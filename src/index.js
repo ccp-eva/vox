@@ -11,6 +11,10 @@ import setTargetCenter from './js/setTargetCenter';
 import clickDistanceFromTarget from './js/clickDistanceFromTarget';
 
 // TODO balloon flugbahn flüssig animieren
+//      mit animStep in animate können wir dauer der animierung bestimmen
+// TODO do we want/need absolute distance? or rather pure and then see whether biased towards left/right?
+// TODO soll responseLog unser kompletter trial datensatz werden?
+//      also da auch nr of trials, reihenfolge randomisierung etc drin speichern?
 
 // ---------------------------------------------------------------------------------------------------------------------
 // SVG & SCREEN SIZE
@@ -274,6 +278,7 @@ let next = false; // this is to be changed on user input
 
 outerSVG.onclick = () => { next = true; };
 
+// https://stackoverflow.com/questions/51374649/using-async-functions-to-await-user-input-from-onclick
 async function waitForClick() {
   while (next === false) await pause(50); // pause script but avoid browser to freeze ;)
   next = false; // reset var
@@ -284,17 +289,17 @@ async function waitForClick() {
 //
 // TODO for now, you can end trial by clicking before balloon landed!
 // ---------------------------------------------------------------------------------------------------------------------
-// https://stackoverflow.com/questions/51374649/using-async-functions-to-await-user-input-from-onclick
 async function runTrial(agents, trialCount) {
-  // wait for user response
-  // on user click, runs clickDistanceFromTarget function
-  const doClick = (event) => clickDistanceFromTarget(event, targets[trialCount], outerSVG, responseLog);
-  outerSVG.addEventListener('click', doClick, false);
-
   // actual sequence of the trial
   await startTrial(agents, trialCount);
   await pause(1000);
   await changeGaze(agents, trialCount);
+
+  // wait for user response
+  // on user click, runs clickDistanceFromTarget function
+  // need this line in order to pass event and other arguments to clickDistance function
+  const doClick = (event) => clickDistanceFromTarget(event, targets[trialCount], outerSVG, responseLog);
+  outerSVG.addEventListener('click', doClick, false);
 
   // wait for user response and log response time and accuracy
   const t0 = new Date().getTime();
