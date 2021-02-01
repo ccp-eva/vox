@@ -1,3 +1,4 @@
+import { gsap } from 'gsap';
 import getGazeCoords from './js/getGazeCoords';
 import randomNumber from './js/randomNumber';
 import shuffleArray from './js/shuffleArray';
@@ -95,8 +96,8 @@ const hedgeMidY = hedge.getBBox().y + hedge.getBBox().height / 2 - balloonBlue.g
 // trialType saves whether we want to display hedge (test) or not (fam)
 // first new Array() number specifies how many fam trials, second how many test trials
 // instead of trialNumber: trialType.length specifies our number of trials!
-const famNr = 5;
-const testNr = 0;
+const famNr = 0;
+const testNr = 1;
 const trialType = [].concat(new Array(famNr).fill('fam'), new Array(testNr).fill('test'));
 
 // calculate how many times each agent should be repeated, based on trialNumber
@@ -298,8 +299,8 @@ async function runTrial(agents, trialCount) {
   // wait for user response
   // on user click, runs clickDistanceFromTarget function
   // need this line in order to pass event and other arguments to clickDistance function
-  const doClick = (event) => clickDistanceFromTarget(event, targets[trialCount], outerSVG, responseLog);
-  outerSVG.addEventListener('click', doClick, false);
+  const handleClick = (event) => clickDistanceFromTarget(event, targets[trialCount], outerSVG, responseLog);
+  outerSVG.addEventListener('click', handleClick, false);
 
   // wait for user response and log response time and accuracy
   const t0 = new Date().getTime();
@@ -312,7 +313,7 @@ async function runTrial(agents, trialCount) {
   console.log(`user has clicked ${nrClicks} time(s)`);
 
   // in order to save only current click values, we always need new eventListener
-  outerSVG.removeEventListener('click', doClick, false);
+  outerSVG.removeEventListener('click', handleClick, false);
 
   // recursion anchor
   if (trialCount + 1 < trialType.length) {
@@ -322,4 +323,9 @@ async function runTrial(agents, trialCount) {
 
 // CAUTION: trialCount start at zero, ie. first trial = 0
 // (because we need first element in array, that's at position 0)
-runTrial(agents, 0);
+// runTrial(agents, 0);
+
+// ----------------------------------------------------
+// GSAP
+//
+gsap.to('#hedge', { rotation: 27, x: 100, duration: 1 });

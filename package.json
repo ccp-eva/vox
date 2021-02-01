@@ -17,7 +17,9 @@
   ],
   "author": "Kalinke & Prein",
   "license": "MIT",
-  "dependencies": {},
+  "dependencies": {
+    "gsap": "^3.6.0"
+  },
   "devDependencies": {
     "eslint": "^7.15.0",
     "eslint-config-airbnb-base": "^14.2.1",
