@@ -10,6 +10,7 @@ import getEyeCenter from './js/getEyeCenter';
 import setEyeCenter from './js/setEyeCenter';
 import setTargetCenter from './js/setTargetCenter';
 import clickDistanceFromTarget from './js/clickDistanceFromTarget';
+import distanceViewBoxes from './js/distanceViewBoxes';
 
 // TODO balloon flugbahn flüssig animieren
 //      mit animStep in animate können wir dauer der animierung bestimmen
@@ -97,8 +98,8 @@ const hedgeMidY = hedge.getBBox().y + hedge.getBBox().height / 2 - balloonBlue.g
 // trialType saves whether we want to display hedge (test) or not (fam)
 // first new Array() number specifies how many fam trials, second how many test trials
 // instead of trialNumber: trialType.length specifies our number of trials!
-const famNr = 2;
-const testNr = 2;
+const famNr = 1;
+const testNr = 0;
 const trialType = [].concat(new Array(famNr).fill('fam'), new Array(testNr).fill('test'));
 
 // calculate how many times each agent should be repeated, based on trialNumber
@@ -297,8 +298,13 @@ async function changeGaze(agents, trialCount) {
   const gazeCoordsLeft = getGazeCoords(targets[trialCount], targetViewBoxRandom, pupilLeft, eyelineLeft);
   const gazeCoordsRight = getGazeCoords(targets[trialCount], targetViewBoxRandom, pupilRight, eyelineRight);
 
+  // Use a linear ease (Linear.easeNone) and do the math yourself, like duration = distance / pixelsPerSecond
+  const distanceCenterRandom = distanceViewBoxes(targetViewBoxCenter, targetViewBoxRandom);
+  const perSecond = 300;
+
   gsap.to(targets[trialCount], {
-    duration: 2,
+    duration: `${distanceCenterRandom / perSecond}`,
+    ease: 'none',
     attr: { viewBox: `${targetViewBoxRandom}` },
     onComplete() {
       setTargetCenter(targets[trialCount], targetViewBoxRandom);
@@ -308,7 +314,8 @@ async function changeGaze(agents, trialCount) {
   gsap.to(
     [pupilLeft, irisLeft],
     {
-      duration: 2,
+      duration: `${distanceCenterRandom / perSecond}`,
+      ease: 'none',
       attr: {
         cx: `${gazeCoordsLeft.x}`,
         cy: `${gazeCoordsLeft.y}`,
@@ -323,7 +330,8 @@ async function changeGaze(agents, trialCount) {
   gsap.to(
     [pupilRight, irisRight],
     {
-      duration: 2,
+      duration: `${distanceCenterRandom / perSecond}`,
+      ease: 'none',
       attr: {
         cx: `${gazeCoordsRight.x}`,
         cy: `${gazeCoordsRight.y}`,
