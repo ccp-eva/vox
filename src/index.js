@@ -62,6 +62,7 @@ for (let i = 0; i < agentsNames.length; i++) {
     right: getEyeCenter(document.getElementById(`${agentsNames[i]}-pupil-right`)),
   };
 }
+console.log('eyeCenters', eyeCenters);
 
 // NOTE: we believe that all target objects are the same size here!!
 const balloonBlue = document.getElementById('balloon-blue');
@@ -96,8 +97,8 @@ const hedgeMidY = hedge.getBBox().y + hedge.getBBox().height / 2 - balloonBlue.g
 // trialType saves whether we want to display hedge (test) or not (fam)
 // first new Array() number specifies how many fam trials, second how many test trials
 // instead of trialNumber: trialType.length specifies our number of trials!
-const famNr = 0;
-const testNr = 1;
+const famNr = 2;
+const testNr = 2;
 const trialType = [].concat(new Array(famNr).fill('fam'), new Array(testNr).fill('test'));
 
 // calculate how many times each agent should be repeated, based on trialNumber
@@ -223,7 +224,61 @@ async function startTrial(agents, trialCount) {
 // TODO might need to add target as function argument
 // TODO ${agents[trialCount].getAttribute('id')} for just getting 'pig' necessary?!
 // ---------------------------------------------------------------------------------------------------------------------
+
+// ---------------------------------------------------------------------------------------------------------------------
+// ---------------------------------------------------------------------------------------------------------------------
+// OLD; WORKS
 // NOTE: async functions return promise, so we can wait for them (await)
+// async function changeGaze(agents, trialCount) {
+//   const currentAgent = `${agents[trialCount].getAttribute('id')}`;
+//   // get IDs of eye
+//   const pupilLeft = document.getElementById(`${currentAgent}-pupil-left`);
+//   const pupilRight = document.getElementById(`${currentAgent}-pupil-right`);
+//   const irisLeft = document.getElementById(`${currentAgent}-iris-left`);
+//   const irisRight = document.getElementById(`${currentAgent}-iris-right`);
+//   const eyelineLeft = document.getElementById(`${currentAgent}-eyeline-left`);
+//   const eyelineRight = document.getElementById(`${currentAgent}-eyeline-right`);
+
+//   // define where the target will move
+//   // WE NEED MINUS! SINCE WE MOVE THE COORDINATE SYSTEM TO THE LEFT / UP in order to let the balloon move right / down
+//   // eslint-disable-next-line max-len
+//   const targetViewBoxRandom = `-${randomNumber(sectionArray[trialCount].min, sectionArray[trialCount].max)} -${hedgeMidY} ${origViewBoxWidth} ${origViewBoxHeight}`;
+
+//   // TODO in test trial let balloon fly straight down, then to position
+//   // animate target and set target viewBox to the value where it just moved
+//   // if fam: how whole path of target. if test: let balloon hide first
+//   // if (trialType[trialCount] === 'fam') {
+//   //   // BACK TO RANDOM: next two lines
+//   //   animateViewBox(targets[trialCount], targetViewBoxRandom);
+//   //   targets[trialCount].setAttribute('viewBox', targetViewBoxRandom);
+//   // } else if (trialType[trialCount] === 'test') {
+//   //   animateViewBox(targets[trialCount], targetViewBoxRandom);
+//   //   targets[trialCount].setAttribute('viewBox', targetViewBoxRandom);
+//   // }
+
+//   animateViewBox(targets[trialCount], targetViewBoxRandom);
+//   targets[trialCount].setAttribute('viewBox', targetViewBoxRandom);
+
+//   // calculate positions for both eyes (AFTER target viewBox value has changed)
+//   const gazeCoordsLeft = getGazeCoords(targets[trialCount], pupilLeft, eyelineLeft);
+//   const gazeCoordsRight = getGazeCoords(targets[trialCount], pupilRight, eyelineRight);
+
+//   // animate eyes and set eye viewBoxes to the value where it just moved
+//   animateCoord(pupilLeft, gazeCoordsLeft);
+//   animateCoord(pupilRight, gazeCoordsRight);
+//   animateCoord(irisLeft, gazeCoordsLeft);
+//   animateCoord(irisRight, gazeCoordsRight);
+//   pupilLeft.setAttribute('cx', gazeCoordsLeft.x);
+//   pupilLeft.setAttribute('cy', gazeCoordsLeft.y);
+//   irisLeft.setAttribute('cx', gazeCoordsLeft.x);
+//   irisLeft.setAttribute('cy', gazeCoordsLeft.y);
+// }
+// ---------------------------------------------------------------------------------------------------------------------
+// ---------------------------------------------------------------------------------------------------------------------
+
+// ---------------------------------------------------------------------------------------------------------------------
+// NEW; WITH GSAP
+// ---------------------------------------------------------------------------------------------------------------------
 async function changeGaze(agents, trialCount) {
   const currentAgent = `${agents[trialCount].getAttribute('id')}`;
   // get IDs of eye
@@ -238,36 +293,47 @@ async function changeGaze(agents, trialCount) {
   // WE NEED MINUS! SINCE WE MOVE THE COORDINATE SYSTEM TO THE LEFT / UP in order to let the balloon move right / down
   // eslint-disable-next-line max-len
   const targetViewBoxRandom = `-${randomNumber(sectionArray[trialCount].min, sectionArray[trialCount].max)} -${hedgeMidY} ${origViewBoxWidth} ${origViewBoxHeight}`;
+  // calculate new position of eyes with the values where target WILL move to (is not yet there!)
+  const gazeCoordsLeft = getGazeCoords(targets[trialCount], targetViewBoxRandom, pupilLeft, eyelineLeft);
+  const gazeCoordsRight = getGazeCoords(targets[trialCount], targetViewBoxRandom, pupilRight, eyelineRight);
 
-  // animate target and set target viewBox to the value where it just moved
-  // if fam: how whole path of target. if test: let balloon hide first
-  if (trialType[trialCount] === 'fam') {
-    // BACK TO RANDOM: next two lines
-    animateViewBox(targets[trialCount], targetViewBoxRandom);
-    targets[trialCount].setAttribute('viewBox', targetViewBoxRandom);
-  } else if (trialType[trialCount] === 'test') {
-    animateViewBox(targets[trialCount], targetViewBoxRandom);
-    targets[trialCount].setAttribute('viewBox', targetViewBoxRandom);
-  }
+  gsap.to(targets[trialCount], {
+    duration: 2,
+    attr: { viewBox: `${targetViewBoxRandom}` },
+    onComplete() {
+      setTargetCenter(targets[trialCount], targetViewBoxRandom);
+    },
+  });
 
-  // calculate positions for both eyes (AFTER target viewBox value has changed)
-  const gazeCoordsLeft = getGazeCoords(targets[trialCount], pupilLeft, eyelineLeft);
-  const gazeCoordsRight = getGazeCoords(targets[trialCount], pupilRight, eyelineRight);
+  gsap.to(
+    [pupilLeft, irisLeft],
+    {
+      duration: 2,
+      attr: {
+        cx: `${gazeCoordsLeft.x}`,
+        cy: `${gazeCoordsLeft.y}`,
+      },
+      onComplete() {
+        setEyeCenter(pupilLeft, gazeCoordsLeft);
+        setEyeCenter(irisLeft, gazeCoordsLeft);
+      },
+    },
+  );
 
-  // animate eyes and set eye viewBoxes to the value where it just moved
-  animateCoord(pupilLeft, gazeCoordsLeft);
-  animateCoord(pupilRight, gazeCoordsRight);
-  animateCoord(irisLeft, gazeCoordsLeft);
-  animateCoord(irisRight, gazeCoordsRight);
-
-  pupilLeft.setAttribute('cx', gazeCoordsLeft.x);
-  pupilLeft.setAttribute('cy', gazeCoordsLeft.y);
-  pupilRight.setAttribute('cx', gazeCoordsRight.x);
-  pupilRight.setAttribute('cy', gazeCoordsRight.y);
-  irisLeft.setAttribute('cx', gazeCoordsLeft.x);
-  irisLeft.setAttribute('cy', gazeCoordsLeft.y);
-  irisRight.setAttribute('cx', gazeCoordsRight.x);
-  irisRight.setAttribute('cy', gazeCoordsRight.y);
+  gsap.to(
+    [pupilRight, irisRight],
+    {
+      duration: 2,
+      attr: {
+        cx: `${gazeCoordsRight.x}`,
+        cy: `${gazeCoordsRight.y}`,
+      },
+      onComplete() {
+        setEyeCenter(pupilRight, gazeCoordsRight);
+        setEyeCenter(irisRight, gazeCoordsRight);
+      },
+    },
+  );
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -323,9 +389,4 @@ async function runTrial(agents, trialCount) {
 
 // CAUTION: trialCount start at zero, ie. first trial = 0
 // (because we need first element in array, that's at position 0)
-// runTrial(agents, 0);
-
-// ----------------------------------------------------
-// GSAP
-//
-gsap.to('#hedge', { rotation: 27, x: 100, duration: 1 });
+runTrial(agents, 0);

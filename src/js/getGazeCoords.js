@@ -1,5 +1,5 @@
 // call with getGazeCoords(document.getElementById("target"), document.getElementById("eye"))
-export default (target, pupil, eyeline) => {
+export default (target, targetViewBoxRandom, pupil, eyeline) => {
   // first, get all elements that we need
   // get eyeline with eyeRadius
   const eyeRadius = parseFloat(eyeline.getAttribute('r'), 10);
@@ -15,11 +15,10 @@ export default (target, pupil, eyeline) => {
   // define target’s center point, use bounding box
   const targetWidth = target.getBBox().width;
   const targetHeight = target.getBBox().height;
-  // const targetX = target.getBBox().x;
-  // const targetY = target.getBBox().y;
+
   // use viewbox coordinates
-  const targetX = Math.abs(target.getAttribute('viewBox').split(' ')[0]);
-  const targetY = Math.abs(target.getAttribute('viewBox').split(' ')[1]);
+  const targetX = Math.abs(targetViewBoxRandom.split(' ')[0]);
+  const targetY = Math.abs(targetViewBoxRandom.split(' ')[1]);
 
   const targetCenterX = targetX + targetWidth / 2;
   const targetCenterY = targetY + targetHeight / 2;
