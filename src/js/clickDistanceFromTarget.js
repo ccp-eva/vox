@@ -1,31 +1,46 @@
+import { gsap } from 'gsap';
+
 export default (event, target, outerSVG, responseLog) => {
-  const { offsetWidth } = document.body;
-  const { offsetHeight } = document.body;
+  // save all relevant properties in this empty object
+  const clickLog = {};
+  // in our context, offset and client same values
+  clickLog.offsetWidth = document.body.offsetWidth;
+  clickLog.offsetHeight = document.body.offsetHeight;
   const origViewBoxWidth = parseFloat(outerSVG.getAttribute('viewBox').split(' ')[2]);
   const origViewBoxHeight = parseFloat(outerSVG.getAttribute('viewBox').split(' ')[3]);
 
-  const windowScaling = { width: origViewBoxWidth / offsetWidth, height: origViewBoxHeight / offsetHeight };
+  // how much smaller/bigger is the SVG coordinate system wrt the screen size?
+  clickLog.screenScalingWidth = origViewBoxWidth / clickLog.offsetWidth;
+  clickLog.screenScalingHeight = origViewBoxHeight / clickLog.offsetHeight;
 
-  const clickCoords = {
-    x: windowScaling.width * event.offsetX,
-    y: windowScaling.height * event.offsetY,
-  };
-  console.log('');
-  console.log('clickCoords', clickCoords);
+  // click coordinates (event.offset) * scaling
+  clickLog.clickX = clickLog.screenScalingWidth * event.offsetX;
+  clickLog.clickY = clickLog.screenScalingHeight * event.offsetY;
 
-  const targetCenterX = parseFloat(target.getAttribute('viewBox').split(' ')[0]);
-  const targetCenterY = parseFloat(target.getAttribute('viewBox').split(' ')[1]);
+  const clickBubble = document.getElementById('click-bubble');
+  // let clickBubble be visible only for 0.2 sec
+  gsap.to(clickBubble, {
+    duration: 0.2,
+    attr: { visibility: 'visible' },
+    onComplete() {
+      clickBubble.setAttribute('visibility', 'hidden');
+    },
+  });
+
+  // setCircleCenter(clickBubble, { x: clickLog.clickX, y: clickLog.clickY });
+  clickBubble.setAttribute('cx', `${clickLog.clickX}`);
+  clickBubble.setAttribute('cy', `${clickLog.clickY}`);
+
+  const targetX = parseFloat(target.getAttribute('viewBox').split(' ')[0]);
+  const targetY = parseFloat(target.getAttribute('viewBox').split(' ')[1]);
+
+  // define center of target
+  clickLog.targetCenterX = -(targetX - target.getBBox().width / 2);
+  clickLog.targetCenterY = -(targetY - target.getBBox().height / 2);
 
   // clicked on target?
-  const targetHit = {
-    x: -(targetCenterX - target.getBBox().width / 2),
-    y: -(targetCenterY - target.getBBox().height / 2),
-  };
-  console.log('targetHit', targetHit);
+  clickLog.clickDeviationX = clickLog.clickX - clickLog.targetCenterX;
+  clickLog.clickDeviationY = clickLog.clickY - clickLog.targetCenterY;
 
-  const clickDeviation = {
-    x: Math.abs(targetHit.x - clickCoords.x),
-    y: Math.abs(targetHit.y - clickCoords.y),
-  };
-  responseLog.push(clickDeviation);
+  responseLog.push(clickLog);
 };
