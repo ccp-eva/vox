@@ -1,10 +1,10 @@
 import shuffleArray from './js/shuffleArray';
-import divideWithRemainder from './js/divideWithRemainder';
 import clickDistanceFromTarget from './js/clickDistanceFromTarget';
 import checkForTouchscreen from './js/checkForTouchscreen';
 import startTrial from './js/startTrial';
 import changeGaze from './js/changeGaze';
 import pause from './js/pause';
+import randomizeTrials from './randomizeTrials';
 
 // ---------------------------------------------------------------------------------------------------------------------
 // SVG & SCREEN SIZE
@@ -38,14 +38,16 @@ const coverBlurr = document.getElementById('cover-blurr');
 const pig = document.getElementById('pig');
 const monkey = document.getElementById('monkey');
 const sheep = document.getElementById('sheep');
-const agentsNr = 3;
+// eslint-disable-next-line prefer-const
+let agentsSingle = [pig, monkey, sheep];
 
 // NOTE: we believe that all target objects are the same size here!!
 const balloonBlue = document.getElementById('balloon-blue');
 const balloonRed = document.getElementById('balloon-red');
 const balloonYellow = document.getElementById('balloon-yellow');
 const balloonGreen = document.getElementById('balloon-green');
-const targetsNr = 4;
+// eslint-disable-next-line prefer-const
+let targetsSingle = [balloonBlue, balloonRed, balloonYellow, balloonGreen];
 
 // hide all in beginning
 [balloonBlue, balloonRed, balloonYellow, balloonGreen,
@@ -90,7 +92,7 @@ const targetViewBoxHidden = `-${targetPositionMid} -${origViewBoxHeight - hedge.
 // placeholder x for random horizontal position. y value and width, height always stays same
 const targetViewBoxRandom = `-x -${hedgeMidY} ${origViewBoxWidth} ${origViewBoxHeight}`;
 
-[balloonBlue, balloonRed, balloonYellow, balloonGreen].forEach((target) => {
+targetsSingle.forEach((target) => {
   target.setAttribute('viewBoxCenter', `${targetViewBoxCenter}`);
   target.setAttribute('viewBoxHidden', `${targetViewBoxHidden}`);
   target.setAttribute('viewBoxRandom', `${targetViewBoxRandom}`);
@@ -99,47 +101,9 @@ const targetViewBoxRandom = `-x -${hedgeMidY} ${origViewBoxWidth} ${origViewBoxH
 // ---------------------------------------------------------------------------------------------------------------------
 // TRIAL NUMBER & RANDOMIZATION
 // ---------------------------------------------------------------------------------------------------------------------
-// trialType saves whether we want to display hedge (test) or not (fam)
-// first new Array() number specifies how many fam trials, second how many test trials
-// instead of trialNumber: trialType.length specifies our number of trials!
 const famNr = 2;
 const testNr = 3;
-const trialType = [].concat(new Array(famNr).fill('fam'), new Array(testNr).fill('test'));
-
-// calculate how many times each agent should be repeated, based on trialNumber
-const agentsDiv = divideWithRemainder(trialType.length, agentsNr);
-
-let agents = shuffleArray([]
-  .concat(new Array(agentsDiv.quotient).fill(pig),
-    new Array(agentsDiv.quotient).fill(sheep),
-    new Array(agentsDiv.quotient).fill(monkey)));
-
-// if our trialNumber is not divisable by number of agents, put random agents for remainder number:
-// create random array with agents
-// keep only as many entries in array as we need (remove rest)
-// combine with list of repeated agents
-if (agentsDiv.remainder > 0) {
-  const agentsTmp = shuffleArray([pig, sheep, monkey]);
-  agentsTmp.splice(0, agentsTmp.length - agentsDiv.remainder);
-  agents = agents.concat(agentsTmp);
-}
-console.log('agents', agents);
-
-// SAME FOR TARGET
-const targetsDiv = divideWithRemainder(trialType.length, targetsNr);
-
-let targets = shuffleArray([]
-  .concat(new Array(targetsDiv.quotient).fill(balloonRed),
-    new Array(targetsDiv.quotient).fill(balloonBlue),
-    new Array(targetsDiv.quotient).fill(balloonYellow),
-    new Array(targetsDiv.quotient).fill(balloonGreen)));
-
-if (targetsDiv.remainder > 0) {
-  const targetsTmp = shuffleArray([balloonRed, balloonBlue, balloonYellow, balloonGreen]);
-  targetsTmp.splice(0, targetsTmp.length - targetsDiv.remainder);
-  targets = targets.concat(targetsTmp);
-}
-console.log('targets', targets);
+const { trialType, agents, targets } = randomizeTrials(famNr, testNr, agentsSingle, targetsSingle);
 
 // ---------------------------------------------------------------------------------------------------------------------
 // CALCULATE POSITIONS OF TARGET
