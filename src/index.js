@@ -31,7 +31,6 @@ console.log('viewbox size', {
 // ---------------------------------------------------------------------------------------------------------------------
 const button = document.getElementById('button');
 const clickBubble = document.getElementById('click-bubble');
-const coverBlurr = document.getElementById('cover-blurr');
 
 // if you change animal agents or targets, then change ID here...
 const pig = document.getElementById('pig');
@@ -51,7 +50,7 @@ let targetsSingle = [balloonBlue, balloonRed, balloonYellow, balloonGreen];
 // hide all in beginning
 [balloonBlue, balloonRed, balloonYellow, balloonGreen,
   pig, monkey, sheep,
-  button, clickBubble, coverBlurr,
+  clickBubble,
 ].forEach((element) => {
   element.setAttribute('visibility', 'hidden');
 });
@@ -100,8 +99,8 @@ targetsSingle.forEach((target) => {
 // ---------------------------------------------------------------------------------------------------------------------
 // TRIAL NUMBER & RANDOMIZATION OF AGENTS, TARGETS AND TARGET POSITIONS
 // ---------------------------------------------------------------------------------------------------------------------
-const famNr = 10;
-const testNr = 10;
+const famNr = 2;
+const testNr = 2;
 const {
   trialType, agents, targets, positions,
 } = randomizeTrials(famNr, testNr, agentsSingle, targetsSingle, targetPositionRight);
@@ -134,6 +133,7 @@ async function waitForButtonClick() {
 async function runTrial(agents, trialCount) {
   // before trial starts, prepare it and hide underneath blurr
   prepareTrial(agents, targets, trialCount, trialType);
+
   // start trial on buttonClick
   await waitForButtonClick();
 
@@ -164,6 +164,9 @@ async function runTrial(agents, trialCount) {
 
   // in order to save only current click values, we always need new eventListener
   outerSVG.removeEventListener('click', handleClick, false);
+
+  // so that we don't rush to the next trial/startscreen but have a little time
+  await pause(1000);
 
   // recursion anchor
   if (trialCount + 1 < trialType.length) {
