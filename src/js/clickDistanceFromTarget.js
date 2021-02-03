@@ -29,6 +29,8 @@ export default (event, target, outerSVG, responseLog) => {
     },
   });
 
+  document.getElementById('sound').play();
+
   const targetX = parseFloat(target.getAttribute('viewBox').split(' ')[0]);
   const targetY = parseFloat(target.getAttribute('viewBox').split(' ')[1]);
 
