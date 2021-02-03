@@ -1,19 +1,10 @@
-import { gsap } from 'gsap';
-import getGazeCoords from './js/getGazeCoords';
-import randomNumber from './js/randomNumber';
 import shuffleArray from './js/shuffleArray';
-import showElement from './js/showElement';
 import divideWithRemainder from './js/divideWithRemainder';
-import getEyeCenter from './js/getEyeCenter';
-import setCircleCenter from './js/setCircleCenter';
-import setTargetCenter from './js/setTargetCenter';
 import clickDistanceFromTarget from './js/clickDistanceFromTarget';
-import distanceViewBoxes from './js/distanceViewBoxes';
 import checkForTouchscreen from './js/checkForTouchscreen';
-
-// TODO do we want/need absolute distance? or rather pure and then see whether biased towards left/right?
-// TODO soll responseLog unser kompletter trial datensatz werden?
-//      also da auch nr of trials, reihenfolge randomisierung etc drin speichern?
+import startTrial from './js/startTrial';
+import changeGaze from './js/changeGaze';
+import pause from './js/pause';
 
 // ---------------------------------------------------------------------------------------------------------------------
 // SVG & SCREEN SIZE
@@ -47,23 +38,14 @@ const coverBlurr = document.getElementById('cover-blurr');
 const pig = document.getElementById('pig');
 const monkey = document.getElementById('monkey');
 const sheep = document.getElementById('sheep');
-
-// save the original position of the eyes of agents
-const agentsNames = ['pig', 'monkey', 'sheep'];
-const eyeCenters = [];
-for (let i = 0; i < agentsNames.length; i++) {
-  eyeCenters[`${agentsNames[i]}`] = {
-    left: getEyeCenter(document.getElementById(`${agentsNames[i]}-pupil-left`)),
-    right: getEyeCenter(document.getElementById(`${agentsNames[i]}-pupil-right`)),
-  };
-}
-console.log('eyeCenters', eyeCenters);
+const agentsNr = 3;
 
 // NOTE: we believe that all target objects are the same size here!!
 const balloonBlue = document.getElementById('balloon-blue');
 const balloonRed = document.getElementById('balloon-red');
 const balloonYellow = document.getElementById('balloon-yellow');
 const balloonGreen = document.getElementById('balloon-green');
+const targetsNr = 4;
 
 // hide all in beginning
 [balloonBlue, balloonRed, balloonYellow, balloonGreen,
@@ -73,21 +55,46 @@ const balloonGreen = document.getElementById('balloon-green');
   element.setAttribute('visibility', 'hidden');
 });
 
+// for all agents, save the original pupil/iris positions as attributes in svg elements
+['pig', 'monkey', 'sheep'].forEach((agent) => {
+  const pupilLeft = document.getElementById(`${agent}-pupil-left`);
+  const irisLeft = document.getElementById(`${agent}-iris-left`);
+  const pupilRight = document.getElementById(`${agent}-pupil-right`);
+  const irisRight = document.getElementById(`${agent}-iris-right`);
+
+  pupilLeft.setAttribute('cxOrig', `${pupilLeft.getAttribute('cx')}`);
+  pupilLeft.setAttribute('cyOrig', `${pupilLeft.getAttribute('cy')}`);
+  irisLeft.setAttribute('cxOrig', `${irisLeft.getAttribute('cx')}`);
+  irisLeft.setAttribute('cyOrig', `${irisLeft.getAttribute('cy')}`);
+  pupilRight.setAttribute('cxOrig', `${pupilRight.getAttribute('cx')}`);
+  pupilRight.setAttribute('cyOrig', `${pupilRight.getAttribute('cy')}`);
+  irisRight.setAttribute('cxOrig', `${irisRight.getAttribute('cx')}`);
+  irisRight.setAttribute('cyOrig', `${irisRight.getAttribute('cy')}`);
+});
+
+// calculate some target positions:
 // get position on the very right (as constraint) and mid of the screen
 const targetPositionRight = origViewBoxWidth - balloonBlue.getBBox().width;
 const targetPositionMid = origViewBoxWidth / 2 - balloonBlue.getBBox().width / 2;
 // eslint-disable-next-line max-len
 const targetViewBoxCenter = `-${targetPositionMid} -${origViewBoxHeight / 2.8} ${origViewBoxWidth} ${origViewBoxHeight}`;
 
-// calculate from which coordinates the balloons are hidden behind the hedge
-const hedgeback = document.getElementById('hedgeback');
-// eslint-disable-next-line max-len
-const targetViewBoxHidden = `-${targetPositionMid} -${origViewBoxHeight - hedgeback.getAttribute('height')} ${origViewBoxWidth} ${origViewBoxHeight}`;
-
-// get hedge and middle Y of it
+// get hedge
 const hedge = document.getElementById('hedge');
 // take y coordinate of hedge + half of the height. Then, subtract half of the balloon height.
 const hedgeMidY = hedge.getBBox().y + hedge.getBBox().height / 2 - balloonBlue.getBBox().height / 2;
+// define from which point onwards the balloon is hidden behind hedge
+// BBox of hedge is a bit too high to hide balloon, therefore / 1.1
+// eslint-disable-next-line max-len
+const targetViewBoxHidden = `-${targetPositionMid} -${origViewBoxHeight - hedge.getBBox().height / 1.1} ${origViewBoxWidth} ${origViewBoxHeight}`;
+// placeholder x for random horizontal position. y value and width, height always stays same
+const targetViewBoxRandom = `-x -${hedgeMidY} ${origViewBoxWidth} ${origViewBoxHeight}`;
+
+[balloonBlue, balloonRed, balloonYellow, balloonGreen].forEach((target) => {
+  target.setAttribute('viewBoxCenter', `${targetViewBoxCenter}`);
+  target.setAttribute('viewBoxHidden', `${targetViewBoxHidden}`);
+  target.setAttribute('viewBoxRandom', `${targetViewBoxRandom}`);
+});
 
 // ---------------------------------------------------------------------------------------------------------------------
 // TRIAL NUMBER & RANDOMIZATION
@@ -95,12 +102,12 @@ const hedgeMidY = hedge.getBBox().y + hedge.getBBox().height / 2 - balloonBlue.g
 // trialType saves whether we want to display hedge (test) or not (fam)
 // first new Array() number specifies how many fam trials, second how many test trials
 // instead of trialNumber: trialType.length specifies our number of trials!
-const famNr = 0;
-const testNr = 5;
+const famNr = 2;
+const testNr = 3;
 const trialType = [].concat(new Array(famNr).fill('fam'), new Array(testNr).fill('test'));
 
 // calculate how many times each agent should be repeated, based on trialNumber
-const agentsDiv = divideWithRemainder(trialType.length, agentsNames.length);
+const agentsDiv = divideWithRemainder(trialType.length, agentsNr);
 
 let agents = shuffleArray([]
   .concat(new Array(agentsDiv.quotient).fill(pig),
@@ -119,7 +126,6 @@ if (agentsDiv.remainder > 0) {
 console.log('agents', agents);
 
 // SAME FOR TARGET
-const targetsNr = 4; // here, save number of balloons
 const targetsDiv = divideWithRemainder(trialType.length, targetsNr);
 
 let targets = shuffleArray([]
@@ -158,215 +164,6 @@ const sectionArray = shuffleArray([section1, section2, section3, section4, secti
 console.log('sectionArray', sectionArray);
 
 // ---------------------------------------------------------------------------------------------------------------------
-// FUNCTION FOR BREAK
-// ---------------------------------------------------------------------------------------------------------------------
-async function pause(ms) {
-  return new Promise((resolve) => setTimeout(resolve, ms));
-}
-
-// ---------------------------------------------------------------------------------------------------------------------
-// FUNCTION FOR BEGINNING NEW TRIAL (back to starting point)
-//
-// TODO function needed for showing/hiding hedge? or okay here?
-// ---------------------------------------------------------------------------------------------------------------------
-// NOTE: async functions return promise, so we can wait for them (await)
-async function startTrial(agents, trialCount) {
-  const currentAgent = `${agents[trialCount].getAttribute('id')}`;
-
-  // show agent and target of the current trial only, hide the other ones
-  showElement(agents, trialCount);
-  showElement(targets, trialCount);
-
-  const pupilLeft = document.getElementById(`${currentAgent}-pupil-left`);
-  const pupilRight = document.getElementById(`${currentAgent}-pupil-right`);
-  const irisLeft = document.getElementById(`${currentAgent}-iris-left`);
-  const irisRight = document.getElementById(`${currentAgent}-iris-right`);
-
-  // get the center/ middle position of eye of currentAgent
-  const midEyeLeft = { x: eyeCenters[`${currentAgent}`].left.x, y: eyeCenters[`${currentAgent}`].left.y };
-  const midEyeRight = { x: eyeCenters[`${currentAgent}`].right.x, y: eyeCenters[`${currentAgent}`].right.y };
-
-  // set target to center
-  setTargetCenter(targets[trialCount], targetViewBoxCenter);
-  targets[trialCount].setAttribute('viewBox', targetViewBoxCenter);
-
-  // set eyes to center
-  setCircleCenter(pupilLeft, midEyeLeft);
-  setCircleCenter(pupilRight, midEyeRight);
-  setCircleCenter(irisLeft, midEyeLeft);
-  setCircleCenter(irisRight, midEyeRight);
-
-  // depending on trial type, show or hide hedge
-  if (trialType[trialCount] === 'fam') {
-    hedge.setAttribute('visibility', 'hidden');
-  } else if (trialType[trialCount] === 'test') {
-    hedge.setAttribute('visibility', 'visible');
-  }
-}
-
-// ---------------------------------------------------------------------------------------------------------------------
-// FUNCTION FOR CHANGING GAZE
-//
-// TODO might need to add target as function argument
-// TODO ${agents[trialCount].getAttribute('id')} for just getting 'pig' necessary?!
-// ---------------------------------------------------------------------------------------------------------------------
-async function changeGaze(agents, trialCount) {
-  const currentAgent = `${agents[trialCount].getAttribute('id')}`;
-  // get IDs of eye
-  const pupilLeft = document.getElementById(`${currentAgent}-pupil-left`);
-  const pupilRight = document.getElementById(`${currentAgent}-pupil-right`);
-  const irisLeft = document.getElementById(`${currentAgent}-iris-left`);
-  const irisRight = document.getElementById(`${currentAgent}-iris-right`);
-  const eyelineLeft = document.getElementById(`${currentAgent}-eyeline-left`);
-  const eyelineRight = document.getElementById(`${currentAgent}-eyeline-right`);
-
-  // first let eyes follow ballooon to middle, until balloon is hidden
-  const gazeCoordsBeginningLeft = getGazeCoords(targets[trialCount], targetViewBoxHidden, pupilLeft, eyelineLeft);
-  const gazeCoordsBeginningRight = getGazeCoords(targets[trialCount], targetViewBoxHidden, pupilRight, eyelineRight);
-
-  // define where the target will move
-  // WE NEED MINUS! SINCE WE MOVE THE COORDINATE SYSTEM TO THE LEFT / UP in order to let the balloon move right / down
-  // eslint-disable-next-line max-len
-  const targetViewBoxRandom = `-${randomNumber(sectionArray[trialCount].min, sectionArray[trialCount].max)} -${hedgeMidY} ${origViewBoxWidth} ${origViewBoxHeight}`;
-  // calculate new position of eyes with the values where target WILL move to (is not yet there!)
-  const gazeCoordsLeft = getGazeCoords(targets[trialCount], targetViewBoxRandom, pupilLeft, eyelineLeft);
-  const gazeCoordsRight = getGazeCoords(targets[trialCount], targetViewBoxRandom, pupilRight, eyelineRight);
-
-  // calculate distance between middle and target position, for constant speed
-  const distanceCenterRandom = distanceViewBoxes(targetViewBoxCenter, targetViewBoxRandom);
-  const distanceCenterHidden = distanceViewBoxes(targetViewBoxCenter, targetViewBoxHidden);
-  const distanceHiddenRandom = distanceViewBoxes(targetViewBoxHidden, targetViewBoxRandom);
-  const perSecond = 300;
-  const timelineFam = gsap.timeline();
-  const timelineTest = gsap.timeline();
-
-  // animate target
-  // for fam trials, just show full path. everything at the same time
-  if (trialType[trialCount] === 'fam') {
-    timelineFam
-      .to(targets[trialCount], {
-        duration: `${distanceCenterRandom / perSecond}`,
-        ease: 'none',
-        attr: { viewBox: `${targetViewBoxRandom}` },
-        onComplete() {
-          setTargetCenter(targets[trialCount], targetViewBoxRandom);
-        },
-      })
-      // animate left eye
-      .to([pupilLeft, irisLeft],
-        {
-          duration: `${distanceCenterRandom / perSecond}`,
-          ease: 'none',
-          attr: {
-            cx: `${gazeCoordsLeft.x}`,
-            cy: `${gazeCoordsLeft.y}`,
-          },
-          onComplete() {
-            setCircleCenter(pupilLeft, gazeCoordsLeft);
-            setCircleCenter(irisLeft, gazeCoordsLeft);
-          },
-        }, '<')
-      // animate right eye
-      .to([pupilRight, irisRight],
-        {
-          duration: `${distanceCenterRandom / perSecond}`,
-          ease: 'none',
-          attr: {
-            cx: `${gazeCoordsRight.x}`,
-            cy: `${gazeCoordsRight.y}`,
-          },
-          onComplete() {
-            setCircleCenter(pupilRight, gazeCoordsRight);
-            setCircleCenter(irisRight, gazeCoordsRight);
-          },
-        }, '<');
-
-  // for test trials, first hide balloon, then move to final position
-  } else {
-    // hedge.setAttribute('visibility', 'hidden');
-    timelineTest
-      // first: hide balloon
-      .to(targets[trialCount], {
-        duration: `${distanceCenterHidden / perSecond}`,
-        ease: 'none',
-        attr: { viewBox: `${targetViewBoxHidden}` },
-      })
-    // let eyes follow balloon already
-      .to([pupilLeft, irisLeft],
-        {
-          duration: `${distanceCenterHidden / perSecond}`,
-          ease: 'none',
-          attr: {
-            cx: `${gazeCoordsBeginningLeft.x}`,
-            cy: `${gazeCoordsBeginningLeft.y}`,
-          },
-        }, '<')
-      .to([pupilRight, irisRight],
-        {
-          duration: `${distanceCenterHidden / perSecond}`,
-          ease: 'none',
-          attr: {
-            cx: `${gazeCoordsBeginningRight.x}`,
-            cy: `${gazeCoordsBeginningRight.y}`,
-          },
-        }, '<');
-    // then move balloon to final position
-    timelineTest.to(targets[trialCount], {
-      duration: `${distanceHiddenRandom / perSecond}`,
-      ease: 'none',
-      attr: { viewBox: `${targetViewBoxRandom}` },
-      onComplete() {
-        setTargetCenter(targets[trialCount], targetViewBoxRandom);
-      },
-    })
-      // eye movement from hidden to target
-      .to([pupilLeft, irisLeft],
-        {
-          duration: `${distanceCenterRandom / perSecond}`,
-          ease: 'none',
-          attr: {
-            cx: `${gazeCoordsLeft.x}`,
-            cy: `${gazeCoordsLeft.y}`,
-          },
-          onComplete() {
-            setCircleCenter(pupilLeft, gazeCoordsLeft);
-            setCircleCenter(irisLeft, gazeCoordsLeft);
-          },
-        }, '<')
-      .to([pupilRight, irisRight],
-        {
-          duration: `${distanceCenterRandom / perSecond}`,
-          ease: 'none',
-          attr: {
-            cx: `${gazeCoordsRight.x}`,
-            cy: `${gazeCoordsRight.y}`,
-          },
-          onComplete() {
-            setCircleCenter(pupilRight, gazeCoordsRight);
-            setCircleCenter(irisRight, gazeCoordsRight);
-          },
-        }, '<');
-  }
-}
-
-// https://greensock.com/docs/v3/Plugins/MotionPathPlugin
-// SVG elements don't seem to respond to setting the className property.
-// Use elem.setAttribute('class', 'foo')
-// that doesn't work:
-// const viewBoxes = [
-//   { viewBox: `${targetViewBoxCenter}` },
-//   // some paths inbetween
-//   { viewBox: `${targetViewBoxRandom}` },
-// ];
-
-// und dann in gsap.to hinter vor onComplete:
-// motionPath: {
-//   path: viewBoxes,
-//   type: 'cubic',
-//   autoRotate: true,
-// },
-
-// ---------------------------------------------------------------------------------------------------------------------
 // EVENTLISTENER
 // ---------------------------------------------------------------------------------------------------------------------
 let nrClicks = 0;
@@ -388,9 +185,9 @@ async function waitForClick() {
 // ---------------------------------------------------------------------------------------------------------------------
 async function runTrial(agents, trialCount) {
   // actual sequence of the trial
-  await startTrial(agents, trialCount);
-  await pause(1000);
-  await changeGaze(agents, trialCount);
+  startTrial(agents, targets, trialCount, trialType);
+  await pause(2000);
+  await changeGaze(agents, targets, sectionArray, trialCount, trialType);
 
   // wait for user response
   // on user click, runs clickDistanceFromTarget function
