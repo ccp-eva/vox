@@ -1,7 +1,7 @@
 import divideWithRemainder from './js/divideWithRemainder';
 import shuffleArray from './js/shuffleArray';
 
-export default (famNr, testNr, agentsSingle, targetsSingle) => {
+export default (famNr, testNr, agentsSingle, targetsSingle, targetPositionRight) => {
   // create array with entry for each fam and test trial
   const trialType = [].concat(new Array(famNr).fill('fam'), new Array(testNr).fill('test'));
 
@@ -40,5 +40,35 @@ export default (famNr, testNr, agentsSingle, targetsSingle) => {
     targets = targets.concat(targetsTmp);
   }
   console.log('targets', targets);
-  return { trialType, agents, targets };
+
+  // ten equally big sections, where targets can land
+  const positionsSingle = [];
+  let prevMax = 0;
+  for (let i = 1; i <= 10; i++) {
+    const section = {
+      min: prevMax,
+      max: (targetPositionRight / 10) * i,
+    };
+    prevMax = section.max;
+    positionsSingle.push(section);
+  }
+
+  const positionsDiv = divideWithRemainder(trialType.length, positionsSingle.length);
+
+  let positions = [];
+  positionsSingle.forEach((section) => {
+    positions = positions.concat(new Array(positionsDiv.quotient).fill(section));
+  });
+  positions = shuffleArray(positions);
+
+  if (positionsDiv.remainder > 0) {
+    const positionsTmp = shuffleArray(positionsSingle);
+    positionsTmp.splice(0, positionsTmp.length - positionsDiv.remainder);
+    positions = positions.concat(positionsTmp);
+  }
+  console.log('positions', positions);
+
+  return {
+    trialType, agents, targets, positions,
+  };
 };

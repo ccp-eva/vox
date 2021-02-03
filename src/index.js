@@ -1,4 +1,3 @@
-import shuffleArray from './js/shuffleArray';
 import clickDistanceFromTarget from './js/clickDistanceFromTarget';
 import checkForTouchscreen from './js/checkForTouchscreen';
 import startTrial from './js/startTrial';
@@ -99,33 +98,13 @@ targetsSingle.forEach((target) => {
 });
 
 // ---------------------------------------------------------------------------------------------------------------------
-// TRIAL NUMBER & RANDOMIZATION
+// TRIAL NUMBER & RANDOMIZATION OF AGENTS, TARGETS AND TARGET POSITIONS
 // ---------------------------------------------------------------------------------------------------------------------
-const famNr = 2;
-const testNr = 3;
-const { trialType, agents, targets } = randomizeTrials(famNr, testNr, agentsSingle, targetsSingle);
-
-// ---------------------------------------------------------------------------------------------------------------------
-// CALCULATE POSITIONS OF TARGET
-// TODO function for this?
-// TODO pick random so viele sections aus sectionArray wie trialNumbers
-// ---------------------------------------------------------------------------------------------------------------------
-// range of possible values to move the target: 0 - targetPositionRight. divide this range into ten
-// for each of these ten categories, pick a random number for each trial
-const section1 = { min: 0, max: targetPositionRight / 10 };
-const section2 = { min: section1.max, max: (targetPositionRight / 10) * 2 };
-const section3 = { min: section2.max, max: (targetPositionRight / 10) * 3 };
-const section4 = { min: section3.max, max: (targetPositionRight / 10) * 4 };
-const section5 = { min: section4.max, max: (targetPositionRight / 10) * 5 };
-const section6 = { min: section5.max, max: (targetPositionRight / 10) * 6 };
-const section7 = { min: section6.max, max: (targetPositionRight / 10) * 7 };
-const section8 = { min: section7.max, max: (targetPositionRight / 10) * 8 };
-const section9 = { min: section8.max, max: (targetPositionRight / 10) * 9 };
-const section10 = { min: section9.max, max: targetPositionRight };
-
-// eslint-disable-next-line max-len
-const sectionArray = shuffleArray([section1, section2, section3, section4, section5, section6, section7, section8, section9, section10]);
-console.log('sectionArray', sectionArray);
+const famNr = 10;
+const testNr = 10;
+const {
+  trialType, agents, targets, positions,
+} = randomizeTrials(famNr, testNr, agentsSingle, targetsSingle, targetPositionRight);
 
 // ---------------------------------------------------------------------------------------------------------------------
 // EVENTLISTENER
@@ -150,8 +129,8 @@ async function waitForClick() {
 async function runTrial(agents, trialCount) {
   // actual sequence of the trial
   startTrial(agents, targets, trialCount, trialType);
-  await pause(2000);
-  await changeGaze(agents, targets, sectionArray, trialCount, trialType);
+  await pause(1000);
+  await changeGaze(agents, targets, positions, trialCount, trialType);
 
   // wait for user response
   // on user click, runs clickDistanceFromTarget function
