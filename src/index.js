@@ -1,6 +1,6 @@
 import clickDistanceFromTarget from './js/clickDistanceFromTarget';
 import checkForTouchscreen from './js/checkForTouchscreen';
-import startTrial from './js/startTrial';
+import prepareTrial from './js/prepareTrial';
 import changeGaze from './js/changeGaze';
 import pause from './js/pause';
 import randomizeTrials from './randomizeTrials';
@@ -111,35 +111,42 @@ const {
 // ---------------------------------------------------------------------------------------------------------------------
 let nrClicks = 0;
 const responseLog = [];
-let next = false; // this is to be changed on user input
-
-outerSVG.onclick = () => { next = true; };
 
 // https://stackoverflow.com/questions/51374649/using-async-functions-to-await-user-input-from-onclick
+let next = false; // this is to be changed on user input
+outerSVG.onclick = () => { next = true; };
 async function waitForClick() {
   while (next === false) await pause(50); // pause script but avoid browser to freeze ;)
   next = false; // reset var
 }
 
+let buttonNext = false;
+button.onclick = () => { buttonNext = true; };
+async function waitForButtonClick() {
+  while (next === false) await pause(50); // pause script but avoid browser to freeze ;)
+  next = false; // reset var
+}
 // ---------------------------------------------------------------------------------------------------------------------
 // SPECIFY ORDER OF EVENTS
 //
 // TODO for now, you can end trial by clicking before balloon landed!
 // ---------------------------------------------------------------------------------------------------------------------
 async function runTrial(agents, trialCount) {
-  // actual sequence of the trial
-  startTrial(agents, targets, trialCount, trialType);
-  await pause(1000);
-  await changeGaze(agents, targets, positions, trialCount, trialType);
+  // before trial starts, prepare it and hide underneath blurr
+  prepareTrial(agents, targets, trialCount, trialType);
+  // start trial on buttonClick
+  await waitForButtonClick();
 
-  // wait for user response
-  // on user click, runs clickDistanceFromTarget function
-  // need this line in order to pass event and other arguments to clickDistance function
+  // define what to do on user click
+  // button: start trial/changeGaze
+  button.addEventListener('click', changeGaze(agents, targets, positions, trialCount, trialType), false);
+
+  // response logging in changegaze
+  // handleClick hands over clickEvent parameter to clickDistanceFromTarget function
   const handleClick = (event) => clickDistanceFromTarget(event, targets[trialCount], outerSVG, responseLog);
   outerSVG.addEventListener('click', handleClick, false);
-
   // wait for user response and log response time and accuracy
-  const t0 = new Date().getTime();
+  const t0 = new Date().getTime(); // TODO
   await waitForClick();
   const responseTime = new Date().getTime() - t0;
 
@@ -152,7 +159,6 @@ async function runTrial(agents, trialCount) {
   responseLog[trialCount].trialType = trialType[trialCount];
 
   console.log('responseLog', responseLog[trialCount]);
-
   nrClicks += 1;
   console.log(`user has clicked ${nrClicks} time(s)`);
 

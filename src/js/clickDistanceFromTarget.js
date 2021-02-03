@@ -18,18 +18,16 @@ export default (event, target, outerSVG, responseLog) => {
   clickLog.clickY = clickLog.screenScalingHeight * event.offsetY;
 
   const clickBubble = document.getElementById('click-bubble');
+  clickBubble.setAttribute('cx', `${clickLog.clickX}`);
+  clickBubble.setAttribute('cy', `${clickLog.clickY}`);
   // let clickBubble be visible only for 0.2 sec
   gsap.to(clickBubble, {
-    duration: 0.2,
+    duration: 0.5,
     attr: { visibility: 'visible' },
     onComplete() {
       clickBubble.setAttribute('visibility', 'hidden');
     },
   });
-
-  // setCircleCenter(clickBubble, { x: clickLog.clickX, y: clickLog.clickY });
-  clickBubble.setAttribute('cx', `${clickLog.clickX}`);
-  clickBubble.setAttribute('cy', `${clickLog.clickY}`);
 
   const targetX = parseFloat(target.getAttribute('viewBox').split(' ')[0]);
   const targetY = parseFloat(target.getAttribute('viewBox').split(' ')[1]);

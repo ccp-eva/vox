@@ -6,6 +6,9 @@ import randomNumber from './randomNumber';
 import distanceViewBoxes from './distanceViewBoxes';
 
 export default (agents, targets, sectionArray, trialCount, trialType) => new Promise((resolve) => {
+  document.getElementById('button').setAttribute('visibility', 'hidden');
+  document.getElementById('cover-blurr').setAttribute('visibility', 'hidden');
+
   const currentAgent = `${agents[trialCount].getAttribute('id')}`;
   // get IDs of eye
   const pupilLeft = document.getElementById(`${currentAgent}-pupil-left`);
@@ -45,6 +48,7 @@ export default (agents, targets, sectionArray, trialCount, trialType) => new Pro
   if (trialType[trialCount] === 'fam') {
     timelineFam
       .to(targets[trialCount], {
+        delay: 2,
         duration: `${distanceCenterRandom / perSecond}`,
         ease: 'none',
         attr: { viewBox: `${targetViewBoxRandom}` },
@@ -87,6 +91,7 @@ export default (agents, targets, sectionArray, trialCount, trialType) => new Pro
     timelineTest
     // first: hide balloon
       .to(targets[trialCount], {
+        delay: 2,
         duration: `${distanceCenterHidden / perSecond}`,
         ease: 'none',
         attr: { viewBox: `${targetViewBoxHidden}` },

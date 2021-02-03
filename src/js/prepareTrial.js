@@ -3,6 +3,9 @@ import setTargetCenter from './setTargetCenter';
 import showElement from './showElement';
 
 export default (agents, targets, trialCount, trialType) => {
+  document.getElementById('button').setAttribute('visibility', 'visible');
+  document.getElementById('cover-blurr').setAttribute('visibility', 'visible');
+
   // show agent and target of the current trial only, hide the other ones
   showElement(agents, trialCount);
   showElement(targets, trialCount);
