@@ -31,6 +31,7 @@ console.log('viewbox size', {
 // ---------------------------------------------------------------------------------------------------------------------
 const button = document.getElementById('button');
 const clickBubble = document.getElementById('click-bubble');
+const wall = document.getElementById('wall');
 
 // if you change animal agents or targets, then change ID here...
 const pig = document.getElementById('pig');
@@ -99,8 +100,8 @@ targetsSingle.forEach((target) => {
 // ---------------------------------------------------------------------------------------------------------------------
 // TRIAL NUMBER & RANDOMIZATION OF AGENTS, TARGETS AND TARGET POSITIONS
 // ---------------------------------------------------------------------------------------------------------------------
-const famNr = 2;
-const testNr = 2;
+const famNr = 1;
+const testNr = 3;
 const {
   trialType, agents, targets, positions,
 } = randomizeTrials(famNr, testNr, agentsSingle, targetsSingle, targetPositionRight);
@@ -112,19 +113,28 @@ let nrClicks = 0;
 const responseLog = [];
 
 // https://stackoverflow.com/questions/51374649/using-async-functions-to-await-user-input-from-onclick
-let next = false; // this is to be changed on user input
-outerSVG.onclick = () => { next = true; };
-async function waitForClick() {
-  while (next === false) await pause(50); // pause script but avoid browser to freeze ;)
-  next = false; // reset var
-}
-
-let buttonNext = false;
-button.onclick = () => { buttonNext = true; };
+// for beginning a trial; click in the beginning
+let buttonNext = false; // this is to be changed on user input
 async function waitForButtonClick() {
-  while (next === false) await pause(50); // pause script but avoid browser to freeze ;)
-  next = false; // reset var
+  while (buttonNext === false) await pause(50); // pause script but avoid browser to freeze ;)
+  buttonNext = false; // reset var
 }
+const handleButtonClick = (event) => {
+  event.preventDefault();
+  buttonNext = true;
+};
+
+// for the actual target click in the trials
+let targetNext = false; // this is to be changed on user input
+async function waitForTargetClick() {
+  while (targetNext === false) await pause(50); // pause script but avoid browser to freeze ;)
+  targetNext = false; // reset var
+}
+const handleTargetClick = (event) => {
+  event.preventDefault();
+  targetNext = true;
+};
+
 // ---------------------------------------------------------------------------------------------------------------------
 // SPECIFY ORDER OF EVENTS
 //
@@ -134,24 +144,35 @@ async function runTrial(agents, trialCount) {
   // before trial starts, prepare it and hide underneath blurr
   prepareTrial(agents, targets, trialCount, trialType);
 
-  // start trial on buttonClick
+  // for for user to start trial
+  button.addEventListener('click', handleButtonClick, { capture: false, once: true });
   await waitForButtonClick();
 
-  // define what to do on user click
-  // button: start trial/changeGaze
-  button.addEventListener('click', changeGaze(agents, targets, positions, trialCount, trialType), false);
+  // during trial presentation, nothing can be clicked
+  await changeGaze(agents, targets, positions, trialCount, trialType);
 
-  // response logging in changegaze
+  // wait for user response and log response time
+  const t0 = new Date().getTime();
+
+  // wait for target click of user (can click on wall/hedge/target)
+  wall.addEventListener('click', handleTargetClick, { capture: false, once: true });
+  hedge.addEventListener('click', handleTargetClick, { capture: false, once: true });
+  targets[trialCount].addEventListener('click', handleTargetClick, { capture: false, once: true });
+
+  await waitForTargetClick();
+
+  // log where the user clicked
+  // NEEDS TO STAY HERE; ONLY IN THIS FUNCTION WE KNOW ALL TRIAL PARAMETERS!
   // handleClick hands over clickEvent parameter to clickDistanceFromTarget function
-  const handleClick = (event) => clickDistanceFromTarget(event, targets[trialCount], outerSVG, responseLog);
-  outerSVG.addEventListener('click', handleClick, false);
-  // wait for user response and log response time and accuracy
-  const t0 = new Date().getTime(); // TODO
-  await waitForClick();
+  const logTargetClick = (event) => { clickDistanceFromTarget(event, targets[trialCount], outerSVG, responseLog); };
+  wall.addEventListener('click', logTargetClick, { capture: false, once: true });
+  hedge.addEventListener('click', logTargetClick, { capture: false, once: true });
+
+  // after click, save response time
   const responseTime = new Date().getTime() - t0;
 
   // log all important trial infos
-  // TODO apparently has to be underneath await waitForClick(). don't know why!?
+  // responseLog.push({}); // just to get rid of intermediate error
   responseLog[trialCount].responseTime = responseTime;
   responseLog[trialCount].trialNr = trialCount + 1;
   responseLog[trialCount].agent = `${agents[trialCount].getAttribute('id')}`;
@@ -161,9 +182,6 @@ async function runTrial(agents, trialCount) {
   console.log('responseLog', responseLog[trialCount]);
   nrClicks += 1;
   console.log(`user has clicked ${nrClicks} time(s)`);
-
-  // in order to save only current click values, we always need new eventListener
-  outerSVG.removeEventListener('click', handleClick, false);
 
   // so that we don't rush to the next trial/startscreen but have a little time
   await pause(1000);
