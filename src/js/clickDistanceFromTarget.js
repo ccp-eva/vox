@@ -43,4 +43,5 @@ export default (event, target, outerSVG, responseLog) => {
   clickLog.clickDeviationY = clickLog.clickY - clickLog.targetCenterY;
 
   responseLog.push(clickLog);
+  console.log(responseLog);
 };
