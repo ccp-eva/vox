@@ -82,6 +82,8 @@ export default (agents, targets, sectionArray, trialCount, trialType) => new Pro
           onComplete() {
             setCircleCenter(pupilRight, gazeCoordsRight);
             setCircleCenter(irisRight, gazeCoordsRight);
+            console.log('animation famtrial complete');
+            resolve();
           },
         }, '<');
 
@@ -149,9 +151,9 @@ export default (agents, targets, sectionArray, trialCount, trialType) => new Pro
           onComplete() {
             setCircleCenter(pupilRight, gazeCoordsRight);
             setCircleCenter(irisRight, gazeCoordsRight);
+            console.log('animation testtrial complete');
+            resolve();
           },
         }, '<');
   }
-
-  resolve('successfully changed gaze');
 });
