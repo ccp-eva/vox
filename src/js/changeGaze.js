@@ -48,7 +48,7 @@ export default (agents, targets, sectionArray, trialCount, trialType) => new Pro
   if (trialType[trialCount] === 'fam') {
     timelineFam
       .to(targets[trialCount], {
-        delay: 2,
+        delay: 1,
         duration: `${distanceCenterRandom / perSecond}`,
         ease: 'none',
         attr: { viewBox: `${targetViewBoxRandom}` },
@@ -83,7 +83,7 @@ export default (agents, targets, sectionArray, trialCount, trialType) => new Pro
             setCircleCenter(pupilRight, gazeCoordsRight);
             setCircleCenter(irisRight, gazeCoordsRight);
             console.log('animation famtrial complete');
-            resolve();
+            resolve({ pupilLeft, pupilRight });
           },
         }, '<');
 
@@ -93,7 +93,7 @@ export default (agents, targets, sectionArray, trialCount, trialType) => new Pro
     timelineTest
     // first: hide balloon
       .to(targets[trialCount], {
-        delay: 2,
+        delay: 1,
         duration: `${distanceCenterHidden / perSecond}`,
         ease: 'none',
         attr: { viewBox: `${targetViewBoxHidden}` },
@@ -152,7 +152,7 @@ export default (agents, targets, sectionArray, trialCount, trialType) => new Pro
             setCircleCenter(pupilRight, gazeCoordsRight);
             setCircleCenter(irisRight, gazeCoordsRight);
             console.log('animation testtrial complete');
-            resolve();
+            resolve({ pupilLeft, pupilRight });
           },
         }, '<');
   }
