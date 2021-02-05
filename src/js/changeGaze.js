@@ -82,8 +82,9 @@ export default (agents, targets, sectionArray, trialCount, trialType) => new Pro
           onComplete() {
             setCircleCenter(pupilRight, gazeCoordsRight);
             setCircleCenter(irisRight, gazeCoordsRight);
+            const durationAnimation = distanceCenterRandom / perSecond;
             console.log('animation famtrial complete');
-            resolve({ pupilLeft, pupilRight });
+            resolve({ pupilLeft, pupilRight, durationAnimation });
           },
         }, '<');
 
@@ -129,7 +130,7 @@ export default (agents, targets, sectionArray, trialCount, trialType) => new Pro
     // eye movement from hidden to target
       .to([pupilLeft, irisLeft],
         {
-          duration: `${distanceCenterRandom / perSecond}`,
+          duration: `${distanceHiddenRandom / perSecond}`,
           ease: 'none',
           attr: {
             cx: `${gazeCoordsLeft.x}`,
@@ -142,7 +143,7 @@ export default (agents, targets, sectionArray, trialCount, trialType) => new Pro
         }, '<')
       .to([pupilRight, irisRight],
         {
-          duration: `${distanceCenterRandom / perSecond}`,
+          duration: `${distanceHiddenRandom / perSecond}`,
           ease: 'none',
           attr: {
             cx: `${gazeCoordsRight.x}`,
@@ -151,8 +152,9 @@ export default (agents, targets, sectionArray, trialCount, trialType) => new Pro
           onComplete() {
             setCircleCenter(pupilRight, gazeCoordsRight);
             setCircleCenter(irisRight, gazeCoordsRight);
+            const durationAnimation = (distanceCenterHidden / perSecond) + (distanceHiddenRandom / perSecond);
             console.log('animation testtrial complete');
-            resolve({ pupilLeft, pupilRight });
+            resolve({ pupilLeft, pupilRight, durationAnimation });
           },
         }, '<');
   }
