@@ -152,32 +152,38 @@ async function runTrial(agents, trialCount) {
   // animate target and eye movements
   // during trial presentation, nothing can be clicked
   // function resolves promise with pupil values which we log later
-  const { pupilLeft, pupilRight } = await changeGaze(agents, targets, positions, trialCount, trialType);
+  const { pupilLeft, pupilRight, durationAnimation } = await changeGaze(agents, targets, positions, trialCount, trialType);
 
   // wait for user response and log response time
   const t0 = new Date().getTime();
 
   // wait for target click of user (can click on wall/hedge/target)
-  wall.addEventListener('click', handleTargetClick, { capture: false, once: true });
-  hedge.addEventListener('click', handleTargetClick, { capture: false, once: true });
-  targets[trialCount].addEventListener('click', handleTargetClick, { capture: false, once: true });
+  // wall.addEventListener('click', handleTargetClick, { capture: false, once: true });
+  // hedge.addEventListener('click', handleTargetClick, { capture: false, once: true });
+  // targets[trialCount].addEventListener('click', handleTargetClick, { capture: false, once: true });
+  outerSVG.addEventListener('click', handleTargetClick, { capture: false, once: true });
 
   // log where the user clicked
   // NEEDS TO STAY HERE; ONLY IN THIS FUNCTION WE KNOW ALL TRIAL PARAMETERS!
   // handleClick hands over clickEvent parameter to clickDistanceFromTarget function
   const logTargetClick = (event) => { clickDistanceFromTarget(event, targets[trialCount], outerSVG, responseLog); };
-  wall.addEventListener('click', logTargetClick, { capture: false, once: true });
-  hedge.addEventListener('click', logTargetClick, { capture: false, once: true });
-  targets[trialCount].addEventListener('click', logTargetClick, { capture: false, once: true });
+
+  // wall.addEventListener('click', logTargetClick, { capture: false, once: true });
+  // hedge.addEventListener('click', logTargetClick, { capture: false, once: true });
+  // targets[trialCount].addEventListener('click', logTargetClick, { capture: false, once: true });
+  outerSVG.addEventListener('click', logTargetClick, { capture: false, once: true });
 
   await waitForTargetClick();
 
-  wall.removeEventListener('click', handleTargetClick);
-  hedge.removeEventListener('click', handleTargetClick);
-  targets[trialCount].removeEventListener('click', handleTargetClick);
-  wall.removeEventListener('click', logTargetClick);
-  hedge.removeEventListener('click', logTargetClick);
-  targets[trialCount].removeEventListener('click', logTargetClick);
+  // wall.removeEventListener('click', handleTargetClick);
+  // hedge.removeEventListener('click', handleTargetClick);
+  // targets[trialCount].removeEventListener('click', handleTargetClick);
+  // wall.removeEventListener('click', logTargetClick);
+  // hedge.removeEventListener('click', logTargetClick);
+  // targets[trialCount].removeEventListener('click', logTargetClick);
+
+  outerSVG.removeEventListener('click', handleTargetClick);
+  outerSVG.removeEventListener('click', logTargetClick);
 
   // after click, save response time
   const responseTime = new Date().getTime() - t0;
@@ -197,6 +203,8 @@ async function runTrial(agents, trialCount) {
   responseLog[trialCount].pupilRightOrigY = parseFloat(pupilRight.getAttribute('cyOrig'));
   responseLog[trialCount].pupilRightRandomX = parseFloat(pupilRight.getAttribute('cx'));
   responseLog[trialCount].pupilRightRandomY = parseFloat(pupilRight.getAttribute('cy'));
+  // NOTE: durationAnimation does NOT include 1 sec delay in beginning. Value in sec.
+  responseLog[trialCount].durationAnimation = durationAnimation;
 
   console.log('responseLog', responseLog[trialCount]);
 
