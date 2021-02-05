@@ -14,12 +14,14 @@ export default (event, target, outerSVG, responseLog) => {
   clickLog.screenScalingHeight = origViewBoxHeight / clickLog.offsetHeight;
 
   // click coordinates (event.offset) * scaling
-  clickLog.clickX = clickLog.screenScalingWidth * event.offsetX;
-  clickLog.clickY = clickLog.screenScalingHeight * event.offsetY;
+  clickLog.clickX = event.offsetX;
+  clickLog.clickY = event.offsetY;
+  clickLog.clickScaledX = clickLog.screenScalingWidth * clickLog.clickX;
+  clickLog.clickScaledY = clickLog.screenScalingHeight * clickLog.clickY;
 
   const clickBubble = document.getElementById('click-bubble');
-  clickBubble.setAttribute('cx', `${clickLog.clickX}`);
-  clickBubble.setAttribute('cy', `${clickLog.clickY}`);
+  clickBubble.setAttribute('cx', `${clickLog.clickScaledX}`);
+  clickBubble.setAttribute('cy', `${clickLog.clickScaledY}`);
   // let clickBubble be visible only for 0.2 sec
   gsap.to(clickBubble, {
     duration: 0.5,
@@ -31,17 +33,28 @@ export default (event, target, outerSVG, responseLog) => {
 
   document.getElementById('sound').play();
 
-  const targetX = parseFloat(target.getAttribute('viewBox').split(' ')[0]);
-  const targetY = parseFloat(target.getAttribute('viewBox').split(' ')[1]);
+  clickLog.targetX = parseFloat(target.getAttribute('viewBox').split(' ')[0]) * -1;
+  clickLog.targetY = parseFloat(target.getAttribute('viewBox').split(' ')[1]) * -1;
 
   // define center of target
-  clickLog.targetCenterX = -(targetX - target.getBBox().width / 2);
-  clickLog.targetCenterY = -(targetY - target.getBBox().height / 2);
+  clickLog.targetWidth = target.getBBox().width;
+  clickLog.targetHeight = target.getBBox().height;
+  clickLog.targetCenterX = clickLog.targetX - target.getBBox().width / 2;
+  clickLog.targetCenterY = clickLog.targetY - target.getBBox().height / 2;
 
   // clicked on target?
-  clickLog.clickDeviationX = clickLog.clickX - clickLog.targetCenterX;
-  clickLog.clickDeviationY = clickLog.clickY - clickLog.targetCenterY;
+  clickLog.clickDistFromTargetCenterX = clickLog.clickScaledX - clickLog.targetCenterX;
+  clickLog.clickDistFromTargetCenterY = clickLog.clickScaledY - clickLog.targetCenterY;
+
+  clickLog.hitTargetX = false;
+  clickLog.hitTargetY = false;
+
+  if (clickLog.targetX <= clickLog.clickScaledX && clickLog.clickScaledX <= (clickLog.targetX + clickLog.targetWidth)) {
+    clickLog.hitTargetX = true;
+  }
+  if (clickLog.targetY <= clickLog.clickScaledY && clickLog.clickScaledY <= (clickLog.targetY + clickLog.targetHeight)) {
+    clickLog.hitTargetY = true;
+  }
 
   responseLog.push(clickLog);
-  console.log(responseLog);
 };
