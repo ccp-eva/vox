@@ -14,8 +14,10 @@ export default (event, target, outerSVG, responseLog) => {
   clickLog.screenScalingHeight = origViewBoxHeight / clickLog.offsetHeight;
 
   // click coordinates (event.offset) * scaling
-  clickLog.clickX = event.offsetX;
-  clickLog.clickY = event.offsetY;
+  // originally, we used offset. Didn't work in Firefox.
+  clickLog.clickX = event.clientX - outerSVG.getBoundingClientRect().left;
+  clickLog.clickY = event.clientY - outerSVG.getBoundingClientRect().top;
+
   clickLog.clickScaledX = clickLog.screenScalingWidth * clickLog.clickX;
   clickLog.clickScaledY = clickLog.screenScalingHeight * clickLog.clickY;
 
