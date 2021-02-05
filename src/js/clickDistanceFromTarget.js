@@ -39,12 +39,14 @@ export default (event, target, outerSVG, responseLog) => {
   // define center of target
   clickLog.targetWidth = target.getBBox().width;
   clickLog.targetHeight = target.getBBox().height;
-  clickLog.targetCenterX = clickLog.targetX - target.getBBox().width / 2;
-  clickLog.targetCenterY = clickLog.targetY - target.getBBox().height / 2;
+  clickLog.targetCenterX = clickLog.targetX + target.getBBox().width / 2;
+  clickLog.targetCenterY = clickLog.targetY + target.getBBox().height / 2;
 
   // clicked on target?
+  // for x: negative values mean too far left, positive values mean too far right
+  // for y: negative values mean too low, positive values mean too high
   clickLog.clickDistFromTargetCenterX = clickLog.clickScaledX - clickLog.targetCenterX;
-  clickLog.clickDistFromTargetCenterY = clickLog.clickScaledY - clickLog.targetCenterY;
+  clickLog.clickDistFromTargetCenterY = clickLog.targetCenterY - clickLog.clickScaledY;
 
   clickLog.hitTargetX = false;
   clickLog.hitTargetY = false;
