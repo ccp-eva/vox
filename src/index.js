@@ -3,7 +3,7 @@ import checkForTouchscreen from './js/checkForTouchscreen';
 import prepareTrial from './js/prepareTrial';
 import changeGaze from './js/changeGaze';
 import pause from './js/pause';
-import randomizeTrials from './randomizeTrials';
+import randomizeTrials from './js/randomizeTrials';
 
 // ---------------------------------------------------------------------------------------------------------------------
 // SVG & SCREEN SIZE
@@ -109,7 +109,6 @@ const {
 // ---------------------------------------------------------------------------------------------------------------------
 // EVENTLISTENER
 // ---------------------------------------------------------------------------------------------------------------------
-let nrClicks = 0;
 const responseLog = [];
 
 // https://stackoverflow.com/questions/51374649/using-async-functions-to-await-user-input-from-onclick
@@ -141,6 +140,7 @@ const handleTargetClick = (event) => {
 // TODO for now, you can end trial by clicking before balloon landed!
 // ---------------------------------------------------------------------------------------------------------------------
 async function runTrial(agents, trialCount) {
+  console.log(' ');
   // before trial starts, prepare it and hide underneath blurr
   prepareTrial(agents, targets, trialCount, trialType);
 
@@ -148,8 +148,10 @@ async function runTrial(agents, trialCount) {
   button.addEventListener('click', handleButtonClick, { capture: false, once: true });
   await waitForButtonClick();
 
+  // animate target and eye movements
   // during trial presentation, nothing can be clicked
-  await changeGaze(agents, targets, positions, trialCount, trialType);
+  // function resolves promise with pupil values which we log later
+  const { pupilLeft, pupilRight } = await changeGaze(agents, targets, positions, trialCount, trialType);
 
   // wait for user response and log response time
   const t0 = new Date().getTime();
@@ -159,14 +161,22 @@ async function runTrial(agents, trialCount) {
   hedge.addEventListener('click', handleTargetClick, { capture: false, once: true });
   targets[trialCount].addEventListener('click', handleTargetClick, { capture: false, once: true });
 
-  await waitForTargetClick();
-
   // log where the user clicked
   // NEEDS TO STAY HERE; ONLY IN THIS FUNCTION WE KNOW ALL TRIAL PARAMETERS!
   // handleClick hands over clickEvent parameter to clickDistanceFromTarget function
   const logTargetClick = (event) => { clickDistanceFromTarget(event, targets[trialCount], outerSVG, responseLog); };
   wall.addEventListener('click', logTargetClick, { capture: false, once: true });
   hedge.addEventListener('click', logTargetClick, { capture: false, once: true });
+  targets[trialCount].addEventListener('click', logTargetClick, { capture: false, once: true });
+
+  await waitForTargetClick();
+
+  wall.removeEventListener('click', handleTargetClick);
+  hedge.removeEventListener('click', handleTargetClick);
+  targets[trialCount].removeEventListener('click', handleTargetClick);
+  wall.removeEventListener('click', logTargetClick);
+  hedge.removeEventListener('click', logTargetClick);
+  targets[trialCount].removeEventListener('click', logTargetClick);
 
   // after click, save response time
   const responseTime = new Date().getTime() - t0;
@@ -178,10 +188,16 @@ async function runTrial(agents, trialCount) {
   responseLog[trialCount].agent = `${agents[trialCount].getAttribute('id')}`;
   responseLog[trialCount].target = `${targets[trialCount].getAttribute('id')}`;
   responseLog[trialCount].trialType = trialType[trialCount];
+  responseLog[trialCount].pupilLeftOrigX = parseFloat(pupilLeft.getAttribute('cxOrig'));
+  responseLog[trialCount].pupilLeftOrigY = parseFloat(pupilLeft.getAttribute('cyOrig'));
+  responseLog[trialCount].pupilLeftRandomX = parseFloat(pupilLeft.getAttribute('cx'));
+  responseLog[trialCount].pupilLeftRandomY = parseFloat(pupilLeft.getAttribute('cy'));
+  responseLog[trialCount].pupilRightOrigX = parseFloat(pupilRight.getAttribute('cxOrig'));
+  responseLog[trialCount].pupilRightOrigY = parseFloat(pupilRight.getAttribute('cyOrig'));
+  responseLog[trialCount].pupilRightRandomX = parseFloat(pupilRight.getAttribute('cx'));
+  responseLog[trialCount].pupilRightRandomY = parseFloat(pupilRight.getAttribute('cy'));
 
   console.log('responseLog', responseLog[trialCount]);
-  nrClicks += 1;
-  console.log(`user has clicked ${nrClicks} time(s)`);
 
   // so that we don't rush to the next trial/startscreen but have a little time
   await pause(1000);
