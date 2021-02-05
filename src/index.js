@@ -147,6 +147,7 @@ async function runTrial(agents, trialCount) {
   // for for user to start trial
   button.addEventListener('click', handleButtonClick, { capture: false, once: true });
   await waitForButtonClick();
+  button.removeEventListener('click', handleButtonClick);
 
   // animate target and eye movements
   // during trial presentation, nothing can be clicked
