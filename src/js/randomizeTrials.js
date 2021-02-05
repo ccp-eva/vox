@@ -1,5 +1,5 @@
-import divideWithRemainder from './js/divideWithRemainder';
-import shuffleArray from './js/shuffleArray';
+import divideWithRemainder from './divideWithRemainder';
+import shuffleArray from './shuffleArray';
 
 export default (famNr, testNr, agentsSingle, targetsSingle, targetPositionRight) => {
   // create array with entry for each fam and test trial
