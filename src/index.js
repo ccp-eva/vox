@@ -118,66 +118,20 @@ const {
 } = randomizeTrials(famNr, testNr, agentsSingle, targetsSingle, targetPositionRight);
 
 // ---------------------------------------------------------------------------------------------------------------------
-// EVENTLISTENER
+// FUNCTION FOR WAITING FOR CLICKS
 // ---------------------------------------------------------------------------------------------------------------------
 const responseLog = [];
 
-// https://stackoverflow.com/questions/51374649/using-async-functions-to-await-user-input-from-onclick
-
-// INSTRUCTIONS
-let buttonInstruction = false;
-async function waitForInstructionClick() {
-  while (buttonInstruction === false) await pause(50);
-  buttonInstruction = false;
+let buttonNext = false;
+async function waitForClick() {
+  while (buttonNext === false) await pause(50);
+  buttonNext = false;
 }
-const handleInstructionClick = (event) => {
+const handleClick = (event) => {
   event.preventDefault();
-  buttonInstruction = true;
+  buttonNext = true;
 };
 
-// IN TRIALS: startTrialClick
-let buttonStartTrial = false; // this is to be changed on user input
-async function waitForStartTrialClick() {
-  while (buttonStartTrial === false) await pause(50); // pause script but avoid browser to freeze ;)
-  buttonStartTrial = false; // reset var
-}
-const handleStartTrialClick = (event) => {
-  event.preventDefault();
-  buttonStartTrial = true;
-};
-
-// IN TRIALS: targetClick, for transitioning to next trial
-let buttonNextTrial = false;
-async function waitForTargetClick() {
-  while (buttonNextTrial === false) await pause(50);
-  buttonNextTrial = false;
-}
-const handleTargetClick = (event) => {
-  event.preventDefault();
-  buttonNextTrial = true;
-};
-
-// TRANSITION between fam and test trials
-let buttonTransition = false;
-async function waitForTransitionClick() {
-  while (buttonTransition === false) await pause(50);
-  buttonTransition = false;
-}
-const handleTransitionClick = (event) => {
-  event.preventDefault();
-  buttonTransition = true;
-};
-
-// GOODBYE between fam and test trials
-let buttonGoodbye = false;
-async function waitForGoodbyeClick() {
-  while (buttonGoodbye === false) await pause(50);
-  buttonGoodbye = false;
-}
-const handleGoodbyeClick = (event) => {
-  event.preventDefault();
-  buttonGoodbye = true;
-};
 // ---------------------------------------------------------------------------------------------------------------------
 // SPECIFY ORDER OF ONE TRIAL
 // ---------------------------------------------------------------------------------------------------------------------
@@ -188,9 +142,9 @@ async function runTrial(agents, trialCount) {
   prepareTrial(agents, targets, trialCount, trialType);
 
   // wait for user to start trial
-  experimentButton.addEventListener('click', handleStartTrialClick, { capture: false, once: true });
-  await waitForStartTrialClick();
-  experimentButton.removeEventListener('click', handleStartTrialClick);
+  experimentButton.addEventListener('click', handleClick, { capture: false, once: true });
+  await waitForClick();
+  experimentButton.removeEventListener('click', handleClick);
 
   // animate target and eye movements
   // during trial presentation, nothing can be clicked
@@ -206,24 +160,20 @@ async function runTrial(agents, trialCount) {
 
   // wait for target click of user (can only click where hedge is/would be)
   // in htlm, <g id="hedge" pointer-events="all">, so that you can click on it even if hidden
-  hedge.addEventListener('click', handleTargetClick, { capture: false, once: true });
+  hedge.addEventListener('click', handleClick, { capture: false, once: true });
 
   // log where the user clicked
-  // NEEDS TO STAY HERE; ONLY IN THIS FUNCTION WE KNOW ALL TRIAL PARAMETERS!
-  // handleClick hands over clickEvent parameter to clickDistanceFromTarget function
+  // logTargetClick hands over clickEvent parameter to clickDistanceFromTarget function
   const logTargetClick = (event) => { clickDistanceFromTarget(event, targets[trialCount], outerSVG, responseLog); };
-
   hedge.addEventListener('click', logTargetClick, { capture: false, once: true });
-  await waitForTargetClick();
-
-  hedge.removeEventListener('click', handleTargetClick);
+  await waitForClick();
+  hedge.removeEventListener('click', handleClick);
   hedge.removeEventListener('click', logTargetClick);
 
   // after click, save response time
   const responseTime = new Date().getTime() - t0;
 
   // log all important trial infos
-  // responseLog.push({}); // just to get rid of intermediate error
   responseLog[trialCount].responseTime = responseTime;
   responseLog[trialCount].trialNr = trialCount + 1;
   responseLog[trialCount].agent = `${agents[trialCount].getAttribute('id')}`;
@@ -239,16 +189,10 @@ async function runTrial(agents, trialCount) {
   responseLog[trialCount].pupilRightRandomY = parseFloat(pupilRight.getAttribute('cy'));
   // NOTE: durationAnimation does NOT include 1 sec delay in beginning. Value in msec.
   responseLog[trialCount].durationAnimation = durationAnimation * 1000;
-
   console.log('responseLog', responseLog[trialCount]);
 
   // so that we don't rush to the next trial/startscreen but have a little time
   await pause(1000);
-
-  // recursion anchor
-  // if (trialCount + 1 < trialType.length && trialType[trialCount + 1] === 'fam') {
-  //   runTrial(agents, trialCount + 1);
-  // }
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -262,9 +206,9 @@ async function runAll(trialCount) {
   instructions.setAttribute('visibility', 'visible');
 
   // wait for user to continue
-  instructionsButton.addEventListener('click', handleInstructionClick, { capture: false, once: true });
-  await waitForInstructionClick();
-  instructionsButton.removeEventListener('click', handleInstructionClick);
+  instructionsButton.addEventListener('click', handleClick, { capture: false, once: true });
+  await waitForClick();
+  instructionsButton.removeEventListener('click', handleClick);
 
   // FAM PHASE
   [instructions, transition, goodbye,
@@ -293,9 +237,9 @@ async function runAll(trialCount) {
   transition.setAttribute('visibility', 'visible');
 
   // wait for user to continue
-  transitionButton.addEventListener('click', handleTransitionClick, { capture: false, once: true });
-  await waitForTransitionClick();
-  transitionButton.removeEventListener('click', handleTransitionClick);
+  transitionButton.addEventListener('click', handleClick, { capture: false, once: true });
+  await waitForClick();
+  transitionButton.removeEventListener('click', handleClick);
 
   // TEST PHASE
   transition.setAttribute('visibility', 'hidden');
@@ -319,9 +263,9 @@ async function runAll(trialCount) {
   goodbye.setAttribute('visibility', 'visible');
 
   // wait for user to continue
-  goodbyeButton.addEventListener('click', handleGoodbyeClick, { capture: false, once: true });
-  await waitForGoodbyeClick();
-  goodbyeButton.removeEventListener('click', handleGoodbyeClick);
+  goodbyeButton.addEventListener('click', handleClick, { capture: false, once: true });
+  await waitForClick();
+  goodbyeButton.removeEventListener('click', handleClick);
 }
 
 // CAUTION: trialCount start at zero, ie. first trial = 0
