@@ -4,12 +4,14 @@ import setTargetCenter from './setTargetCenter';
 import getGazeCoords from './getGazeCoords';
 import randomNumber from './randomNumber';
 import distanceViewBoxes from './distanceViewBoxes';
+import checkForTouchscreen from './checkForTouchscreen';
 
 export default (agents, targets, sectionArray, trialCount, trialType) => new Promise((resolve) => {
   document.getElementById('experiment-button').setAttribute('visibility', 'hidden');
   document.getElementById('cover-blurr').setAttribute('visibility', 'hidden');
 
   const currentAgent = `${agents[trialCount].getAttribute('id')}`;
+  const hedge = document.getElementById('hedge');
   // get IDs of eye
   const pupilLeft = document.getElementById(`${currentAgent}-pupil-left`);
   const pupilRight = document.getElementById(`${currentAgent}-pupil-right`);
@@ -154,6 +156,17 @@ export default (agents, targets, sectionArray, trialCount, trialType) => new Pro
             setCircleCenter(irisRight, gazeCoordsRight);
             const durationAnimation = (distanceCenterHidden / perSecond) + (distanceHiddenRandom / perSecond);
             console.log('animation testtrial complete');
+            const touchScreen = checkForTouchscreen();
+
+            // FOR NOW; PRETEND TO ALWAYS BE ON TOUCHSCREEN
+            // eslint-disable-next-line no-constant-condition
+            // TODO little delay
+            // TODO log in click function whether right bin was clicked
+            if (!touchScreen) {
+              hedge.setAttribute('visibility', 'hidden');
+              targets[trialCount].setAttribute('visibility', 'hidden');
+            }
+
             resolve({ pupilLeft, pupilRight, durationAnimation });
           },
         }, '<');

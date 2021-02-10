@@ -1,5 +1,4 @@
 import clickDistanceFromTarget from './js/clickDistanceFromTarget';
-import checkForTouchscreen from './js/checkForTouchscreen';
 import prepareTrial from './js/prepareTrial';
 import changeGaze from './js/changeGaze';
 import pause from './js/pause';
@@ -14,7 +13,6 @@ import randomizeTrials from './js/randomizeTrials';
 const { offsetWidth } = document.body;
 const { offsetHeight } = document.body;
 console.log('client browser size', { offsetWidth, offsetHeight });
-console.log('checkForTouchscreen', checkForTouchscreen());
 
 // get viewBox size from whole SVG
 const outerSVG = document.getElementById('outer-svg');
@@ -58,14 +56,6 @@ const balloonYellow = document.getElementById('balloon-yellow');
 const balloonGreen = document.getElementById('balloon-green');
 // eslint-disable-next-line prefer-const
 let targetsSingle = [balloonBlue, balloonRed, balloonYellow, balloonGreen];
-
-// [instructions, transition, goodbye,
-//   clickBubble, fiveBoxes, sevenBoxes,
-//   pig, monkey, sheep,
-//   balloonBlue, balloonRed, balloonYellow, balloonGreen,
-// ].forEach((element) => {
-//   element.setAttribute('visibility', 'hidden');
-// });
 
 // for all agents, save the original pupil/iris positions as attributes in svg elements
 ['pig', 'monkey', 'sheep'].forEach((agent) => {
@@ -111,8 +101,8 @@ targetsSingle.forEach((target) => {
 // ---------------------------------------------------------------------------------------------------------------------
 // TRIAL NUMBER & RANDOMIZATION OF AGENTS, TARGETS AND TARGET POSITIONS
 // ---------------------------------------------------------------------------------------------------------------------
-const famNr = 2;
-const testNr = 2;
+const famNr = 1;
+const testNr = 3;
 const {
   trialType, agents, targets, positions,
 } = randomizeTrials(famNr, testNr, agentsSingle, targetsSingle, targetPositionRight);
@@ -257,7 +247,9 @@ async function runAll(trialCount) {
 
   // TEST PHASE
   transition.setAttribute('visibility', 'hidden');
-  experiment.setAttribute('visibility', 'visible');
+  [experiment, sevenBoxes].forEach((element) => {
+    element.setAttribute('visibility', 'visible');
+  });
 
   while (trialCount < trialType.length) {
     // eslint-disable-next-line no-await-in-loop
