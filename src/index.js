@@ -192,6 +192,7 @@ async function runTrial(agents, trialCount) {
   responseLog[trialCount].agent = `${agents[trialCount].getAttribute('id')}`;
   responseLog[trialCount].target = `${targets[trialCount].getAttribute('id')}`;
   responseLog[trialCount].trialType = trialType[trialCount];
+  responseLog[trialCount].positionBin = positions[trialCount].bin;
   responseLog[trialCount].pupilLeftOrigX = parseFloat(pupilLeft.getAttribute('cxOrig'));
   responseLog[trialCount].pupilLeftOrigY = parseFloat(pupilLeft.getAttribute('cyOrig'));
   responseLog[trialCount].pupilLeftRandomX = parseFloat(pupilLeft.getAttribute('cx'));

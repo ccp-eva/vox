@@ -46,6 +46,7 @@ export default (famNr, testNr, agentsSingle, targetsSingle, targetPositionRight)
   let prevMax = 0;
   for (let i = 1; i <= 10; i++) {
     const section = {
+      bin: i,
       min: prevMax,
       max: (targetPositionRight / 10) * i,
     };
