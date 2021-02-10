@@ -34,12 +34,7 @@ const transition = document.getElementById('transition');
 const goodbye = document.getElementById('goodbye');
 const experiment = document.getElementById('experiment');
 
-// start state
-// [transition, goodbye, experiment].forEach((element) => {
-//   element.setAttribute('visibility', 'hidden');
-// });
-
-const instructionButton = document.getElementById('instruction-button');
+const instructionsButton = document.getElementById('instructions-button');
 const transitionButton = document.getElementById('transition-button');
 const goodbyeButton = document.getElementById('goodbye-button');
 const experimentButton = document.getElementById('experiment-button');
@@ -64,13 +59,13 @@ const balloonGreen = document.getElementById('balloon-green');
 // eslint-disable-next-line prefer-const
 let targetsSingle = [balloonBlue, balloonRed, balloonYellow, balloonGreen];
 
-[instructions, transition, goodbye,
-  clickBubble, fiveBoxes, sevenBoxes,
-  pig, monkey, sheep,
-  balloonBlue, balloonRed, balloonYellow, balloonGreen,
-].forEach((element) => {
-  element.setAttribute('visibility', 'hidden');
-});
+// [instructions, transition, goodbye,
+//   clickBubble, fiveBoxes, sevenBoxes,
+//   pig, monkey, sheep,
+//   balloonBlue, balloonRed, balloonYellow, balloonGreen,
+// ].forEach((element) => {
+//   element.setAttribute('visibility', 'hidden');
+// });
 
 // for all agents, save the original pupil/iris positions as attributes in svg elements
 ['pig', 'monkey', 'sheep'].forEach((agent) => {
@@ -96,8 +91,8 @@ const targetPositionMid = origViewBoxWidth / 2 - balloonBlue.getBBox().width / 2
 // eslint-disable-next-line max-len
 const targetViewBoxCenter = `-${targetPositionMid} -${origViewBoxHeight / 2.8} ${origViewBoxWidth} ${origViewBoxHeight}`;
 
-// calculate y coords for balloon (-15 for little distance from border)
-const hedgeMidY = origViewBoxHeight - balloonBlue.getBBox().height - 15;
+// calculate y coords for balloon (-10 for little distance from border)
+const hedgeMidY = origViewBoxHeight - balloonBlue.getBBox().height - 10;
 
 // define from which point onwards the balloon is hidden behind hedge
 // BBox of hedge is a bit too high to hide balloon, therefore / 1.1
@@ -117,7 +112,7 @@ targetsSingle.forEach((target) => {
 // TRIAL NUMBER & RANDOMIZATION OF AGENTS, TARGETS AND TARGET POSITIONS
 // ---------------------------------------------------------------------------------------------------------------------
 const famNr = 1;
-const testNr = 3;
+const testNr = 1;
 const {
   trialType, agents, targets, positions,
 } = randomizeTrials(famNr, testNr, agentsSingle, targetsSingle, targetPositionRight);
@@ -128,32 +123,63 @@ const {
 const responseLog = [];
 
 // https://stackoverflow.com/questions/51374649/using-async-functions-to-await-user-input-from-onclick
-// for beginning a trial; click in the beginning
-let buttonNext = false; // this is to be changed on user input
-async function waitForButtonClick() {
-  while (buttonNext === false) await pause(50); // pause script but avoid browser to freeze ;)
-  buttonNext = false; // reset var
+
+// INSTRUCTIONS
+let buttonInstruction = false;
+async function waitForInstructionClick() {
+  while (buttonInstruction === false) await pause(50);
+  buttonInstruction = false;
 }
-const handleButtonClick = (event) => {
+const handleInstructionClick = (event) => {
   event.preventDefault();
-  buttonNext = true;
+  buttonInstruction = true;
 };
 
-// for the actual target click in the trials
-let targetNext = false; // this is to be changed on user input
+// IN TRIALS: startTrialClick
+let buttonStartTrial = false; // this is to be changed on user input
+async function waitForStartTrialClick() {
+  while (buttonStartTrial === false) await pause(50); // pause script but avoid browser to freeze ;)
+  buttonStartTrial = false; // reset var
+}
+const handleStartTrialClick = (event) => {
+  event.preventDefault();
+  buttonStartTrial = true;
+};
+
+// IN TRIALS: targetClick, for transitioning to next trial
+let buttonNextTrial = false;
 async function waitForTargetClick() {
-  while (targetNext === false) await pause(50); // pause script but avoid browser to freeze ;)
-  targetNext = false; // reset var
+  while (buttonNextTrial === false) await pause(50);
+  buttonNextTrial = false;
 }
 const handleTargetClick = (event) => {
   event.preventDefault();
-  targetNext = true;
+  buttonNextTrial = true;
 };
 
+// TRANSITION between fam and test trials
+let buttonTransition = false;
+async function waitForTransitionClick() {
+  while (buttonTransition === false) await pause(50);
+  buttonTransition = false;
+}
+const handleTransitionClick = (event) => {
+  event.preventDefault();
+  buttonTransition = true;
+};
+
+// GOODBYE between fam and test trials
+let buttonGoodbye = false;
+async function waitForGoodbyeClick() {
+  while (buttonGoodbye === false) await pause(50);
+  buttonGoodbye = false;
+}
+const handleGoodbyeClick = (event) => {
+  event.preventDefault();
+  buttonGoodbye = true;
+};
 // ---------------------------------------------------------------------------------------------------------------------
-// SPECIFY ORDER OF EVENTS
-//
-// TODO for now, you can end trial by clicking before balloon landed!
+// SPECIFY ORDER OF ONE TRIAL
 // ---------------------------------------------------------------------------------------------------------------------
 async function runTrial(agents, trialCount) {
   console.log(' ');
@@ -161,10 +187,10 @@ async function runTrial(agents, trialCount) {
   // before trial starts, prepare it and hide underneath blurr
   prepareTrial(agents, targets, trialCount, trialType);
 
-  // for for user to start trial
-  experimentButton.addEventListener('click', handleButtonClick, { capture: false, once: true });
-  await waitForButtonClick();
-  experimentButton.removeEventListener('click', handleButtonClick);
+  // wait for user to start trial
+  experimentButton.addEventListener('click', handleStartTrialClick, { capture: false, once: true });
+  await waitForStartTrialClick();
+  experimentButton.removeEventListener('click', handleStartTrialClick);
 
   // animate target and eye movements
   // during trial presentation, nothing can be clicked
@@ -220,11 +246,84 @@ async function runTrial(agents, trialCount) {
   await pause(1000);
 
   // recursion anchor
-  if (trialCount + 1 < trialType.length) {
-    runTrial(agents, trialCount + 1);
+  // if (trialCount + 1 < trialType.length && trialType[trialCount + 1] === 'fam') {
+  //   runTrial(agents, trialCount + 1);
+  // }
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+// SPECIFY ORDER OF ALL EVENTS
+// ---------------------------------------------------------------------------------------------------------------------
+async function runAll(trialCount) {
+  // INSTRUCTION PHASE
+  [transition, experiment, goodbye].forEach((element) => {
+    element.setAttribute('visibility', 'hidden');
+  });
+  instructions.setAttribute('visibility', 'visible');
+
+  // wait for user to continue
+  instructionsButton.addEventListener('click', handleInstructionClick, { capture: false, once: true });
+  await waitForInstructionClick();
+  instructionsButton.removeEventListener('click', handleInstructionClick);
+
+  // FAM PHASE
+  [instructions, transition, goodbye,
+    clickBubble, fiveBoxes, sevenBoxes,
+    pig, monkey, sheep,
+    balloonBlue, balloonRed, balloonYellow, balloonGreen,
+  ].forEach((element) => {
+    element.setAttribute('visibility', 'hidden');
+  });
+  experiment.setAttribute('visibility', 'visible');
+
+  while (trialCount < famNr) {
+    // eslint-disable-next-line no-await-in-loop
+    await runTrial(agents, trialCount);
+    // eslint-disable-next-line no-param-reassign
+    trialCount += 1;
   }
+
+  // TRANSITION PHASE
+  [experiment,
+    pig, monkey, sheep,
+    balloonBlue, balloonRed, balloonYellow, balloonGreen,
+  ].forEach((element) => {
+    element.setAttribute('visibility', 'hidden');
+  });
+  transition.setAttribute('visibility', 'visible');
+
+  // wait for user to continue
+  transitionButton.addEventListener('click', handleTransitionClick, { capture: false, once: true });
+  await waitForTransitionClick();
+  transitionButton.removeEventListener('click', handleTransitionClick);
+
+  // TEST PHASE
+  transition.setAttribute('visibility', 'hidden');
+  experiment.setAttribute('visibility', 'visible');
+
+  while (trialCount < trialType.length) {
+    // eslint-disable-next-line no-await-in-loop
+    await runTrial(agents, trialCount);
+    // eslint-disable-next-line no-param-reassign
+    trialCount += 1;
+  }
+  console.log('test phase completed');
+
+  // GOODBYE
+  [experiment, hedge,
+    pig, monkey, sheep,
+    balloonBlue, balloonRed, balloonYellow, balloonGreen,
+  ].forEach((element) => {
+    element.setAttribute('visibility', 'hidden');
+  });
+  goodbye.setAttribute('visibility', 'visible');
+
+  // wait for user to continue
+  goodbyeButton.addEventListener('click', handleGoodbyeClick, { capture: false, once: true });
+  await waitForGoodbyeClick();
+  goodbyeButton.removeEventListener('click', handleGoodbyeClick);
 }
 
 // CAUTION: trialCount start at zero, ie. first trial = 0
 // (because we need first element in array, that's at position 0)
-runTrial(agents, 0);
+runAll(0);
