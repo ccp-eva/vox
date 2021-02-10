@@ -50,14 +50,14 @@ export default (event, target, outerSVG, responseLog) => {
   clickLog.clickDistFromTargetCenterX = clickLog.clickScaledX - clickLog.targetCenterX;
   clickLog.clickDistFromTargetCenterY = clickLog.targetCenterY - clickLog.clickScaledY;
 
-  clickLog.hitTargetX = false;
-  clickLog.hitTargetY = false;
+  clickLog.hitBBTargetX = false;
+  clickLog.hitBBTargetY = false;
 
   if (clickLog.targetX <= clickLog.clickScaledX && clickLog.clickScaledX <= (clickLog.targetX + clickLog.targetWidth)) {
-    clickLog.hitTargetX = true;
+    clickLog.hitBBTargetX = true;
   }
   if (clickLog.targetY <= clickLog.clickScaledY && clickLog.clickScaledY <= (clickLog.targetY + clickLog.targetHeight)) {
-    clickLog.hitTargetY = true;
+    clickLog.hitBBTargetY = true;
   }
 
   responseLog.push(clickLog);

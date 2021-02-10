@@ -22,16 +22,22 @@ const origViewBoxX = parseFloat(outerSVG.getAttribute('viewBox').split(' ')[0]);
 const origViewBoxY = parseFloat(outerSVG.getAttribute('viewBox').split(' ')[1]);
 const origViewBoxWidth = parseFloat(outerSVG.getAttribute('viewBox').split(' ')[2]);
 const origViewBoxHeight = parseFloat(outerSVG.getAttribute('viewBox').split(' ')[3]);
-console.log('viewbox size', {
+console.log('viewBox size', {
   origViewBoxX, origViewBoxY, origViewBoxWidth, origViewBoxHeight,
 });
 
 // ---------------------------------------------------------------------------------------------------------------------
 // GET ALL RELEVANT ELEMENTS IN SVG
 // ---------------------------------------------------------------------------------------------------------------------
+const instructions = document.getElementById('instructions');
+const transition = document.getElementById('transition');
+const goodbye = document.getElementById('goodbye');
+
 const button = document.getElementById('button');
 const clickBubble = document.getElementById('click-bubble');
-const wall = document.getElementById('wall');
+const clickArea = document.getElementById('click-area');
+const fiveBoxes = document.getElementById('five-boxes');
+const sevenBoxes = document.getElementById('seven-boxes');
 
 // if you change animal agents or targets, then change ID here...
 const pig = document.getElementById('pig');
@@ -51,7 +57,8 @@ let targetsSingle = [balloonBlue, balloonRed, balloonYellow, balloonGreen];
 // hide all in beginning
 [balloonBlue, balloonRed, balloonYellow, balloonGreen,
   pig, monkey, sheep,
-  clickBubble,
+  clickBubble, fiveBoxes, sevenBoxes,
+  instructions, transition, goodbye,
 ].forEach((element) => {
   element.setAttribute('visibility', 'hidden');
 });
@@ -82,8 +89,9 @@ const targetViewBoxCenter = `-${targetPositionMid} -${origViewBoxHeight / 2.8} $
 
 // get hedge
 const hedge = document.getElementById('hedge');
-// take y coordinate of hedge + half of the height. Then, subtract half of the balloon height.
-const hedgeMidY = hedge.getBBox().y + hedge.getBBox().height / 2 - balloonBlue.getBBox().height / 2;
+// calculate y coords for balloon (-15 for little distance from border)
+const hedgeMidY = origViewBoxHeight - balloonBlue.getBBox().height - 15;
+
 // define from which point onwards the balloon is hidden behind hedge
 // BBox of hedge is a bit too high to hide balloon, therefore / 1.1
 // eslint-disable-next-line max-len
@@ -152,7 +160,11 @@ async function runTrial(agents, trialCount) {
   // animate target and eye movements
   // during trial presentation, nothing can be clicked
   // function resolves promise with pupil values which we log later
-  const { pupilLeft, pupilRight, durationAnimation } = await changeGaze(agents, targets, positions, trialCount, trialType);
+  const {
+    pupilLeft,
+    pupilRight,
+    durationAnimation,
+  } = await changeGaze(agents, targets, positions, trialCount, trialType);
 
   // wait for user response and log response time
   const t0 = new Date().getTime();
@@ -203,8 +215,8 @@ async function runTrial(agents, trialCount) {
   responseLog[trialCount].pupilRightOrigY = parseFloat(pupilRight.getAttribute('cyOrig'));
   responseLog[trialCount].pupilRightRandomX = parseFloat(pupilRight.getAttribute('cx'));
   responseLog[trialCount].pupilRightRandomY = parseFloat(pupilRight.getAttribute('cy'));
-  // NOTE: durationAnimation does NOT include 1 sec delay in beginning. Value in sec.
-  responseLog[trialCount].durationAnimation = durationAnimation;
+  // NOTE: durationAnimation does NOT include 1 sec delay in beginning. Value in msec.
+  responseLog[trialCount].durationAnimation = durationAnimation * 1000;
 
   console.log('responseLog', responseLog[trialCount]);
 
