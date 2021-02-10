@@ -32,12 +32,22 @@ console.log('viewBox size', {
 const instructions = document.getElementById('instructions');
 const transition = document.getElementById('transition');
 const goodbye = document.getElementById('goodbye');
+const experiment = document.getElementById('experiment');
 
-const button = document.getElementById('button');
+// start state
+// [transition, goodbye, experiment].forEach((element) => {
+//   element.setAttribute('visibility', 'hidden');
+// });
+
+const instructionButton = document.getElementById('instruction-button');
+const transitionButton = document.getElementById('transition-button');
+const goodbyeButton = document.getElementById('goodbye-button');
+const experimentButton = document.getElementById('experiment-button');
 const clickBubble = document.getElementById('click-bubble');
 const clickArea = document.getElementById('click-area');
 const fiveBoxes = document.getElementById('five-boxes');
 const sevenBoxes = document.getElementById('seven-boxes');
+const hedge = document.getElementById('hedge');
 
 // if you change animal agents or targets, then change ID here...
 const pig = document.getElementById('pig');
@@ -54,11 +64,10 @@ const balloonGreen = document.getElementById('balloon-green');
 // eslint-disable-next-line prefer-const
 let targetsSingle = [balloonBlue, balloonRed, balloonYellow, balloonGreen];
 
-// hide all in beginning
-[balloonBlue, balloonRed, balloonYellow, balloonGreen,
-  pig, monkey, sheep,
+[instructions, transition, goodbye,
   clickBubble, fiveBoxes, sevenBoxes,
-  instructions, transition, goodbye,
+  pig, monkey, sheep,
+  balloonBlue, balloonRed, balloonYellow, balloonGreen,
 ].forEach((element) => {
   element.setAttribute('visibility', 'hidden');
 });
@@ -87,8 +96,6 @@ const targetPositionMid = origViewBoxWidth / 2 - balloonBlue.getBBox().width / 2
 // eslint-disable-next-line max-len
 const targetViewBoxCenter = `-${targetPositionMid} -${origViewBoxHeight / 2.8} ${origViewBoxWidth} ${origViewBoxHeight}`;
 
-// get hedge
-const hedge = document.getElementById('hedge');
 // calculate y coords for balloon (-15 for little distance from border)
 const hedgeMidY = origViewBoxHeight - balloonBlue.getBBox().height - 15;
 
@@ -99,6 +106,7 @@ const targetViewBoxHidden = `-${targetPositionMid} -${origViewBoxHeight - hedge.
 // placeholder x for random horizontal position. y value and width, height always stays same
 const targetViewBoxRandom = `-x -${hedgeMidY} ${origViewBoxWidth} ${origViewBoxHeight}`;
 
+// save target viewbox values in svg attribute (this way we have to save less variables)
 targetsSingle.forEach((target) => {
   target.setAttribute('viewBoxCenter', `${targetViewBoxCenter}`);
   target.setAttribute('viewBoxHidden', `${targetViewBoxHidden}`);
@@ -149,17 +157,18 @@ const handleTargetClick = (event) => {
 // ---------------------------------------------------------------------------------------------------------------------
 async function runTrial(agents, trialCount) {
   console.log(' ');
+
   // before trial starts, prepare it and hide underneath blurr
   prepareTrial(agents, targets, trialCount, trialType);
 
   // for for user to start trial
-  button.addEventListener('click', handleButtonClick, { capture: false, once: true });
+  experimentButton.addEventListener('click', handleButtonClick, { capture: false, once: true });
   await waitForButtonClick();
-  button.removeEventListener('click', handleButtonClick);
+  experimentButton.removeEventListener('click', handleButtonClick);
 
   // animate target and eye movements
   // during trial presentation, nothing can be clicked
-  // function resolves promise with pupil values which we log later
+  // function resolves promise with pupil & animation values which we log later
   const {
     pupilLeft,
     pupilRight,
@@ -169,33 +178,20 @@ async function runTrial(agents, trialCount) {
   // wait for user response and log response time
   const t0 = new Date().getTime();
 
-  // wait for target click of user (can click on wall/hedge/target)
-  // wall.addEventListener('click', handleTargetClick, { capture: false, once: true });
-  // hedge.addEventListener('click', handleTargetClick, { capture: false, once: true });
-  // targets[trialCount].addEventListener('click', handleTargetClick, { capture: false, once: true });
-  outerSVG.addEventListener('click', handleTargetClick, { capture: false, once: true });
+  // wait for target click of user (can only click where hedge is/would be)
+  // in htlm, <g id="hedge" pointer-events="all">, so that you can click on it even if hidden
+  hedge.addEventListener('click', handleTargetClick, { capture: false, once: true });
 
   // log where the user clicked
   // NEEDS TO STAY HERE; ONLY IN THIS FUNCTION WE KNOW ALL TRIAL PARAMETERS!
   // handleClick hands over clickEvent parameter to clickDistanceFromTarget function
   const logTargetClick = (event) => { clickDistanceFromTarget(event, targets[trialCount], outerSVG, responseLog); };
 
-  // wall.addEventListener('click', logTargetClick, { capture: false, once: true });
-  // hedge.addEventListener('click', logTargetClick, { capture: false, once: true });
-  // targets[trialCount].addEventListener('click', logTargetClick, { capture: false, once: true });
-  outerSVG.addEventListener('click', logTargetClick, { capture: false, once: true });
-
+  hedge.addEventListener('click', logTargetClick, { capture: false, once: true });
   await waitForTargetClick();
 
-  // wall.removeEventListener('click', handleTargetClick);
-  // hedge.removeEventListener('click', handleTargetClick);
-  // targets[trialCount].removeEventListener('click', handleTargetClick);
-  // wall.removeEventListener('click', logTargetClick);
-  // hedge.removeEventListener('click', logTargetClick);
-  // targets[trialCount].removeEventListener('click', logTargetClick);
-
-  outerSVG.removeEventListener('click', handleTargetClick);
-  outerSVG.removeEventListener('click', logTargetClick);
+  hedge.removeEventListener('click', handleTargetClick);
+  hedge.removeEventListener('click', logTargetClick);
 
   // after click, save response time
   const responseTime = new Date().getTime() - t0;

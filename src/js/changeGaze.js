@@ -6,7 +6,7 @@ import randomNumber from './randomNumber';
 import distanceViewBoxes from './distanceViewBoxes';
 
 export default (agents, targets, sectionArray, trialCount, trialType) => new Promise((resolve) => {
-  document.getElementById('button').setAttribute('visibility', 'hidden');
+  document.getElementById('experiment-button').setAttribute('visibility', 'hidden');
   document.getElementById('cover-blurr').setAttribute('visibility', 'hidden');
 
   const currentAgent = `${agents[trialCount].getAttribute('id')}`;
