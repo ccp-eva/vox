@@ -111,14 +111,14 @@ targetsSingle.forEach((target) => {
 // ---------------------------------------------------------------------------------------------------------------------
 // TRIAL NUMBER & RANDOMIZATION OF AGENTS, TARGETS AND TARGET POSITIONS
 // ---------------------------------------------------------------------------------------------------------------------
-const famNr = 1;
-const testNr = 1;
+const famNr = 2;
+const testNr = 2;
 const {
   trialType, agents, targets, positions,
 } = randomizeTrials(famNr, testNr, agentsSingle, targetsSingle, targetPositionRight);
 
 // ---------------------------------------------------------------------------------------------------------------------
-// FUNCTION FOR WAITING FOR CLICKS
+// FUNCTION FOR WAITING FOR CLICKS, HANDLING CLICKS
 // ---------------------------------------------------------------------------------------------------------------------
 const responseLog = [];
 
@@ -130,6 +130,16 @@ async function waitForClick() {
 const handleClick = (event) => {
   event.preventDefault();
   buttonNext = true;
+};
+
+const handleWrongClick = (event) => {
+  event.preventDefault();
+  const screenScalingHeight = origViewBoxHeight / offsetHeight;
+  const clickY = event.clientY - outerSVG.getBoundingClientRect().top;
+  const clickScaledY = screenScalingHeight * clickY;
+  if (clickScaledY < (origViewBoxHeight - hedge.getBBox().height)) {
+    document.getElementById('negative-sound').play();
+  }
 };
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -145,6 +155,8 @@ async function runTrial(agents, trialCount) {
   experimentButton.addEventListener('click', handleClick, { capture: false, once: true });
   await waitForClick();
   experimentButton.removeEventListener('click', handleClick);
+
+  outerSVG.addEventListener('click', handleWrongClick, false);
 
   // animate target and eye movements
   // during trial presentation, nothing can be clicked
@@ -169,6 +181,7 @@ async function runTrial(agents, trialCount) {
   await waitForClick();
   hedge.removeEventListener('click', handleClick);
   hedge.removeEventListener('click', logTargetClick);
+  outerSVG.removeEventListener('click', handleWrongClick, false);
 
   // after click, save response time
   const responseTime = new Date().getTime() - t0;

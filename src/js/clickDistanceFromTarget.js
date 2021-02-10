@@ -33,7 +33,7 @@ export default (event, target, outerSVG, responseLog) => {
     },
   });
 
-  document.getElementById('sound').play();
+  document.getElementById('positive-sound').play();
 
   clickLog.targetX = parseFloat(target.getAttribute('viewBox').split(' ')[0]) * -1;
   clickLog.targetY = parseFloat(target.getAttribute('viewBox').split(' ')[1]) * -1;
