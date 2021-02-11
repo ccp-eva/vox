@@ -101,7 +101,7 @@ targetsSingle.forEach((target) => {
 // ---------------------------------------------------------------------------------------------------------------------
 // TRIAL NUMBER & RANDOMIZATION OF AGENTS, TARGETS AND TARGET POSITIONS
 // ---------------------------------------------------------------------------------------------------------------------
-const famNr = 1;
+const famNr = 0;
 const testNr = 3;
 const {
   trialType, agents, targets, positions,
@@ -263,6 +263,7 @@ async function runAll(trialCount) {
   [experiment, hedge,
     pig, monkey, sheep,
     balloonBlue, balloonRed, balloonYellow, balloonGreen,
+    fiveBoxes, sevenBoxes,
   ].forEach((element) => {
     element.setAttribute('visibility', 'hidden');
   });

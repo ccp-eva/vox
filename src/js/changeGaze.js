@@ -45,6 +45,11 @@ export default (agents, targets, sectionArray, trialCount, trialType) => new Pro
   const timelineFam = gsap.timeline();
   const timelineTest = gsap.timeline();
 
+  const showBoxes = () => {
+    hedge.setAttribute('visibility', 'hidden');
+    targets[trialCount].setAttribute('visibility', 'hidden');
+  };
+
   // animate target
   // for fam trials, just show full path. everything at the same time
   if (trialType[trialCount] === 'fam') {
@@ -92,7 +97,6 @@ export default (agents, targets, sectionArray, trialCount, trialType) => new Pro
 
     // for test trials, first hide balloon, then move to final position
   } else {
-    // hedge.setAttribute('visibility', 'hidden');
     timelineTest
     // first: hide balloon
       .to(targets[trialCount], {
@@ -156,15 +160,10 @@ export default (agents, targets, sectionArray, trialCount, trialType) => new Pro
             setCircleCenter(irisRight, gazeCoordsRight);
             const durationAnimation = (distanceCenterHidden / perSecond) + (distanceHiddenRandom / perSecond);
             console.log('animation testtrial complete');
-            const touchScreen = checkForTouchscreen();
 
-            // FOR NOW; PRETEND TO ALWAYS BE ON TOUCHSCREEN
-            // eslint-disable-next-line no-constant-condition
-            // TODO little delay
-            // TODO log in click function whether right bin was clicked
+            const touchScreen = checkForTouchscreen();
             if (!touchScreen) {
-              hedge.setAttribute('visibility', 'hidden');
-              targets[trialCount].setAttribute('visibility', 'hidden');
+              timelineTest.add(showBoxes, '+=1'); // after 1 sec gap
             }
 
             resolve({ pupilLeft, pupilRight, durationAnimation });
