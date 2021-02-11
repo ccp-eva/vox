@@ -1,7 +1,11 @@
 import divideWithRemainder from './divideWithRemainder';
 import shuffleArray from './shuffleArray';
+import checkForTouchscreen from './checkForTouchscreen';
 
 export default (famNr, testNr, agentsSingle, targetsSingle, targetPositionRight) => {
+  const touchScreen = checkForTouchscreen();
+  console.log('touchScreen', touchScreen);
+
   // create array with entry for each fam and test trial
   const trialType = [].concat(new Array(famNr).fill('fam'), new Array(testNr).fill('test'));
 
@@ -41,17 +45,37 @@ export default (famNr, testNr, agentsSingle, targetsSingle, targetPositionRight)
   }
   console.log('targets', targets);
 
-  // ten equally big sections, where targets can land
   const positionsSingle = [];
-  let prevMax = 0;
-  for (let i = 1; i <= 10; i++) {
-    const section = {
-      bin: i,
-      min: prevMax,
-      max: (targetPositionRight / 10) * i,
-    };
-    prevMax = section.max;
-    positionsSingle.push(section);
+
+  // for touchscreen & hedge: ten equally big sections, where targets can land
+  if (touchScreen) {
+    let prevMax = 0;
+    for (let i = 1; i <= 10; i++) {
+      const section = {
+        bin: i,
+        min: prevMax,
+        max: (targetPositionRight / 10) * i,
+      };
+      prevMax = section.max;
+      positionsSingle.push(section);
+    }
+  // for PC version with boxes
+  } else if (!touchScreen) {
+    const box1 = document.getElementById('box1');
+    const box2 = document.getElementById('box2');
+    const box3 = document.getElementById('box3');
+    const box4 = document.getElementById('box4');
+    const box5 = document.getElementById('box5');
+
+    [box1, box2, box3, box4, box5].forEach((box, i) => {
+      const section = {
+        // so that it starts with 1
+        bin: i + 1,
+        // add half a target width for placing upper left balloon corner in middle of box
+        x: (box.getBBox().x + box.getBBox().width / 2) - targetsSingle[0].getBBox().width / 2,
+      };
+      positionsSingle.push(section);
+    });
   }
 
   const positionsDiv = divideWithRemainder(trialType.length, positionsSingle.length);

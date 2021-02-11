@@ -37,9 +37,8 @@ const transitionButton = document.getElementById('transition-button');
 const goodbyeButton = document.getElementById('goodbye-button');
 const experimentButton = document.getElementById('experiment-button');
 const clickBubble = document.getElementById('click-bubble');
-const clickArea = document.getElementById('click-area');
 const fiveBoxes = document.getElementById('five-boxes');
-const sevenBoxes = document.getElementById('seven-boxes');
+// const sevenBoxes = document.getElementById('seven-boxes');
 const hedge = document.getElementById('hedge');
 
 // if you change animal agents or targets, then change ID here...
@@ -82,7 +81,7 @@ const targetPositionMid = origViewBoxWidth / 2 - balloonBlue.getBBox().width / 2
 const targetViewBoxCenter = `-${targetPositionMid} -${origViewBoxHeight / 2.8} ${origViewBoxWidth} ${origViewBoxHeight}`;
 
 // calculate y coords for balloon (-10 for little distance from border)
-const hedgeMidY = origViewBoxHeight - balloonBlue.getBBox().height - 10;
+const hedgeMidY = origViewBoxHeight - balloonBlue.getBBox().height - 25;
 
 // define from which point onwards the balloon is hidden behind hedge
 // BBox of hedge is a bit too high to hide balloon, therefore / 1.1
@@ -216,7 +215,7 @@ async function runAll(trialCount) {
 
   // FAM PHASE
   [instructions, transition, goodbye,
-    clickBubble, fiveBoxes, sevenBoxes,
+    clickBubble, fiveBoxes,
     pig, monkey, sheep,
     balloonBlue, balloonRed, balloonYellow, balloonGreen,
   ].forEach((element) => {
@@ -247,7 +246,7 @@ async function runAll(trialCount) {
 
   // TEST PHASE
   transition.setAttribute('visibility', 'hidden');
-  [experiment, sevenBoxes].forEach((element) => {
+  [experiment, fiveBoxes].forEach((element) => {
     element.setAttribute('visibility', 'visible');
   });
 
@@ -263,7 +262,7 @@ async function runAll(trialCount) {
   [experiment, hedge,
     pig, monkey, sheep,
     balloonBlue, balloonRed, balloonYellow, balloonGreen,
-    fiveBoxes, sevenBoxes,
+    fiveBoxes,
   ].forEach((element) => {
     element.setAttribute('visibility', 'hidden');
   });
@@ -273,6 +272,9 @@ async function runAll(trialCount) {
   goodbyeButton.addEventListener('click', handleClick, { capture: false, once: true });
   await waitForClick();
   goodbyeButton.removeEventListener('click', handleClick);
+
+  // end with blank page
+  goodbye.setAttribute('visibility', 'hidden');
 }
 
 // CAUTION: trialCount start at zero, ie. first trial = 0

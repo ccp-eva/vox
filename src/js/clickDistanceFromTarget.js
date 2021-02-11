@@ -1,6 +1,7 @@
 import { gsap } from 'gsap';
 
 export default (event, target, outerSVG, responseLog) => {
+  console.log(event);
   // save all relevant properties in this empty object
   const clickLog = {};
   // in our context, offset and client same values

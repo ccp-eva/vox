@@ -6,7 +6,8 @@ import randomNumber from './randomNumber';
 import distanceViewBoxes from './distanceViewBoxes';
 import checkForTouchscreen from './checkForTouchscreen';
 
-export default (agents, targets, sectionArray, trialCount, trialType) => new Promise((resolve) => {
+export default (agents, targets, positions, trialCount, trialType) => new Promise((resolve) => {
+  const touchScreen = checkForTouchscreen();
   document.getElementById('experiment-button').setAttribute('visibility', 'hidden');
   document.getElementById('cover-blurr').setAttribute('visibility', 'hidden');
   const hedge = document.getElementById('hedge');
@@ -23,8 +24,15 @@ export default (agents, targets, sectionArray, trialCount, trialType) => new Pro
   const targetViewBoxCenter = targets[trialCount].getAttribute('viewBoxCenter');
   const targetViewBoxHidden = targets[trialCount].getAttribute('viewBoxHidden');
   let targetViewBoxRandom = targets[trialCount].getAttribute('viewBoxRandom');
-  const randomX = randomNumber(sectionArray[trialCount].min, sectionArray[trialCount].max);
-  targetViewBoxRandom = targetViewBoxRandom.replace('x', randomX);
+
+  // for touchscreen & hedge version: any random location
+  if (touchScreen) {
+    const randomX = randomNumber(positions[trialCount].min, positions[trialCount].max);
+    targetViewBoxRandom = targetViewBoxRandom.replace('x', randomX);
+    // for PC version & boxes: random box location
+  } else if (!touchScreen) {
+    targetViewBoxRandom = targetViewBoxRandom.replace('x', positions[trialCount].x);
+  }
 
   // first let eyes follow ballooon to middle, until balloon is hidden
   const gazeCoordsBeginningLeft = getGazeCoords(targets[trialCount], targetViewBoxHidden, pupilLeft, eyelineLeft);
@@ -46,7 +54,7 @@ export default (agents, targets, sectionArray, trialCount, trialType) => new Pro
   let durationAnimation = 0;
   if (trialType[trialCount] === 'fam') {
     durationAnimation = distanceCenterRandom / perSecond;
-  } else if (trialType[trialCount] === 'fam') {
+  } else if (trialType[trialCount] === 'test') {
     durationAnimation = (distanceCenterHidden / perSecond) + (distanceHiddenRandom / perSecond);
   }
 
@@ -55,7 +63,7 @@ export default (agents, targets, sectionArray, trialCount, trialType) => new Pro
 
   const showBoxes = () => {
     hedge.setAttribute('visibility', 'hidden');
-    targets[trialCount].setAttribute('visibility', 'hidden');
+    // targets[trialCount].setAttribute('visibility', 'hidden');
   };
 
   // animate target
@@ -167,9 +175,8 @@ export default (agents, targets, sectionArray, trialCount, trialType) => new Pro
             setCircleCenter(irisRight, gazeCoordsRight);
 
             // for PC version, hide hedge and show boxes
-            const touchScreen = checkForTouchscreen();
             if (!touchScreen) {
-              timelineTest.add(showBoxes, '+=1'); // after 1 sec gap
+              timelineTest.add(showBoxes, '+=0.2'); // after 1 sec gap
             }
           },
         }, '<')
