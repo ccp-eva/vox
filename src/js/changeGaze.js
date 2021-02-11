@@ -9,9 +9,9 @@ import checkForTouchscreen from './checkForTouchscreen';
 export default (agents, targets, sectionArray, trialCount, trialType) => new Promise((resolve) => {
   document.getElementById('experiment-button').setAttribute('visibility', 'hidden');
   document.getElementById('cover-blurr').setAttribute('visibility', 'hidden');
+  const hedge = document.getElementById('hedge');
 
   const currentAgent = `${agents[trialCount].getAttribute('id')}`;
-  const hedge = document.getElementById('hedge');
   // get IDs of eye
   const pupilLeft = document.getElementById(`${currentAgent}-pupil-left`);
   const pupilRight = document.getElementById(`${currentAgent}-pupil-right`);
@@ -42,6 +42,14 @@ export default (agents, targets, sectionArray, trialCount, trialType) => new Pro
   const distanceCenterHidden = distanceViewBoxes(targetViewBoxCenter, targetViewBoxHidden);
   const distanceHiddenRandom = distanceViewBoxes(targetViewBoxHidden, targetViewBoxRandom);
   const perSecond = 300;
+
+  let durationAnimation = 0;
+  if (trialType[trialCount] === 'fam') {
+    durationAnimation = distanceCenterRandom / perSecond;
+  } else if (trialType[trialCount] === 'fam') {
+    durationAnimation = (distanceCenterHidden / perSecond) + (distanceHiddenRandom / perSecond);
+  }
+
   const timelineFam = gsap.timeline();
   const timelineTest = gsap.timeline();
 
@@ -89,7 +97,6 @@ export default (agents, targets, sectionArray, trialCount, trialType) => new Pro
           onComplete() {
             setCircleCenter(pupilRight, gazeCoordsRight);
             setCircleCenter(irisRight, gazeCoordsRight);
-            const durationAnimation = distanceCenterRandom / perSecond;
             console.log('animation famtrial complete');
             resolve({ pupilLeft, pupilRight, durationAnimation });
           },
@@ -158,16 +165,17 @@ export default (agents, targets, sectionArray, trialCount, trialType) => new Pro
           onComplete() {
             setCircleCenter(pupilRight, gazeCoordsRight);
             setCircleCenter(irisRight, gazeCoordsRight);
-            const durationAnimation = (distanceCenterHidden / perSecond) + (distanceHiddenRandom / perSecond);
-            console.log('animation testtrial complete');
 
+            // for PC version, hide hedge and show boxes
             const touchScreen = checkForTouchscreen();
             if (!touchScreen) {
               timelineTest.add(showBoxes, '+=1'); // after 1 sec gap
             }
-
-            resolve({ pupilLeft, pupilRight, durationAnimation });
           },
-        }, '<');
+        }, '<')
+      .then(() => {
+        console.log('animation testtrial complete');
+        resolve({ pupilLeft, pupilRight, durationAnimation });
+      });
   }
 });

@@ -101,8 +101,8 @@ targetsSingle.forEach((target) => {
 // ---------------------------------------------------------------------------------------------------------------------
 // TRIAL NUMBER & RANDOMIZATION OF AGENTS, TARGETS AND TARGET POSITIONS
 // ---------------------------------------------------------------------------------------------------------------------
-const famNr = 0;
-const testNr = 3;
+const famNr = 2;
+const testNr = 2;
 const {
   trialType, agents, targets, positions,
 } = randomizeTrials(famNr, testNr, agentsSingle, targetsSingle, targetPositionRight);
