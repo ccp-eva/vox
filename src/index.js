@@ -100,7 +100,7 @@ targetsSingle.forEach((target) => {
 // ---------------------------------------------------------------------------------------------------------------------
 // TRIAL NUMBER & RANDOMIZATION OF AGENTS, TARGETS AND TARGET POSITIONS
 // ---------------------------------------------------------------------------------------------------------------------
-const famNr = 2;
+const famNr = 1;
 const testNr = 2;
 const {
   trialType, agents, targets, positions,
