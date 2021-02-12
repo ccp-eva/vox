@@ -154,6 +154,7 @@ async function runTrial(agents, trialCount) {
     pupilLeft,
     pupilRight,
     durationAnimation,
+    touchScreen,
   } = await changeGaze(agents, targets, positions, trialCount, trialType);
 
   // wait for user response and log response time
@@ -161,13 +162,26 @@ async function runTrial(agents, trialCount) {
 
   // wait for target click of user (can only click where hedge is/would be)
   // in htlm, <g id="hedge" pointer-events="all">, so that you can click on it even if hidden
-  hedge.addEventListener('click', handleClick, { capture: false, once: true });
+  if (touchScreen || trialType[trialCount] === 'fam') {
+    hedge.addEventListener('click', handleClick, { capture: false, once: true });
+  } else if (!touchScreen) {
+    hedge.setAttribute('pointer-events', 'none');
+    fiveBoxes.addEventListener('click', handleClick, { capture: false, once: true });
+  }
 
   // log where the user clicked
   // logTargetClick hands over clickEvent parameter to clickDistanceFromTarget function
-  const logTargetClick = (event) => { clickDistanceFromTarget(event, targets[trialCount], outerSVG, responseLog); };
-  hedge.addEventListener('click', logTargetClick, { capture: false, once: true });
+  const logTargetClick = (event) => {
+    clickDistanceFromTarget(event, targets[trialCount], trialType[trialCount], outerSVG, responseLog);
+  };
+  if (touchScreen || trialType[trialCount] === 'fam') {
+    hedge.addEventListener('click', logTargetClick, { capture: false, once: true });
+  } else if (!touchScreen) {
+    fiveBoxes.addEventListener('click', logTargetClick, { capture: false, once: true });
+  }
+
   await waitForClick();
+
   hedge.removeEventListener('click', handleClick);
   hedge.removeEventListener('click', logTargetClick);
   outerSVG.removeEventListener('click', handleWrongClick, false);
@@ -176,6 +190,7 @@ async function runTrial(agents, trialCount) {
   const responseTime = new Date().getTime() - t0;
 
   // log all important trial infos
+  responseLog[trialCount].touchScreen = touchScreen;
   responseLog[trialCount].responseTime = responseTime;
   responseLog[trialCount].trialNr = trialCount + 1;
   responseLog[trialCount].agent = `${agents[trialCount].getAttribute('id')}`;

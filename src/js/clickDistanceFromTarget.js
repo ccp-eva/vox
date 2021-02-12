@@ -1,7 +1,8 @@
 import { gsap } from 'gsap';
+import checkForTouchscreen from './checkForTouchscreen';
 
-export default (event, target, outerSVG, responseLog) => {
-  console.log(event);
+export default (event, target, trialType, outerSVG, responseLog) => {
+  const touchScreen = checkForTouchscreen();
   // save all relevant properties in this empty object
   const clickLog = {};
   // in our context, offset and client same values
@@ -59,6 +60,18 @@ export default (event, target, outerSVG, responseLog) => {
   }
   if (clickLog.targetY <= clickLog.clickScaledY && clickLog.clickScaledY <= (clickLog.targetY + clickLog.targetHeight)) {
     clickLog.hitBBTargetY = true;
+  }
+
+  // for PC version of experiment, check which box was clicked
+  // TODO pass over trialType and trialCount
+  // TODO create experiment object
+  if (touchScreen) {
+    if (trialType === 'fam') clickLog.clickedArea = 'clickable-area';
+    if (trialType === 'test') clickLog.clickedArea = 'hedge';
+  }
+  if (!touchScreen) {
+    if (trialType === 'fam') clickLog.clickedArea = 'clickable-area';
+    if (trialType === 'test') clickLog.clickedArea = clickLog.clickedArea = event.path[1].getAttribute('id');
   }
 
   responseLog.push(clickLog);
