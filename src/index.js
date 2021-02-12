@@ -184,6 +184,8 @@ async function runTrial(agents, trialCount) {
 
   hedge.removeEventListener('click', handleClick);
   hedge.removeEventListener('click', logTargetClick);
+  fiveBoxes.removeEventListener('click', handleClick);
+  fiveBoxes.removeEventListener('click', logTargetClick);
   outerSVG.removeEventListener('click', handleWrongClick, false);
 
   // after click, save response time

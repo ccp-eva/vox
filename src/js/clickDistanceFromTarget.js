@@ -63,8 +63,6 @@ export default (event, target, trialType, outerSVG, responseLog) => {
   }
 
   // for PC version of experiment, check which box was clicked
-  // TODO pass over trialType and trialCount
-  // TODO create experiment object
   if (touchScreen) {
     if (trialType === 'fam') clickLog.clickedArea = 'clickable-area';
     if (trialType === 'test') clickLog.clickedArea = 'hedge';
