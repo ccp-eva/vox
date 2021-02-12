@@ -106,7 +106,9 @@ export default (agents, targets, positions, trialCount, trialType) => new Promis
             setCircleCenter(pupilRight, gazeCoordsRight);
             setCircleCenter(irisRight, gazeCoordsRight);
             console.log('animation famtrial complete');
-            resolve({ pupilLeft, pupilRight, durationAnimation });
+            resolve({
+              pupilLeft, pupilRight, durationAnimation, touchScreen,
+            });
           },
         }, '<');
 
@@ -182,7 +184,9 @@ export default (agents, targets, positions, trialCount, trialType) => new Promis
         }, '<')
       .then(() => {
         console.log('animation testtrial complete');
-        resolve({ pupilLeft, pupilRight, durationAnimation });
+        resolve({
+          pupilLeft, pupilRight, durationAnimation, touchScreen,
+        });
       });
   }
 });
