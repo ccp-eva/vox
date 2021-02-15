@@ -3,18 +3,20 @@ import setTargetCenter from './setTargetCenter';
 import showElement from './showElement';
 
 export default (agents, targets, trialCount, trialType) => {
-  document.getElementById('experiment-button').setAttribute('visibility', 'visible');
-  document.getElementById('cover-blurr').setAttribute('visibility', 'visible');
+  const outerSVG = document.getElementById('outer-svg');
+  const outerSVGDoc = outerSVG.contentDocument;
+  outerSVGDoc.getElementById('experiment-button').setAttribute('visibility', 'visible');
+  outerSVGDoc.getElementById('cover-blurr').setAttribute('visibility', 'visible');
 
   // show agent and target of the current trial only, hide the other ones
   showElement(agents, trialCount);
   showElement(targets, trialCount);
 
   const currentAgent = `${agents[trialCount].getAttribute('id')}`;
-  const pupilLeft = document.getElementById(`${currentAgent}-pupil-left`);
-  const pupilRight = document.getElementById(`${currentAgent}-pupil-right`);
-  const irisLeft = document.getElementById(`${currentAgent}-iris-left`);
-  const irisRight = document.getElementById(`${currentAgent}-iris-right`);
+  const pupilLeft = outerSVGDoc.getElementById(`${currentAgent}-pupil-left`);
+  const pupilRight = outerSVGDoc.getElementById(`${currentAgent}-pupil-right`);
+  const irisLeft = outerSVGDoc.getElementById(`${currentAgent}-iris-left`);
+  const irisRight = outerSVGDoc.getElementById(`${currentAgent}-iris-right`);
 
   // get the center/ middle position of eye of currentAgent
   const eyeLeftCenter = { x: pupilLeft.getAttribute('cxOrig'), y: pupilLeft.getAttribute('cyOrig') };
@@ -30,7 +32,7 @@ export default (agents, targets, trialCount, trialType) => {
   setTargetCenter(targets[trialCount], `${targets[trialCount].getAttribute('viewBoxCenter')}`);
 
   // depending on trial type, show or hide hedge
-  const hedge = document.getElementById('hedge');
+  const hedge = outerSVGDoc.getElementById('hedge');
   if (trialType[trialCount] === 'fam') {
     hedge.setAttribute('visibility', 'hidden');
   } else if (trialType[trialCount] === 'test') {

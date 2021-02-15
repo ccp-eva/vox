@@ -2,6 +2,8 @@ import { gsap } from 'gsap';
 import checkForTouchscreen from './checkForTouchscreen';
 
 export default (event, target, trialType, outerSVG, responseLog) => {
+  const outerSVGDoc = outerSVG.contentDocument;
+
   const touchScreen = checkForTouchscreen();
   // save all relevant properties in this empty object
   const clickLog = {};
@@ -23,7 +25,7 @@ export default (event, target, trialType, outerSVG, responseLog) => {
   clickLog.clickScaledX = clickLog.screenScalingWidth * clickLog.clickX;
   clickLog.clickScaledY = clickLog.screenScalingHeight * clickLog.clickY;
 
-  const clickBubble = document.getElementById('click-bubble');
+  const clickBubble = outerSVGDoc.getElementById('click-bubble');
   clickBubble.setAttribute('cx', `${clickLog.clickScaledX}`);
   clickBubble.setAttribute('cy', `${clickLog.clickScaledY}`);
   // let clickBubble be visible only for 0.2 sec

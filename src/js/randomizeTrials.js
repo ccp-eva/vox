@@ -61,11 +61,13 @@ export default (famNr, testNr, agentsSingle, targetsSingle, targetPositionRight)
     }
   // for PC version with boxes
   } else if (!touchScreen) {
-    const box1 = document.getElementById('box1');
-    const box2 = document.getElementById('box2');
-    const box3 = document.getElementById('box3');
-    const box4 = document.getElementById('box4');
-    const box5 = document.getElementById('box5');
+    const outerSVG = document.getElementById('outer-svg');
+    const outerSVGDoc = outerSVG.contentDocument;
+    const box1 = outerSVGDoc.getElementById('box1');
+    const box2 = outerSVGDoc.getElementById('box2');
+    const box3 = outerSVGDoc.getElementById('box3');
+    const box4 = outerSVGDoc.getElementById('box4');
+    const box5 = outerSVGDoc.getElementById('box5');
 
     [box1, box2, box3, box4, box5].forEach((box, i) => {
       const section = {

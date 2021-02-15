@@ -8,18 +8,20 @@ import checkForTouchscreen from './checkForTouchscreen';
 
 export default (agents, targets, positions, trialCount, trialType) => new Promise((resolve) => {
   const touchScreen = checkForTouchscreen();
-  document.getElementById('experiment-button').setAttribute('visibility', 'hidden');
-  document.getElementById('cover-blurr').setAttribute('visibility', 'hidden');
-  const hedge = document.getElementById('hedge');
+  const outerSVG = document.getElementById('outer-svg');
+  const outerSVGDoc = outerSVG.contentDocument;
+  outerSVGDoc.getElementById('experiment-button').setAttribute('visibility', 'hidden');
+  outerSVGDoc.getElementById('cover-blurr').setAttribute('visibility', 'hidden');
+  const hedge = outerSVGDoc.getElementById('hedge');
 
   const currentAgent = `${agents[trialCount].getAttribute('id')}`;
   // get IDs of eye
-  const pupilLeft = document.getElementById(`${currentAgent}-pupil-left`);
-  const pupilRight = document.getElementById(`${currentAgent}-pupil-right`);
-  const irisLeft = document.getElementById(`${currentAgent}-iris-left`);
-  const irisRight = document.getElementById(`${currentAgent}-iris-right`);
-  const eyelineLeft = document.getElementById(`${currentAgent}-eyeline-left`);
-  const eyelineRight = document.getElementById(`${currentAgent}-eyeline-right`);
+  const pupilLeft = outerSVGDoc.getElementById(`${currentAgent}-pupil-left`);
+  const pupilRight = outerSVGDoc.getElementById(`${currentAgent}-pupil-right`);
+  const irisLeft = outerSVGDoc.getElementById(`${currentAgent}-iris-left`);
+  const irisRight = outerSVGDoc.getElementById(`${currentAgent}-iris-right`);
+  const eyelineLeft = outerSVGDoc.getElementById(`${currentAgent}-eyeline-left`);
+  const eyelineRight = outerSVGDoc.getElementById(`${currentAgent}-eyeline-right`);
 
   const targetViewBoxCenter = targets[trialCount].getAttribute('viewBoxCenter');
   const targetViewBoxHidden = targets[trialCount].getAttribute('viewBoxHidden');
