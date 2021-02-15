@@ -3,6 +3,12 @@ import prepareTrial from './js/prepareTrial';
 import changeGaze from './js/changeGaze';
 import pause from './js/pause';
 import randomizeTrials from './js/randomizeTrials';
+import downloadData from './js/downloadData';
+
+// ---------------------------------------------------------------------------------------------------------------------
+// PARTICIPANT ID
+// ---------------------------------------------------------------------------------------------------------------------
+const participantID = 'testID';
 
 // ---------------------------------------------------------------------------------------------------------------------
 // SVG & SCREEN SIZE
@@ -292,6 +298,9 @@ async function runAll(trialCount) {
 
   // end with blank page
   goodbye.setAttribute('visibility', 'hidden');
+
+  // locally download data
+  downloadData(responseLog, participantID);
 }
 
 // CAUTION: trialCount start at zero, ie. first trial = 0
