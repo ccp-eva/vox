@@ -2,11 +2,16 @@
   "name": "gaze-following",
   "version": "0.0.2",
   "description": "A web-based experiment for gaze following.",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ccp-eva/vox"
+  },
   "main": "dist/index.html",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "dev": "parcel serve ./src/index.html",
-    "build": "rm -rf dist && rm -rf .parcel-cache && parcel build ./src/index.html --public-url='./'"
+    "build": "rm -rf dist && rm -rf .parcel-cache && parcel build ./src/index.html --public-url='./'",
+    "upgrade-interactive": "npm-check --update"
   },
   "keywords": [
     "vectorized",
@@ -21,9 +26,9 @@
     "gsap": "^3.6.0"
   },
   "devDependencies": {
-    "eslint": "^7.15.0",
+    "eslint": "^7.20.0",
     "eslint-config-airbnb-base": "^14.2.1",
     "eslint-plugin-import": "^2.22.1",
-    "parcel": "^2.0.0-nightly.469"
+    "parcel": "^2.0.0-nightly.596"
   }
 }
