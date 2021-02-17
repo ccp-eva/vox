@@ -2,17 +2,14 @@ import { gsap } from 'gsap';
 import setCircleCenter from './setCircleCenter';
 import setTargetCenter from './setTargetCenter';
 import getGazeCoords from './getGazeCoords';
-import randomNumber from './randomNumber';
 import distanceViewBoxes from './distanceViewBoxes';
-import checkForTouchscreen from './checkForTouchscreen';
 
-export default (agents, targets, positions, trialCount, trialType) => new Promise((resolve) => {
-  const touchScreen = checkForTouchscreen();
+export default (exp, trialCount) => new Promise((resolve) => {
   document.getElementById('experiment-button').setAttribute('visibility', 'hidden');
   document.getElementById('cover-blurr').setAttribute('visibility', 'hidden');
   const hedge = document.getElementById('hedge');
 
-  const currentAgent = `${agents[trialCount].getAttribute('id')}`;
+  const currentAgent = `${exp.agents[trialCount].getAttribute('id')}`;
   // get IDs of eye
   const pupilLeft = document.getElementById(`${currentAgent}-pupil-left`);
   const pupilRight = document.getElementById(`${currentAgent}-pupil-right`);
@@ -21,40 +18,45 @@ export default (agents, targets, positions, trialCount, trialType) => new Promis
   const eyelineLeft = document.getElementById(`${currentAgent}-eyeline-left`);
   const eyelineRight = document.getElementById(`${currentAgent}-eyeline-right`);
 
-  const targetViewBoxCenter = targets[trialCount].getAttribute('viewBoxCenter');
-  const targetViewBoxHidden = targets[trialCount].getAttribute('viewBoxHidden');
-  let targetViewBoxRandom = targets[trialCount].getAttribute('viewBoxRandom');
-
-  // for touchscreen & hedge version: any random location
-  if (touchScreen) {
-    const randomX = randomNumber(positions[trialCount].min, positions[trialCount].max);
-    targetViewBoxRandom = targetViewBoxRandom.replace('x', randomX);
-    // for PC version & boxes: random box location
-  } else if (!touchScreen) {
-    targetViewBoxRandom = targetViewBoxRandom.replace('x', positions[trialCount].x);
-  }
-
   // first let eyes follow ballooon to middle, until balloon is hidden
-  const gazeCoordsBeginningLeft = getGazeCoords(targets[trialCount], targetViewBoxHidden, pupilLeft, eyelineLeft);
-  const gazeCoordsBeginningRight = getGazeCoords(targets[trialCount], targetViewBoxHidden, pupilRight, eyelineRight);
+  const gazeCoordsBeginningLeft = getGazeCoords(
+    exp.targets[trialCount], exp.elemSpecs.targets.viewBoxHidden,
+    pupilLeft, eyelineLeft,
+  );
+  const gazeCoordsBeginningRight = getGazeCoords(
+    exp.targets[trialCount], exp.elemSpecs.targets.viewBoxHidden,
+    pupilRight, eyelineRight,
+  );
 
   // define where the target will move
   // WE NEED MINUS! SINCE WE MOVE THE COORDINATE SYSTEM TO THE LEFT / UP in order to let the balloon move right / down
-  // eslint-disable-next-line max-len
   // calculate new position of eyes with the values where target WILL move to (is not yet there!)
-  const gazeCoordsLeft = getGazeCoords(targets[trialCount], targetViewBoxRandom, pupilLeft, eyelineLeft);
-  const gazeCoordsRight = getGazeCoords(targets[trialCount], targetViewBoxRandom, pupilRight, eyelineRight);
+  const gazeCoordsLeft = getGazeCoords(
+    exp.targets[trialCount], exp.positions[trialCount].viewBoxRandom,
+    pupilLeft, eyelineLeft,
+  );
+
+  const gazeCoordsRight = getGazeCoords(
+    exp.targets[trialCount], exp.positions[trialCount].viewBoxRandom,
+    pupilRight, eyelineRight,
+  );
 
   // calculate distance between middle and target position, for constant speed
-  const distanceCenterRandom = distanceViewBoxes(targetViewBoxCenter, targetViewBoxRandom);
-  const distanceCenterHidden = distanceViewBoxes(targetViewBoxCenter, targetViewBoxHidden);
-  const distanceHiddenRandom = distanceViewBoxes(targetViewBoxHidden, targetViewBoxRandom);
+  const distanceCenterRandom = distanceViewBoxes(
+    exp.elemSpecs.targets.viewBoxCenter, exp.positions[trialCount].viewBoxRandom,
+  );
+  const distanceCenterHidden = distanceViewBoxes(
+    exp.elemSpecs.targets.viewBoxCenter, exp.elemSpecs.targets.viewBoxHidden,
+  );
+  const distanceHiddenRandom = distanceViewBoxes(
+    exp.elemSpecs.targets.viewBoxHidden, exp.positions[trialCount].viewBoxRandom,
+  );
   const perSecond = 300;
 
   let durationAnimation = 0;
-  if (trialType[trialCount] === 'fam') {
+  if (exp.trialType[trialCount] === 'fam') {
     durationAnimation = distanceCenterRandom / perSecond;
-  } else if (trialType[trialCount] === 'test') {
+  } else if (exp.trialType[trialCount] === 'test') {
     durationAnimation = (distanceCenterHidden / perSecond) + (distanceHiddenRandom / perSecond);
   }
 
@@ -63,20 +65,19 @@ export default (agents, targets, positions, trialCount, trialType) => new Promis
 
   const showBoxes = () => {
     hedge.setAttribute('visibility', 'hidden');
-    // targets[trialCount].setAttribute('visibility', 'hidden');
   };
 
   // animate target
   // for fam trials, just show full path. everything at the same time
-  if (trialType[trialCount] === 'fam') {
+  if (exp.trialType[trialCount] === 'fam') {
     timelineFam
-      .to(targets[trialCount], {
+      .to(exp.targets[trialCount], {
         delay: 1,
         duration: `${distanceCenterRandom / perSecond}`,
         ease: 'none',
-        attr: { viewBox: `${targetViewBoxRandom}` },
+        attr: { viewBox: `${exp.positions[trialCount].viewBoxRandom}` },
         onComplete() {
-          setTargetCenter(targets[trialCount], targetViewBoxRandom);
+          setTargetCenter(exp.targets[trialCount], exp.positions[trialCount].viewBoxRandom);
         },
       })
     // animate left eye
@@ -107,7 +108,7 @@ export default (agents, targets, positions, trialCount, trialType) => new Promis
             setCircleCenter(irisRight, gazeCoordsRight);
             console.log('animation famtrial complete');
             resolve({
-              pupilLeft, pupilRight, durationAnimation, touchScreen,
+              pupilLeft, pupilRight, durationAnimation,
             });
           },
         }, '<');
@@ -116,11 +117,11 @@ export default (agents, targets, positions, trialCount, trialType) => new Promis
   } else {
     timelineTest
     // first: hide balloon
-      .to(targets[trialCount], {
+      .to(exp.targets[trialCount], {
         delay: 1,
         duration: `${distanceCenterHidden / perSecond}`,
         ease: 'none',
-        attr: { viewBox: `${targetViewBoxHidden}` },
+        attr: { viewBox: `${exp.elemSpecs.targets.viewBoxHidden}` },
       })
     // let eyes follow balloon already
       .to([pupilLeft, irisLeft],
@@ -142,12 +143,12 @@ export default (agents, targets, positions, trialCount, trialType) => new Promis
           },
         }, '<');
     // then move balloon to final position
-    timelineTest.to(targets[trialCount], {
+    timelineTest.to(exp.targets[trialCount], {
       duration: `${distanceHiddenRandom / perSecond}`,
       ease: 'none',
-      attr: { viewBox: `${targetViewBoxRandom}` },
+      attr: { viewBox: `${exp.positions[trialCount].viewBoxRandom}` },
       onComplete() {
-        setTargetCenter(targets[trialCount], targetViewBoxRandom);
+        setTargetCenter(exp.targets[trialCount], exp.positions[trialCount].viewBoxRandom);
       },
     })
     // eye movement from hidden to target
@@ -177,15 +178,15 @@ export default (agents, targets, positions, trialCount, trialType) => new Promis
             setCircleCenter(irisRight, gazeCoordsRight);
 
             // for PC version, hide hedge and show boxes
-            if (!touchScreen) {
-              timelineTest.add(showBoxes, '+=0.2'); // after 1 sec gap
+            if (!exp.subjData.touchScreen) {
+              timelineTest.add(showBoxes, '+=0.2'); // after gap
             }
           },
         }, '<')
       .then(() => {
         console.log('animation testtrial complete');
         resolve({
-          pupilLeft, pupilRight, durationAnimation, touchScreen,
+          pupilLeft, pupilRight, durationAnimation,
         });
       });
   }

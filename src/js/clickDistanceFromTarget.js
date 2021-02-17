@@ -1,24 +1,23 @@
 import { gsap } from 'gsap';
 import checkForTouchscreen from './checkForTouchscreen';
 
-export default (event, target, trialType, outerSVG, responseLog) => {
+// (event, target, trialType, outerSVG, responseLog)
+export default (event, exp, trialCount, responseLog) => {
   const touchScreen = checkForTouchscreen();
   // save all relevant properties in this empty object
   const clickLog = {};
   // in our context, offset and client same values
   clickLog.offsetWidth = document.body.offsetWidth;
   clickLog.offsetHeight = document.body.offsetHeight;
-  const origViewBoxWidth = parseFloat(outerSVG.getAttribute('viewBox').split(' ')[2]);
-  const origViewBoxHeight = parseFloat(outerSVG.getAttribute('viewBox').split(' ')[3]);
 
   // how much smaller/bigger is the SVG coordinate system wrt the screen size?
-  clickLog.screenScalingWidth = origViewBoxWidth / clickLog.offsetWidth;
-  clickLog.screenScalingHeight = origViewBoxHeight / clickLog.offsetHeight;
+  clickLog.screenScalingWidth = exp.elemSpecs.outerSVG.origViewBoxWidth / clickLog.offsetWidth;
+  clickLog.screenScalingHeight = exp.elemSpecs.outerSVG.origViewBoxHeight / clickLog.offsetHeight;
 
   // click coordinates (event.offset) * scaling
   // originally, we used offset. Didn't work in Firefox.
-  clickLog.clickX = event.clientX - outerSVG.getBoundingClientRect().left;
-  clickLog.clickY = event.clientY - outerSVG.getBoundingClientRect().top;
+  clickLog.clickX = event.clientX - exp.elemSpecs.outerSVG.ID.getBoundingClientRect().left;
+  clickLog.clickY = event.clientY - exp.elemSpecs.outerSVG.ID.getBoundingClientRect().top;
 
   clickLog.clickScaledX = clickLog.screenScalingWidth * clickLog.clickX;
   clickLog.clickScaledY = clickLog.screenScalingHeight * clickLog.clickY;
@@ -37,14 +36,14 @@ export default (event, target, trialType, outerSVG, responseLog) => {
 
   document.getElementById('positive-sound').play();
 
-  clickLog.targetX = parseFloat(target.getAttribute('viewBox').split(' ')[0]) * -1;
-  clickLog.targetY = parseFloat(target.getAttribute('viewBox').split(' ')[1]) * -1;
+  clickLog.targetX = parseFloat(exp.targets[trialCount].getAttribute('viewBox').split(' ')[0]) * -1;
+  clickLog.targetY = parseFloat(exp.targets[trialCount].getAttribute('viewBox').split(' ')[1]) * -1;
 
   // define center of target
-  clickLog.targetWidth = target.getBBox().width;
-  clickLog.targetHeight = target.getBBox().height;
-  clickLog.targetCenterX = clickLog.targetX + target.getBBox().width / 2;
-  clickLog.targetCenterY = clickLog.targetY + target.getBBox().height / 2;
+  clickLog.targetWidth = exp.targets[trialCount].getBBox().width;
+  clickLog.targetHeight = exp.targets[trialCount].getBBox().height;
+  clickLog.targetCenterX = clickLog.targetX + exp.targets[trialCount].getBBox().width / 2;
+  clickLog.targetCenterY = clickLog.targetY + exp.targets[trialCount].getBBox().height / 2;
 
   // clicked on target?
   // for x: negative values mean too far left, positive values mean too far right
@@ -64,12 +63,12 @@ export default (event, target, trialType, outerSVG, responseLog) => {
 
   // for PC version of experiment, check which box was clicked
   if (touchScreen) {
-    if (trialType === 'fam') clickLog.clickedArea = 'clickable-area';
-    if (trialType === 'test') clickLog.clickedArea = 'hedge';
+    if (exp.trialType[trialCount] === 'fam') clickLog.clickedArea = 'clickable-area';
+    if (exp.trialType[trialCount] === 'test') clickLog.clickedArea = 'hedge';
   }
   if (!touchScreen) {
-    if (trialType === 'fam') clickLog.clickedArea = 'clickable-area';
-    if (trialType === 'test') clickLog.clickedArea = clickLog.clickedArea = event.path[1].getAttribute('id');
+    if (exp.trialType[trialCount] === 'fam') clickLog.clickedArea = 'clickable-area';
+    if (exp.trialType[trialCount] === 'test') clickLog.clickedArea = event.path[1].getAttribute('id');
   }
 
   responseLog.push(clickLog);

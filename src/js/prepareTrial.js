@@ -2,23 +2,23 @@ import setCircleCenter from './setCircleCenter';
 import setTargetCenter from './setTargetCenter';
 import showElement from './showElement';
 
-export default (agents, targets, trialCount, trialType) => {
+export default (exp, trialCount) => {
   document.getElementById('experiment-button').setAttribute('visibility', 'visible');
   document.getElementById('cover-blurr').setAttribute('visibility', 'visible');
 
   // show agent and target of the current trial only, hide the other ones
-  showElement(agents, trialCount);
-  showElement(targets, trialCount);
+  showElement(exp.agents, trialCount);
+  showElement(exp.targets, trialCount);
 
-  const currentAgent = `${agents[trialCount].getAttribute('id')}`;
+  const currentAgent = `${exp.agents[trialCount].getAttribute('id')}`;
   const pupilLeft = document.getElementById(`${currentAgent}-pupil-left`);
   const pupilRight = document.getElementById(`${currentAgent}-pupil-right`);
   const irisLeft = document.getElementById(`${currentAgent}-iris-left`);
   const irisRight = document.getElementById(`${currentAgent}-iris-right`);
 
   // get the center/ middle position of eye of currentAgent
-  const eyeLeftCenter = { x: pupilLeft.getAttribute('cxOrig'), y: pupilLeft.getAttribute('cyOrig') };
-  const eyeRightCenter = { x: pupilRight.getAttribute('cxOrig'), y: pupilRight.getAttribute('cyOrig') };
+  const eyeLeftCenter = { x: exp.elemSpecs.eyes[currentAgent].leftCX, y: exp.elemSpecs.eyes[currentAgent].leftCY };
+  const eyeRightCenter = { x: exp.elemSpecs.eyes[currentAgent].rightCX, y: exp.elemSpecs.eyes[currentAgent].rightCY };
 
   // set eyes to center
   setCircleCenter(pupilLeft, eyeLeftCenter);
@@ -27,13 +27,13 @@ export default (agents, targets, trialCount, trialType) => {
   setCircleCenter(irisRight, eyeRightCenter);
 
   // set target to center
-  setTargetCenter(targets[trialCount], `${targets[trialCount].getAttribute('viewBoxCenter')}`);
+  setTargetCenter(exp.targets[trialCount], `${exp.elemSpecs.targets.viewBoxCenter}`);
 
   // depending on trial type, show or hide hedge
   const hedge = document.getElementById('hedge');
-  if (trialType[trialCount] === 'fam') {
+  if (exp.trialType[trialCount] === 'fam') {
     hedge.setAttribute('visibility', 'hidden');
-  } else if (trialType[trialCount] === 'test') {
+  } else if (exp.trialType[trialCount] === 'test') {
     hedge.setAttribute('visibility', 'visible');
   }
 };

@@ -1,11 +1,9 @@
 import divideWithRemainder from './divideWithRemainder';
 import shuffleArray from './shuffleArray';
-import checkForTouchscreen from './checkForTouchscreen';
+import randomNumber from './randomNumber';
 
-export default (famNr, testNr, agentsSingle, targetsSingle, targetPositionRight) => {
-  const touchScreen = checkForTouchscreen();
-  console.log('touchScreen', touchScreen);
-
+// returns all important arrays for our experiment
+export default (famNr, testNr, agentsSingle, targetsSingle, elemSpecs, subjData) => {
   // create array with entry for each fam and test trial
   const trialType = [].concat(new Array(famNr).fill('fam'), new Array(testNr).fill('test'));
 
@@ -27,7 +25,6 @@ export default (famNr, testNr, agentsSingle, targetsSingle, targetPositionRight)
     agentsTmp.splice(0, agentsTmp.length - agentsDiv.remainder);
     agents = agents.concat(agentsTmp);
   }
-  console.log('agents', agents);
 
   // SAME FOR TARGET
   const targetsDiv = divideWithRemainder(trialType.length, targetsSingle.length);
@@ -43,24 +40,62 @@ export default (famNr, testNr, agentsSingle, targetsSingle, targetPositionRight)
     targetsTmp.splice(0, targetsTmp.length - targetsDiv.remainder);
     targets = targets.concat(targetsTmp);
   }
-  console.log('targets', targets);
 
-  const positionsSingle = [];
+  // FOR POSITIONS OF TARGET:
+  // for fam trials and touchscreen with hedge:
+  // ten equally big sections, where targets can land
+  // const elemSpecs.targets.viewBoxRandom = targets[0].getAttribute('viewBoxRandom');
+  let positions = [];
+  const positionsSingleContinuous = [];
+  let prevMax = 0;
+  for (let i = 1; i <= 10; i++) {
+    const randomLocation = randomNumber(prevMax, (elemSpecs.targets.borderRight / 10) * i);
+    const viewBoxRandom = elemSpecs.targets.viewBoxRandom.replace('x', randomLocation);
+    const section = {
+      bin: i,
+      type: 'randomLocation',
+      viewBoxRandom,
+    };
+    prevMax = (elemSpecs.targets.borderRight / 10) * i;
+    positionsSingleContinuous.push(section);
+  }
 
-  // for touchscreen & hedge: ten equally big sections, where targets can land
-  if (touchScreen) {
-    let prevMax = 0;
-    for (let i = 1; i <= 10; i++) {
-      const section = {
-        bin: i,
-        min: prevMax,
-        max: (targetPositionRight / 10) * i,
-      };
-      prevMax = section.max;
-      positionsSingle.push(section);
+  // for touchscreen with hedge, the target lands in random locations for all trials
+  if (subjData.touchScreen) {
+    // how many times can we repeat each section
+    const positionsDiv = divideWithRemainder(trialType.length, positionsSingleContinuous.length);
+    positionsSingleContinuous.forEach((section) => {
+      positions = positions.concat(new Array(positionsDiv.quotient).fill(section));
+    });
+    positions = shuffleArray(positions);
+
+    // if division with remainder, fill up array
+    if (positionsDiv.remainder > 0) {
+      const positionsTmp = shuffleArray(positionsSingleContinuous);
+      positionsTmp.splice(0, positionsTmp.length - positionsDiv.remainder);
+      positions = positions.concat(positionsTmp);
     }
-  // for PC version with boxes
-  } else if (!touchScreen) {
+
+    // for PC version with boxes:
+  } else if (!subjData.touchScreen) {
+    // for fam trials, random location
+    // how many times can we repeat each section
+    let positionsFam = [];
+    const positionsDivFam = divideWithRemainder(famNr, positionsSingleContinuous.length);
+    positionsSingleContinuous.forEach((section) => {
+      positionsFam = positionsFam.concat(new Array(positionsDivFam.quotient).fill(section));
+    });
+    positionsFam = shuffleArray(positionsFam);
+
+    // if division with remainder, fill up array
+    if (positionsDivFam.remainder > 0) {
+      const positionsTmp = shuffleArray(positionsSingleContinuous);
+      positionsTmp.splice(0, positionsTmp.length - positionsDivFam.remainder);
+      positionsFam = positionsFam.concat(positionsTmp);
+    }
+
+    // for test trials, target can only land in boxes
+    const positionsSingleBoxes = [];
     const box1 = document.getElementById('box1');
     const box2 = document.getElementById('box2');
     const box3 = document.getElementById('box3');
@@ -71,29 +106,32 @@ export default (famNr, testNr, agentsSingle, targetsSingle, targetPositionRight)
       const section = {
         // so that it starts with 1
         bin: i + 1,
+        type: 'boxLocation',
         // add half a target width for placing upper left balloon corner in middle of box
-        x: (box.getBBox().x + box.getBBox().width / 2) - targetsSingle[0].getBBox().width / 2,
+        // eslint-disable-next-line max-len
+        viewBoxRandom: elemSpecs.targets.viewBoxRandom.replace('x', ((box.getBBox().x + box.getBBox().width / 2) - targetsSingle[0].getBBox().width / 2)),
+
       };
-      positionsSingle.push(section);
+      positionsSingleBoxes.push(section);
     });
+
+    const positionsDivTest = divideWithRemainder(testNr, positionsSingleBoxes.length);
+
+    let positionsTest = [];
+    positionsSingleBoxes.forEach((section) => {
+      positionsTest = positionsTest.concat(new Array(positionsDivTest.quotient).fill(section));
+    });
+    positionsTest = shuffleArray(positionsTest);
+
+    if (positionsDivTest.remainder > 0) {
+      const positionsTmp = shuffleArray(positionsSingleBoxes);
+      positionsTmp.splice(0, positionsTmp.length - positionsDivTest.remainder);
+      positionsTest = positionsTest.concat(positionsTmp);
+    }
+    positions = positionsFam.concat(positionsTest);
   }
-
-  const positionsDiv = divideWithRemainder(trialType.length, positionsSingle.length);
-
-  let positions = [];
-  positionsSingle.forEach((section) => {
-    positions = positions.concat(new Array(positionsDiv.quotient).fill(section));
-  });
-  positions = shuffleArray(positions);
-
-  if (positionsDiv.remainder > 0) {
-    const positionsTmp = shuffleArray(positionsSingle);
-    positionsTmp.splice(0, positionsTmp.length - positionsDiv.remainder);
-    positions = positions.concat(positionsTmp);
-  }
-  console.log('positions', positions);
 
   return {
-    trialType, agents, targets, positions,
+    trialType, agents, targets, positions, elemSpecs, subjData,
   };
 };

@@ -4,11 +4,15 @@ import changeGaze from './js/changeGaze';
 import pause from './js/pause';
 import randomizeTrials from './js/randomizeTrials';
 import downloadData from './js/downloadData';
+import checkForTouchscreen from './js/checkForTouchscreen';
 
+// TODO response logging in exp object?
 // ---------------------------------------------------------------------------------------------------------------------
 // PARTICIPANT ID
 // ---------------------------------------------------------------------------------------------------------------------
-const participantID = 'testID';
+const subjData = {};
+subjData.participantID = 'testID';
+subjData.touchScreen = checkForTouchscreen();
 
 // ---------------------------------------------------------------------------------------------------------------------
 // SVG & SCREEN SIZE
@@ -16,102 +20,88 @@ const participantID = 'testID';
 // TODO find more elegant solution to tell user to view on fullscreen
 // if (clientWidth < 600 || clientHeight < 200) alert('Please view on bigger screen!');
 // ---------------------------------------------------------------------------------------------------------------------
-const { offsetWidth } = document.body;
-const { offsetHeight } = document.body;
-console.log('client browser size', { offsetWidth, offsetHeight });
+subjData.offsetWidth = document.body.offsetWidth;
+subjData.offsetHeight = document.body.offsetHeight;
 
 // get viewBox size from whole SVG
-const outerSVG = document.getElementById('outer-svg');
-const origViewBoxX = parseFloat(outerSVG.getAttribute('viewBox').split(' ')[0]);
-const origViewBoxY = parseFloat(outerSVG.getAttribute('viewBox').split(' ')[1]);
-const origViewBoxWidth = parseFloat(outerSVG.getAttribute('viewBox').split(' ')[2]);
-const origViewBoxHeight = parseFloat(outerSVG.getAttribute('viewBox').split(' ')[3]);
-console.log('viewBox size', {
-  origViewBoxX, origViewBoxY, origViewBoxWidth, origViewBoxHeight,
-});
-
+const elemSpecs = {
+  outerSVG: {
+    ID: document.getElementById('outer-svg'),
+    origViewBoxX: parseFloat(document.getElementById('outer-svg').getAttribute('viewBox').split(' ')[0]),
+    origViewBoxY: parseFloat(document.getElementById('outer-svg').getAttribute('viewBox').split(' ')[1]),
+    origViewBoxWidth: parseFloat(document.getElementById('outer-svg').getAttribute('viewBox').split(' ')[2]),
+    origViewBoxHeight: parseFloat(document.getElementById('outer-svg').getAttribute('viewBox').split(' ')[3]),
+  },
+};
 // ---------------------------------------------------------------------------------------------------------------------
 // GET ALL RELEVANT ELEMENTS IN SVG
 // ---------------------------------------------------------------------------------------------------------------------
-const instructions = document.getElementById('instructions');
-const transition = document.getElementById('transition');
-const goodbye = document.getElementById('goodbye');
-const experiment = document.getElementById('experiment');
+const instructionSlide = document.getElementById('instructions');
+const transitionSlide = document.getElementById('transition');
+const goodbyeSlide = document.getElementById('goodbye');
+const experimentSlide = document.getElementById('experiment');
 
-const instructionsButton = document.getElementById('instructions-button');
+const instructionButton = document.getElementById('instructions-button');
 const transitionButton = document.getElementById('transition-button');
 const goodbyeButton = document.getElementById('goodbye-button');
 const experimentButton = document.getElementById('experiment-button');
 const clickBubble = document.getElementById('click-bubble');
 const fiveBoxes = document.getElementById('five-boxes');
-// const sevenBoxes = document.getElementById('seven-boxes');
 const hedge = document.getElementById('hedge');
 
 // if you change animal agents or targets, then change ID here...
 const pig = document.getElementById('pig');
 const monkey = document.getElementById('monkey');
 const sheep = document.getElementById('sheep');
-// eslint-disable-next-line prefer-const
-let agentsSingle = [pig, monkey, sheep];
+const agentsSingle = [pig, monkey, sheep];
 
 // NOTE: we believe that all target objects are the same size here!!
 const balloonBlue = document.getElementById('balloon-blue');
 const balloonRed = document.getElementById('balloon-red');
 const balloonYellow = document.getElementById('balloon-yellow');
 const balloonGreen = document.getElementById('balloon-green');
-// eslint-disable-next-line prefer-const
-let targetsSingle = [balloonBlue, balloonRed, balloonYellow, balloonGreen];
+const targetsSingle = [balloonBlue, balloonRed, balloonYellow, balloonGreen];
 
-// for all agents, save the original pupil/iris positions as attributes in svg elements
-['pig', 'monkey', 'sheep'].forEach((agent) => {
-  const pupilLeft = document.getElementById(`${agent}-pupil-left`);
-  const irisLeft = document.getElementById(`${agent}-iris-left`);
-  const pupilRight = document.getElementById(`${agent}-pupil-right`);
-  const irisRight = document.getElementById(`${agent}-iris-right`);
-
-  pupilLeft.setAttribute('cxOrig', `${pupilLeft.getAttribute('cx')}`);
-  pupilLeft.setAttribute('cyOrig', `${pupilLeft.getAttribute('cy')}`);
-  irisLeft.setAttribute('cxOrig', `${irisLeft.getAttribute('cx')}`);
-  irisLeft.setAttribute('cyOrig', `${irisLeft.getAttribute('cy')}`);
-  pupilRight.setAttribute('cxOrig', `${pupilRight.getAttribute('cx')}`);
-  pupilRight.setAttribute('cyOrig', `${pupilRight.getAttribute('cy')}`);
-  irisRight.setAttribute('cxOrig', `${irisRight.getAttribute('cx')}`);
-  irisRight.setAttribute('cyOrig', `${irisRight.getAttribute('cy')}`);
+elemSpecs.eyes = {};
+const agentsChar = ['pig', 'monkey', 'sheep'];
+agentsChar.forEach((agent) => {
+  elemSpecs.eyes[agent] = {
+    leftCX: document.getElementById(`${agent}-pupil-left`).getAttribute('cx'),
+    leftCY: document.getElementById(`${agent}-pupil-left`).getAttribute('cy'),
+    rightCX: document.getElementById(`${agent}-pupil-right`).getAttribute('cx'),
+    rightCY: document.getElementById(`${agent}-pupil-right`).getAttribute('cy'),
+  };
 });
-
 // calculate some target positions:
 // get position on the very right (as constraint) and mid of the screen
-const targetPositionRight = origViewBoxWidth - balloonBlue.getBBox().width;
-const targetPositionMid = origViewBoxWidth / 2 - balloonBlue.getBBox().width / 2;
+const borderRight = elemSpecs.outerSVG.origViewBoxWidth - balloonBlue.getBBox().width;
+const positionMid = elemSpecs.outerSVG.origViewBoxWidth / 2 - balloonBlue.getBBox().width / 2;
 // eslint-disable-next-line max-len
-const targetViewBoxCenter = `-${targetPositionMid} -${origViewBoxHeight / 2.8} ${origViewBoxWidth} ${origViewBoxHeight}`;
+const viewBoxCenter = `-${positionMid} -${elemSpecs.outerSVG.origViewBoxHeight / 2.8} ${elemSpecs.outerSVG.origViewBoxWidth} ${elemSpecs.outerSVG.origViewBoxHeight}`;
 
 // calculate y coords for balloon (-10 for little distance from border)
-const hedgeMidY = origViewBoxHeight - balloonBlue.getBBox().height - 25;
+const hedgeMidY = elemSpecs.outerSVG.origViewBoxHeight - balloonBlue.getBBox().height - 25;
 
 // define from which point onwards the balloon is hidden behind hedge
 // BBox of hedge is a bit too high to hide balloon, therefore / 1.1
 // eslint-disable-next-line max-len
-const targetViewBoxHidden = `-${targetPositionMid} -${origViewBoxHeight - hedge.getBBox().height / 1.1} ${origViewBoxWidth} ${origViewBoxHeight}`;
+const viewBoxHidden = `-${positionMid} -${elemSpecs.outerSVG.origViewBoxHeight - hedge.getBBox().height / 1.1} ${elemSpecs.outerSVG.origViewBoxWidth} ${elemSpecs.outerSVG.origViewBoxHeight}`;
 // placeholder x for random horizontal position. y value and width, height always stays same
-const targetViewBoxRandom = `-x -${hedgeMidY} ${origViewBoxWidth} ${origViewBoxHeight}`;
+const viewBoxRandom = `-x -${hedgeMidY} ${elemSpecs.outerSVG.origViewBoxWidth} ${elemSpecs.outerSVG.origViewBoxHeight}`;
 
-// save target viewbox values in svg attribute (this way we have to save less variables)
-targetsSingle.forEach((target) => {
-  target.setAttribute('viewBoxCenter', `${targetViewBoxCenter}`);
-  target.setAttribute('viewBoxHidden', `${targetViewBoxHidden}`);
-  target.setAttribute('viewBoxRandom', `${targetViewBoxRandom}`);
-});
-
+elemSpecs.targets = {
+  viewBoxCenter,
+  viewBoxHidden,
+  viewBoxRandom,
+  borderRight,
+};
 // ---------------------------------------------------------------------------------------------------------------------
 // TRIAL NUMBER & RANDOMIZATION OF AGENTS, TARGETS AND TARGET POSITIONS
 // ---------------------------------------------------------------------------------------------------------------------
-const famNr = 1;
-const testNr = 2;
-const {
-  trialType, agents, targets, positions,
-} = randomizeTrials(famNr, testNr, agentsSingle, targetsSingle, targetPositionRight);
-
+const famNr = 5;
+const testNr = 5;
+const exp = randomizeTrials(famNr, testNr, agentsSingle, targetsSingle, elemSpecs, subjData);
+console.log('exp object', exp);
 // ---------------------------------------------------------------------------------------------------------------------
 // FUNCTION FOR WAITING FOR CLICKS, HANDLING CLICKS
 // ---------------------------------------------------------------------------------------------------------------------
@@ -129,10 +119,10 @@ const handleClick = (event) => {
 
 const handleWrongClick = (event) => {
   event.preventDefault();
-  const screenScalingHeight = origViewBoxHeight / offsetHeight;
-  const clickY = event.clientY - outerSVG.getBoundingClientRect().top;
+  const screenScalingHeight = elemSpecs.outerSVG.origViewBoxHeight / subjData.offsetHeight;
+  const clickY = event.clientY - exp.elemSpecs.outerSVG.ID.getBoundingClientRect().top;
   const clickScaledY = screenScalingHeight * clickY;
-  if (clickScaledY < (origViewBoxHeight - hedge.getBBox().height)) {
+  if (clickScaledY < (elemSpecs.outerSVG.origViewBoxHeight - hedge.getBBox().height)) {
     document.getElementById('negative-sound').play();
   }
 };
@@ -140,18 +130,17 @@ const handleWrongClick = (event) => {
 // ---------------------------------------------------------------------------------------------------------------------
 // SPECIFY ORDER OF ONE TRIAL
 // ---------------------------------------------------------------------------------------------------------------------
-async function runTrial(agents, trialCount) {
+async function runTrial(exp, trialCount) {
   console.log(' ');
+  console.log('trial Nr: ', trialCount);
 
   // before trial starts, prepare it and hide underneath blurr
-  prepareTrial(agents, targets, trialCount, trialType);
+  prepareTrial(exp, trialCount);
 
   // wait for user to start trial
   experimentButton.addEventListener('click', handleClick, { capture: false, once: true });
   await waitForClick();
   experimentButton.removeEventListener('click', handleClick);
-
-  outerSVG.addEventListener('click', handleWrongClick, false);
 
   // animate target and eye movements
   // during trial presentation, nothing can be clicked
@@ -160,17 +149,18 @@ async function runTrial(agents, trialCount) {
     pupilLeft,
     pupilRight,
     durationAnimation,
-    touchScreen,
-  } = await changeGaze(agents, targets, positions, trialCount, trialType);
+  } = await changeGaze(exp, trialCount);
 
   // wait for user response and log response time
   const t0 = new Date().getTime();
 
+  exp.elemSpecs.outerSVG.ID.addEventListener('click', handleWrongClick, false);
+
   // wait for target click of user (can only click where hedge is/would be)
   // in htlm, <g id="hedge" pointer-events="all">, so that you can click on it even if hidden
-  if (touchScreen || trialType[trialCount] === 'fam') {
+  if (exp.subjData.touchScreen || exp.trialType[trialCount] === 'fam') {
     hedge.addEventListener('click', handleClick, { capture: false, once: true });
-  } else if (!touchScreen) {
+  } else if (!exp.subjData.touchScreen) {
     hedge.setAttribute('pointer-events', 'none');
     fiveBoxes.addEventListener('click', handleClick, { capture: false, once: true });
   }
@@ -178,11 +168,12 @@ async function runTrial(agents, trialCount) {
   // log where the user clicked
   // logTargetClick hands over clickEvent parameter to clickDistanceFromTarget function
   const logTargetClick = (event) => {
-    clickDistanceFromTarget(event, targets[trialCount], trialType[trialCount], outerSVG, responseLog);
+    // (event, target, trialType, outerSVG, responseLog)
+    clickDistanceFromTarget(event, exp, trialCount, responseLog);
   };
-  if (touchScreen || trialType[trialCount] === 'fam') {
+  if (exp.subjData.touchScreen || exp.trialType[trialCount] === 'fam') {
     hedge.addEventListener('click', logTargetClick, { capture: false, once: true });
-  } else if (!touchScreen) {
+  } else if (!exp.subjData.touchScreen) {
     fiveBoxes.addEventListener('click', logTargetClick, { capture: false, once: true });
   }
 
@@ -192,25 +183,25 @@ async function runTrial(agents, trialCount) {
   hedge.removeEventListener('click', logTargetClick);
   fiveBoxes.removeEventListener('click', handleClick);
   fiveBoxes.removeEventListener('click', logTargetClick);
-  outerSVG.removeEventListener('click', handleWrongClick, false);
+  exp.elemSpecs.outerSVG.ID.removeEventListener('click', handleWrongClick, false);
 
   // after click, save response time
   const responseTime = new Date().getTime() - t0;
 
   // log all important trial infos
-  responseLog[trialCount].touchScreen = touchScreen;
+  responseLog[trialCount].touchScreen = exp.subjData.touchScreen;
   responseLog[trialCount].responseTime = responseTime;
   responseLog[trialCount].trialNr = trialCount + 1;
-  responseLog[trialCount].agent = `${agents[trialCount].getAttribute('id')}`;
-  responseLog[trialCount].target = `${targets[trialCount].getAttribute('id')}`;
-  responseLog[trialCount].trialType = trialType[trialCount];
-  responseLog[trialCount].positionBin = positions[trialCount].bin;
-  responseLog[trialCount].pupilLeftOrigX = parseFloat(pupilLeft.getAttribute('cxOrig'));
-  responseLog[trialCount].pupilLeftOrigY = parseFloat(pupilLeft.getAttribute('cyOrig'));
+  responseLog[trialCount].agent = `${exp.agents[trialCount].getAttribute('id')}`;
+  responseLog[trialCount].target = `${exp.targets[trialCount].getAttribute('id')}`;
+  responseLog[trialCount].trialType = exp.trialType[trialCount];
+  responseLog[trialCount].positionBin = exp.positions[trialCount].bin;
+  responseLog[trialCount].pupilLeftOrigX = exp.elemSpecs.eyes[responseLog[trialCount].agent].leftCX;
+  responseLog[trialCount].pupilLeftOrigY = exp.elemSpecs.eyes[responseLog[trialCount].agent].leftCY;
   responseLog[trialCount].pupilLeftRandomX = parseFloat(pupilLeft.getAttribute('cx'));
   responseLog[trialCount].pupilLeftRandomY = parseFloat(pupilLeft.getAttribute('cy'));
-  responseLog[trialCount].pupilRightOrigX = parseFloat(pupilRight.getAttribute('cxOrig'));
-  responseLog[trialCount].pupilRightOrigY = parseFloat(pupilRight.getAttribute('cyOrig'));
+  responseLog[trialCount].pupilRightOrigX = exp.elemSpecs.eyes[responseLog[trialCount].agent].rightCX;
+  responseLog[trialCount].pupilRightOrigY = exp.elemSpecs.eyes[responseLog[trialCount].agent].rightCY;
   responseLog[trialCount].pupilRightRandomX = parseFloat(pupilRight.getAttribute('cx'));
   responseLog[trialCount].pupilRightRandomY = parseFloat(pupilRight.getAttribute('cy'));
   // NOTE: durationAnimation does NOT include 1 sec delay in beginning. Value in msec.
@@ -224,43 +215,41 @@ async function runTrial(agents, trialCount) {
 // ---------------------------------------------------------------------------------------------------------------------
 // SPECIFY ORDER OF ALL EVENTS
 // ---------------------------------------------------------------------------------------------------------------------
-async function runAll(trialCount) {
+async function runAll(exp, trialCount) {
   // INSTRUCTION PHASE
-  [transition, experiment, goodbye].forEach((element) => {
+  [transitionSlide, experimentSlide, goodbyeSlide].forEach((element) => {
     element.setAttribute('visibility', 'hidden');
   });
-  instructions.setAttribute('visibility', 'visible');
+  instructionSlide.setAttribute('visibility', 'visible');
 
   // wait for user to continue
-  instructionsButton.addEventListener('click', handleClick, { capture: false, once: true });
+  instructionButton.addEventListener('click', handleClick, { capture: false, once: true });
   await waitForClick();
-  instructionsButton.removeEventListener('click', handleClick);
+  instructionButton.removeEventListener('click', handleClick);
 
   // FAM PHASE
-  [instructions, transition, goodbye,
+  [instructionSlide, transitionSlide, goodbyeSlide,
     clickBubble, fiveBoxes,
-    pig, monkey, sheep,
-    balloonBlue, balloonRed, balloonYellow, balloonGreen,
   ].forEach((element) => {
     element.setAttribute('visibility', 'hidden');
   });
-  experiment.setAttribute('visibility', 'visible');
+  experimentSlide.setAttribute('visibility', 'visible');
 
   while (trialCount < famNr) {
     // eslint-disable-next-line no-await-in-loop
-    await runTrial(agents, trialCount);
+    await runTrial(exp, trialCount);
     // eslint-disable-next-line no-param-reassign
     trialCount += 1;
   }
 
   // TRANSITION PHASE
-  [experiment,
+  [experimentSlide,
     pig, monkey, sheep,
     balloonBlue, balloonRed, balloonYellow, balloonGreen,
   ].forEach((element) => {
     element.setAttribute('visibility', 'hidden');
   });
-  transition.setAttribute('visibility', 'visible');
+  transitionSlide.setAttribute('visibility', 'visible');
 
   // wait for user to continue
   transitionButton.addEventListener('click', handleClick, { capture: false, once: true });
@@ -268,28 +257,28 @@ async function runAll(trialCount) {
   transitionButton.removeEventListener('click', handleClick);
 
   // TEST PHASE
-  transition.setAttribute('visibility', 'hidden');
-  [experiment, fiveBoxes].forEach((element) => {
+  transitionSlide.setAttribute('visibility', 'hidden');
+  [experimentSlide, fiveBoxes].forEach((element) => {
     element.setAttribute('visibility', 'visible');
   });
 
-  while (trialCount < trialType.length) {
+  while (trialCount < exp.trialType.length) {
     // eslint-disable-next-line no-await-in-loop
-    await runTrial(agents, trialCount);
+    await runTrial(exp, trialCount);
     // eslint-disable-next-line no-param-reassign
     trialCount += 1;
   }
   console.log('test phase completed');
 
   // GOODBYE
-  [experiment, hedge,
+  [experimentSlide, hedge,
     pig, monkey, sheep,
     balloonBlue, balloonRed, balloonYellow, balloonGreen,
     fiveBoxes,
   ].forEach((element) => {
     element.setAttribute('visibility', 'hidden');
   });
-  goodbye.setAttribute('visibility', 'visible');
+  goodbyeSlide.setAttribute('visibility', 'visible');
 
   // wait for user to continue
   goodbyeButton.addEventListener('click', handleClick, { capture: false, once: true });
@@ -297,7 +286,7 @@ async function runAll(trialCount) {
   goodbyeButton.removeEventListener('click', handleClick);
 
   // end with blank page
-  goodbye.setAttribute('visibility', 'hidden');
+  goodbyeSlide.setAttribute('visibility', 'hidden');
 
   // locally download data
   downloadData(responseLog, participantID);
@@ -305,4 +294,4 @@ async function runAll(trialCount) {
 
 // CAUTION: trialCount start at zero, ie. first trial = 0
 // (because we need first element in array, that's at position 0)
-runAll(0);
+runAll(exp, 0);
