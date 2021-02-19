@@ -132,6 +132,12 @@ export default (famNr, testNr, agentsSingle, targetsSingle, elemSpecs, subjData)
   }
 
   return {
-    trialType, agents, targets, positions, elemSpecs, subjData,
+    trialType,
+    agents,
+    targets,
+    positions,
+    elemSpecs,
+    subjData,
+    responseLog: [], // already prepared
   };
 };

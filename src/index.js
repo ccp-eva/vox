@@ -6,12 +6,11 @@ import randomizeTrials from './js/randomizeTrials';
 import downloadData from './js/downloadData';
 import checkForTouchscreen from './js/checkForTouchscreen';
 
-// TODO response logging in exp object?
 // ---------------------------------------------------------------------------------------------------------------------
 // PARTICIPANT ID
 // ---------------------------------------------------------------------------------------------------------------------
 const subjData = {};
-subjData.participantID = 'testID';
+subjData.subjID = 'testID';
 subjData.touchScreen = checkForTouchscreen();
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -66,10 +65,18 @@ elemSpecs.eyes = {};
 const agentsChar = ['pig', 'monkey', 'sheep'];
 agentsChar.forEach((agent) => {
   elemSpecs.eyes[agent] = {
-    leftCX: document.getElementById(`${agent}-pupil-left`).getAttribute('cx'),
-    leftCY: document.getElementById(`${agent}-pupil-left`).getAttribute('cy'),
-    rightCX: document.getElementById(`${agent}-pupil-right`).getAttribute('cx'),
-    rightCY: document.getElementById(`${agent}-pupil-right`).getAttribute('cy'),
+    left: {
+      center: {
+        x: document.getElementById(`${agent}-pupil-left`).getAttribute('cx'),
+        y: document.getElementById(`${agent}-pupil-left`).getAttribute('cy'),
+      },
+    },
+    right: {
+      center: {
+        x: document.getElementById(`${agent}-pupil-right`).getAttribute('cx'),
+        y: document.getElementById(`${agent}-pupil-right`).getAttribute('cy'),
+      },
+    },
   };
 });
 // calculate some target positions:
@@ -98,15 +105,13 @@ elemSpecs.targets = {
 // ---------------------------------------------------------------------------------------------------------------------
 // TRIAL NUMBER & RANDOMIZATION OF AGENTS, TARGETS AND TARGET POSITIONS
 // ---------------------------------------------------------------------------------------------------------------------
-const famNr = 5;
-const testNr = 5;
+const famNr = 2;
+const testNr = 2;
 const exp = randomizeTrials(famNr, testNr, agentsSingle, targetsSingle, elemSpecs, subjData);
 console.log('exp object', exp);
 // ---------------------------------------------------------------------------------------------------------------------
 // FUNCTION FOR WAITING FOR CLICKS, HANDLING CLICKS
 // ---------------------------------------------------------------------------------------------------------------------
-const responseLog = [];
-
 let buttonNext = false;
 async function waitForClick() {
   while (buttonNext === false) await pause(50);
@@ -144,12 +149,7 @@ async function runTrial(exp, trialCount) {
 
   // animate target and eye movements
   // during trial presentation, nothing can be clicked
-  // function resolves promise with pupil & animation values which we log later
-  const {
-    pupilLeft,
-    pupilRight,
-    durationAnimation,
-  } = await changeGaze(exp, trialCount);
+  await changeGaze(exp, trialCount);
 
   // wait for user response and log response time
   const t0 = new Date().getTime();
@@ -168,8 +168,7 @@ async function runTrial(exp, trialCount) {
   // log where the user clicked
   // logTargetClick hands over clickEvent parameter to clickDistanceFromTarget function
   const logTargetClick = (event) => {
-    // (event, target, trialType, outerSVG, responseLog)
-    clickDistanceFromTarget(event, exp, trialCount, responseLog);
+    clickDistanceFromTarget(event, exp, trialCount);
   };
   if (exp.subjData.touchScreen || exp.trialType[trialCount] === 'fam') {
     hedge.addEventListener('click', logTargetClick, { capture: false, once: true });
@@ -188,25 +187,27 @@ async function runTrial(exp, trialCount) {
   // after click, save response time
   const responseTime = new Date().getTime() - t0;
 
+  // TODO check response logging in click distance
+  // used object now instead of array... but does that work with trialCount number?
   // log all important trial infos
-  responseLog[trialCount].touchScreen = exp.subjData.touchScreen;
-  responseLog[trialCount].responseTime = responseTime;
-  responseLog[trialCount].trialNr = trialCount + 1;
-  responseLog[trialCount].agent = `${exp.agents[trialCount].getAttribute('id')}`;
-  responseLog[trialCount].target = `${exp.targets[trialCount].getAttribute('id')}`;
-  responseLog[trialCount].trialType = exp.trialType[trialCount];
-  responseLog[trialCount].positionBin = exp.positions[trialCount].bin;
-  responseLog[trialCount].pupilLeftOrigX = exp.elemSpecs.eyes[responseLog[trialCount].agent].leftCX;
-  responseLog[trialCount].pupilLeftOrigY = exp.elemSpecs.eyes[responseLog[trialCount].agent].leftCY;
-  responseLog[trialCount].pupilLeftRandomX = parseFloat(pupilLeft.getAttribute('cx'));
-  responseLog[trialCount].pupilLeftRandomY = parseFloat(pupilLeft.getAttribute('cy'));
-  responseLog[trialCount].pupilRightOrigX = exp.elemSpecs.eyes[responseLog[trialCount].agent].rightCX;
-  responseLog[trialCount].pupilRightOrigY = exp.elemSpecs.eyes[responseLog[trialCount].agent].rightCY;
-  responseLog[trialCount].pupilRightRandomX = parseFloat(pupilRight.getAttribute('cx'));
-  responseLog[trialCount].pupilRightRandomY = parseFloat(pupilRight.getAttribute('cy'));
+  exp.responseLog[trialCount].subjID = exp.subjData.subjID;
+  exp.responseLog[trialCount].touchScreen = exp.subjData.touchScreen;
+  exp.responseLog[trialCount].responseTime = responseTime;
+  exp.responseLog[trialCount].trialNr = trialCount + 1;
+  exp.responseLog[trialCount].agent = `${exp.agents[trialCount].getAttribute('id')}`;
+  exp.responseLog[trialCount].target = `${exp.targets[trialCount].getAttribute('id')}`;
+  exp.responseLog[trialCount].trialType = exp.trialType[trialCount];
+  exp.responseLog[trialCount].positionBin = exp.positions[trialCount].bin;
+  exp.responseLog[trialCount].pupilLeftCenterX = parseFloat(exp.elemSpecs.eyes[exp.responseLog[trialCount].agent].left.center.x);
+  exp.responseLog[trialCount].pupilLeftCenterY = parseFloat(exp.elemSpecs.eyes[exp.responseLog[trialCount].agent].left.center.y);
+  exp.responseLog[trialCount].pupilLeftRandomX = parseFloat(exp.elemSpecs.eyes[exp.responseLog[trialCount].agent].left.random.x);
+  exp.responseLog[trialCount].pupilLeftRandomY = parseFloat(exp.elemSpecs.eyes[exp.responseLog[trialCount].agent].left.random.y);
+  exp.responseLog[trialCount].pupilRightCenterX = parseFloat(exp.elemSpecs.eyes[exp.responseLog[trialCount].agent].right.center.x);
+  exp.responseLog[trialCount].pupilRightCenterY = parseFloat(exp.elemSpecs.eyes[exp.responseLog[trialCount].agent].right.center.y);
+  exp.responseLog[trialCount].pupilRightRandomX = parseFloat(exp.elemSpecs.eyes[exp.responseLog[trialCount].agent].right.random.x);
+  exp.responseLog[trialCount].pupilRightRandomY = parseFloat(exp.elemSpecs.eyes[exp.responseLog[trialCount].agent].right.random.y);
   // NOTE: durationAnimation does NOT include 1 sec delay in beginning. Value in msec.
-  responseLog[trialCount].durationAnimation = durationAnimation * 1000;
-  console.log('responseLog', responseLog[trialCount]);
+  console.log('exp.responseLog', exp.responseLog[trialCount]);
 
   // so that we don't rush to the next trial/startscreen but have a little time
   await pause(1000);
@@ -289,7 +290,7 @@ async function runAll(exp, trialCount) {
   goodbyeSlide.setAttribute('visibility', 'hidden');
 
   // locally download data
-  downloadData(responseLog, participantID);
+  downloadData(exp.responseLog, subjData.subjID);
 }
 
 // CAUTION: trialCount start at zero, ie. first trial = 0
