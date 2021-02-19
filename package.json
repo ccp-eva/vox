@@ -10,7 +10,8 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "dev": "parcel serve ./src/index.html",
-    "build": "rm -rf dist && rm -rf .parcel-cache && parcel build ./src/index.html --public-url='./'"
+    "build": "rm -rf dist && rm -rf .parcel-cache && parcel build ./src/index.html --public-url='./'",
+    "deploy": "npm run build && rsync -vrP dist/ $npm_config_deploy_user@$npm_config_deploy_path"
   },
   "keywords": [
     "vectorized",
@@ -29,10 +30,12 @@
     "@parcel/optimizer-htmlnano": "^2.0.0-nightly.598",
     "@parcel/packager-css": "^2.0.0-nightly.598",
     "@parcel/packager-html": "^2.0.0-nightly.598",
+    "@parcel/packager-raw-url": "^2.0.0-nightly.2220",
     "@parcel/transformer-css": "^2.0.0-nightly.598",
     "@parcel/transformer-html": "^2.0.0-nightly.598",
     "@parcel/transformer-postcss": "^2.0.0-nightly.598",
     "@parcel/transformer-posthtml": "^2.0.0-nightly.598",
+    "@parcel/transformer-webmanifest": "^2.0.0-nightly.2220",
     "eslint": "^7.20.0",
     "eslint-config-airbnb-base": "^14.2.1",
     "eslint-plugin-import": "^2.22.1",
