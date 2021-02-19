@@ -453,9 +453,9 @@ function hmrAcceptRun(bundle, id) {
 }
 
 },{}],"5rkFb":[function(require,module,exports) {
-var _jsClickDistanceFromTarget = require('./js/clickDistanceFromTarget');
+var _jsLogResponse = require('./js/logResponse');
 var _parcelHelpers = require("@parcel/transformer-js/lib/esmodule-helpers.js");
-var _jsClickDistanceFromTargetDefault = _parcelHelpers.interopDefault(_jsClickDistanceFromTarget);
+var _jsLogResponseDefault = _parcelHelpers.interopDefault(_jsLogResponse);
 var _jsPrepareTrial = require('./js/prepareTrial');
 var _jsPrepareTrialDefault = _parcelHelpers.interopDefault(_jsPrepareTrial);
 var _jsChangeGaze = require('./js/changeGaze');
@@ -468,6 +468,10 @@ var _jsDownloadData = require('./js/downloadData');
 var _jsDownloadDataDefault = _parcelHelpers.interopDefault(_jsDownloadData);
 var _jsCheckForTouchscreen = require('./js/checkForTouchscreen');
 var _jsCheckForTouchscreenDefault = _parcelHelpers.interopDefault(_jsCheckForTouchscreen);
+var _jsShowSlide = require('./js/showSlide');
+var _jsShowSlideDefault = _parcelHelpers.interopDefault(_jsShowSlide);
+// TODO: Liste Manuel
+// TODO: response time logging
 // ---------------------------------------------------------------------------------------------------------------------
 // PARTICIPANT ID
 // ---------------------------------------------------------------------------------------------------------------------
@@ -501,7 +505,7 @@ const experimentSlide = document.getElementById('experiment');
 const instructionButton = document.getElementById('instructions-button');
 const transitionButton = document.getElementById('transition-button');
 const goodbyeButton = document.getElementById('goodbye-button');
-const experimentButton = document.getElementById('experiment-button');
+const losgehtsButton = document.getElementById('experiment-button');
 const clickBubble = document.getElementById('click-bubble');
 const fiveBoxes = document.getElementById('five-boxes');
 const hedge = document.getElementById('hedge');
@@ -520,6 +524,7 @@ elemSpecs.eyes = {};
 const agentsChar = ['pig', 'monkey', 'sheep'];
 agentsChar.forEach(agent => {
   elemSpecs.eyes[agent] = {
+    radius: document.getElementById(`${agent}-pupil-left`).getAttribute('r'),
     left: {
       center: {
         x: document.getElementById(`${agent}-pupil-left`).getAttribute('cx'),
@@ -559,20 +564,63 @@ elemSpecs.targets = {
 // ---------------------------------------------------------------------------------------------------------------------
 const famNr = 2;
 const testNr = 2;
+let trialCount = 0;
 const exp = _jsRandomizeTrialsDefault.default(famNr, testNr, agentsSingle, targetsSingle, elemSpecs, subjData);
 console.log('exp object', exp);
 // ---------------------------------------------------------------------------------------------------------------------
-// FUNCTION FOR WAITING FOR CLICKS, HANDLING CLICKS
+// DEFINE EVENTLISTENER FUNCTIONS
 // ---------------------------------------------------------------------------------------------------------------------
-let buttonNext = false;
-async function waitForClick() {
-  while (buttonNext === false) await _jsPauseDefault.default(50);
-  buttonNext = false;
-}
-const handleClick = event => {
+// ---------------------------------------------------------------------------------------------------------------------
+// RUNS WHEN INSTRUCTION BUTTON IS CLICKED
+// ---------------------------------------------------------------------------------------------------------------------
+// in order to pass on event to function
+const handleInstructionClick = event => {
   event.preventDefault();
-  buttonNext = true;
+  _jsShowSlideDefault.default([experimentSlide], [instructionSlide, transitionSlide, goodbyeSlide, clickBubble, fiveBoxes]);
+  _jsPrepareTrialDefault.default(exp, trialCount);
 };
+// ---------------------------------------------------------------------------------------------------------------------
+// RUNS WHEN TRANSITION BUTTON IS CLICKED
+// ---------------------------------------------------------------------------------------------------------------------
+const handleTransitionClick = event => {
+  event.preventDefault();
+  _jsShowSlideDefault.default([experimentSlide, fiveBoxes], [instructionSlide, transitionSlide, goodbyeSlide, clickBubble]);
+  _jsPrepareTrialDefault.default(exp, trialCount);
+};
+// ---------------------------------------------------------------------------------------------------------------------
+// RUNS WHEN GOODBYE BUTTON IS CLICKED
+// ---------------------------------------------------------------------------------------------------------------------
+const handleGoodbyeClick = event => {
+  event.preventDefault();
+  _jsShowSlideDefault.default([], [goodbyeSlide]);
+  _jsDownloadDataDefault.default(exp.responseLog, subjData.subjID);
+};
+// ---------------------------------------------------------------------------------------------------------------------
+// RUNS WHEN TARGET IS CLICKED
+// ---------------------------------------------------------------------------------------------------------------------
+const handleTargetClick = async function tmp(event) {
+  exp.elemSpecs.outerSVG.ID.removeEventListener('click', handleWrongClick, false);
+  event.preventDefault();
+  // exp.responseLog[trialCount].responseTime = new Date().getTime() - t0;
+  _jsLogResponseDefault.default(event, exp, trialCount);
+  console.log('responseLog: ', exp.responseLog[trialCount]);
+  await _jsPauseDefault.default(1000);
+  // prepare next trial
+  trialCount += 1;
+  // still in fam trials
+  if (trialCount < famNr) {
+    _jsPrepareTrialDefault.default(exp, trialCount);
+  } else if (trialCount === famNr) {
+    _jsShowSlideDefault.default([transitionSlide], [experimentSlide, pig, monkey, sheep, balloonBlue, balloonRed, balloonYellow, balloonGreen]);
+  } else if (trialCount < exp.trialType.length) {
+    _jsPrepareTrialDefault.default(exp, trialCount);
+  } else if (trialCount === exp.trialType.length) {
+    _jsShowSlideDefault.default([goodbyeSlide], [experimentSlide, hedge, pig, monkey, sheep, balloonBlue, balloonRed, balloonYellow, balloonGreen, fiveBoxes]);
+  }
+};
+// ---------------------------------------------------------------------------------------------------------------------
+// RUNS WHEN WRONG CLICK
+// ---------------------------------------------------------------------------------------------------------------------
 const handleWrongClick = event => {
   event.preventDefault();
   const screenScalingHeight = elemSpecs.outerSVG.origViewBoxHeight / subjData.offsetHeight;
@@ -583,161 +631,54 @@ const handleWrongClick = event => {
   }
 };
 // ---------------------------------------------------------------------------------------------------------------------
-// SPECIFY ORDER OF ONE TRIAL
+// RUNS WHEN "los geht's" BUTTON IS CLICKED
 // ---------------------------------------------------------------------------------------------------------------------
-async function runTrial(exp, trialCount) {
-  console.log(' ');
-  console.log('trial Nr: ', trialCount);
-  // before trial starts, prepare it and hide underneath blurr
-  _jsPrepareTrialDefault.default(exp, trialCount);
-  // wait for user to start trial
-  experimentButton.addEventListener('click', handleClick, {
-    capture: false,
-    once: true
-  });
-  await waitForClick();
-  experimentButton.removeEventListener('click', handleClick);
-  // animate target and eye movements
-  // during trial presentation, nothing can be clicked
+const handleLosgehtsClick = async function tmp(event) {
+  event.preventDefault();
+  console.log('');
+  console.log('trial: ', trialCount);
   await _jsChangeGazeDefault.default(exp, trialCount);
-  // wait for user response and log response time
-  const t0 = new Date().getTime();
-  exp.elemSpecs.outerSVG.ID.addEventListener('click', handleWrongClick, false);
-  // wait for target click of user (can only click where hedge is/would be)
-  // in htlm, <g id="hedge" pointer-events="all">, so that you can click on it even if hidden
+  // TODO log response time => how to pass on parameter?
+  // maybe this helps?:
+  // const handleClick = (event) => clickDistanceFromTarget(event, targets[trialCount], outerSVG, responseLog);
+  // const t0 = new Date().getTime();
   if (exp.subjData.touchScreen || exp.trialType[trialCount] === 'fam') {
-    hedge.addEventListener('click', handleClick, {
+    hedge.addEventListener('click', handleTargetClick, {
       capture: false,
       once: true
     });
   } else if (!exp.subjData.touchScreen) {
     hedge.setAttribute('pointer-events', 'none');
-    fiveBoxes.addEventListener('click', handleClick, {
+    fiveBoxes.addEventListener('click', handleTargetClick, {
       capture: false,
       once: true
     });
   }
-  // log where the user clicked
-  // logTargetClick hands over clickEvent parameter to clickDistanceFromTarget function
-  const logTargetClick = event => {
-    _jsClickDistanceFromTargetDefault.default(event, exp, trialCount);
-  };
-  if (exp.subjData.touchScreen || exp.trialType[trialCount] === 'fam') {
-    hedge.addEventListener('click', logTargetClick, {
-      capture: false,
-      once: true
-    });
-  } else if (!exp.subjData.touchScreen) {
-    fiveBoxes.addEventListener('click', logTargetClick, {
-      capture: false,
-      once: true
-    });
-  }
-  await waitForClick();
-  hedge.removeEventListener('click', handleClick);
-  hedge.removeEventListener('click', logTargetClick);
-  fiveBoxes.removeEventListener('click', handleClick);
-  fiveBoxes.removeEventListener('click', logTargetClick);
-  exp.elemSpecs.outerSVG.ID.removeEventListener('click', handleWrongClick, false);
-  // after click, save response time
-  const responseTime = new Date().getTime() - t0;
-  // TODO check response logging in click distance
-  // used object now instead of array... but does that work with trialCount number?
-  // log all important trial infos
-  exp.responseLog[trialCount].subjID = exp.subjData.subjID;
-  exp.responseLog[trialCount].touchScreen = exp.subjData.touchScreen;
-  exp.responseLog[trialCount].responseTime = responseTime;
-  exp.responseLog[trialCount].trialNr = trialCount + 1;
-  exp.responseLog[trialCount].agent = `${exp.agents[trialCount].getAttribute('id')}`;
-  exp.responseLog[trialCount].target = `${exp.targets[trialCount].getAttribute('id')}`;
-  exp.responseLog[trialCount].trialType = exp.trialType[trialCount];
-  exp.responseLog[trialCount].positionBin = exp.positions[trialCount].bin;
-  exp.responseLog[trialCount].pupilLeftCenterX = parseFloat(exp.elemSpecs.eyes[exp.responseLog[trialCount].agent].left.center.x);
-  exp.responseLog[trialCount].pupilLeftCenterY = parseFloat(exp.elemSpecs.eyes[exp.responseLog[trialCount].agent].left.center.y);
-  exp.responseLog[trialCount].pupilLeftRandomX = parseFloat(exp.elemSpecs.eyes[exp.responseLog[trialCount].agent].left.random.x);
-  exp.responseLog[trialCount].pupilLeftRandomY = parseFloat(exp.elemSpecs.eyes[exp.responseLog[trialCount].agent].left.random.y);
-  exp.responseLog[trialCount].pupilRightCenterX = parseFloat(exp.elemSpecs.eyes[exp.responseLog[trialCount].agent].right.center.x);
-  exp.responseLog[trialCount].pupilRightCenterY = parseFloat(exp.elemSpecs.eyes[exp.responseLog[trialCount].agent].right.center.y);
-  exp.responseLog[trialCount].pupilRightRandomX = parseFloat(exp.elemSpecs.eyes[exp.responseLog[trialCount].agent].right.random.x);
-  exp.responseLog[trialCount].pupilRightRandomY = parseFloat(exp.elemSpecs.eyes[exp.responseLog[trialCount].agent].right.random.y);
-  // NOTE: durationAnimation does NOT include 1 sec delay in beginning. Value in msec.
-  console.log('exp.responseLog', exp.responseLog[trialCount]);
-  // so that we don't rush to the next trial/startscreen but have a little time
-  await _jsPauseDefault.default(1000);
-}
+  exp.elemSpecs.outerSVG.ID.addEventListener('click', handleWrongClick, false);
+};
 // ---------------------------------------------------------------------------------------------------------------------
-// SPECIFY ORDER OF ALL EVENTS
+// ACTUALLY RUNNING:
 // ---------------------------------------------------------------------------------------------------------------------
-async function runAll(exp, trialCount) {
-  // INSTRUCTION PHASE
-  [transitionSlide, experimentSlide, goodbyeSlide].forEach(element => {
-    element.setAttribute('visibility', 'hidden');
-  });
-  instructionSlide.setAttribute('visibility', 'visible');
-  // wait for user to continue
-  instructionButton.addEventListener('click', handleClick, {
-    capture: false,
-    once: true
-  });
-  await waitForClick();
-  instructionButton.removeEventListener('click', handleClick);
-  // FAM PHASE
-  [instructionSlide, transitionSlide, goodbyeSlide, clickBubble, fiveBoxes].forEach(element => {
-    element.setAttribute('visibility', 'hidden');
-  });
-  experimentSlide.setAttribute('visibility', 'visible');
-  while (trialCount < famNr) {
-    // eslint-disable-next-line no-await-in-loop
-    await runTrial(exp, trialCount);
-    // eslint-disable-next-line no-param-reassign
-    trialCount += 1;
-  }
-  // TRANSITION PHASE
-  [experimentSlide, pig, monkey, sheep, balloonBlue, balloonRed, balloonYellow, balloonGreen].forEach(element => {
-    element.setAttribute('visibility', 'hidden');
-  });
-  transitionSlide.setAttribute('visibility', 'visible');
-  // wait for user to continue
-  transitionButton.addEventListener('click', handleClick, {
-    capture: false,
-    once: true
-  });
-  await waitForClick();
-  transitionButton.removeEventListener('click', handleClick);
-  // TEST PHASE
-  transitionSlide.setAttribute('visibility', 'hidden');
-  [experimentSlide, fiveBoxes].forEach(element => {
-    element.setAttribute('visibility', 'visible');
-  });
-  while (trialCount < exp.trialType.length) {
-    // eslint-disable-next-line no-await-in-loop
-    await runTrial(exp, trialCount);
-    // eslint-disable-next-line no-param-reassign
-    trialCount += 1;
-  }
-  console.log('test phase completed');
-  // GOODBYE
-  [experimentSlide, hedge, pig, monkey, sheep, balloonBlue, balloonRed, balloonYellow, balloonGreen, fiveBoxes].forEach(element => {
-    element.setAttribute('visibility', 'hidden');
-  });
-  goodbyeSlide.setAttribute('visibility', 'visible');
-  // wait for user to continue
-  goodbyeButton.addEventListener('click', handleClick, {
-    capture: false,
-    once: true
-  });
-  await waitForClick();
-  goodbyeButton.removeEventListener('click', handleClick);
-  // end with blank page
-  goodbyeSlide.setAttribute('visibility', 'hidden');
-  // locally download data
-  _jsDownloadDataDefault.default(exp.responseLog, subjData.subjID);
-}
-// CAUTION: trialCount start at zero, ie. first trial = 0
-// (because we need first element in array, that's at position 0)
-runAll(exp, 0);
+// INSTRUCTION: show slide
+_jsShowSlideDefault.default([instructionSlide], [transitionSlide, experimentSlide, goodbyeSlide]);
+// add event listeners
+instructionButton.addEventListener('click', handleInstructionClick, {
+  capture: false,
+  once: true
+});
+losgehtsButton.addEventListener('click', handleLosgehtsClick, {
+  capture: false
+});
+transitionButton.addEventListener('click', handleTransitionClick, {
+  capture: false,
+  once: true
+});
+goodbyeButton.addEventListener('click', handleGoodbyeClick, {
+  capture: false,
+  once: true
+});
 
-},{"./js/clickDistanceFromTarget":"niaK6","./js/prepareTrial":"7p7up","./js/changeGaze":"6YmDj","./js/pause":"5HbdV","./js/randomizeTrials":"6wU5Z","./js/downloadData":"wKT5K","@parcel/transformer-js/lib/esmodule-helpers.js":"5gA8y","./js/checkForTouchscreen":"1I7hv"}],"niaK6":[function(require,module,exports) {
+},{"./js/logResponse":"30Uy0","./js/prepareTrial":"7p7up","./js/changeGaze":"6YmDj","./js/pause":"5HbdV","./js/randomizeTrials":"6wU5Z","./js/downloadData":"wKT5K","./js/checkForTouchscreen":"1I7hv","./js/showSlide":"50XBw","@parcel/transformer-js/lib/esmodule-helpers.js":"5gA8y"}],"30Uy0":[function(require,module,exports) {
 var _parcelHelpers = require("@parcel/transformer-js/lib/esmodule-helpers.js");
 _parcelHelpers.defineInteropFlag(exports);
 var _gsap = require('gsap');
@@ -757,7 +698,7 @@ exports.default = (event, exp, trialCount) => {
   const clickBubble = document.getElementById('click-bubble');
   clickBubble.setAttribute('cx', `${exp.responseLog[trialCount].clickScaledX}`);
   clickBubble.setAttribute('cy', `${exp.responseLog[trialCount].clickScaledY}`);
-  // let clickBubble be visible only for 0.2 sec
+  // let clickBubble be visible only for 0.5 sec
   _gsap.gsap.to(clickBubble, {
     duration: 0.5,
     attr: {
@@ -797,6 +738,23 @@ exports.default = (event, exp, trialCount) => {
     if (exp.trialType[trialCount] === 'fam') exp.responseLog[trialCount].clickedArea = 'clickable-area';
     if (exp.trialType[trialCount] === 'test') exp.responseLog[trialCount].clickedArea = event.path[1].getAttribute('id');
   }
+  // log all important trial infos
+  exp.responseLog[trialCount].subjID = exp.subjData.subjID;
+  exp.responseLog[trialCount].touchScreen = exp.subjData.touchScreen;
+  exp.responseLog[trialCount].trialNr = trialCount + 1;
+  exp.responseLog[trialCount].agent = `${exp.agents[trialCount].getAttribute('id')}`;
+  exp.responseLog[trialCount].target = `${exp.targets[trialCount].getAttribute('id')}`;
+  exp.responseLog[trialCount].trialType = exp.trialType[trialCount];
+  exp.responseLog[trialCount].positionBin = exp.positions[trialCount].bin;
+  exp.responseLog[trialCount].pupilRadius = parseFloat(exp.elemSpecs.eyes[exp.responseLog[trialCount].agent].radius);
+  exp.responseLog[trialCount].pupilLeftCenterX = parseFloat(exp.elemSpecs.eyes[exp.responseLog[trialCount].agent].left.center.x);
+  exp.responseLog[trialCount].pupilLeftCenterY = parseFloat(exp.elemSpecs.eyes[exp.responseLog[trialCount].agent].left.center.y);
+  exp.responseLog[trialCount].pupilLeftRandomX = parseFloat(exp.elemSpecs.eyes[exp.responseLog[trialCount].agent].left.random.x);
+  exp.responseLog[trialCount].pupilLeftRandomY = parseFloat(exp.elemSpecs.eyes[exp.responseLog[trialCount].agent].left.random.y);
+  exp.responseLog[trialCount].pupilRightCenterX = parseFloat(exp.elemSpecs.eyes[exp.responseLog[trialCount].agent].right.center.x);
+  exp.responseLog[trialCount].pupilRightCenterY = parseFloat(exp.elemSpecs.eyes[exp.responseLog[trialCount].agent].right.center.y);
+  exp.responseLog[trialCount].pupilRightRandomX = parseFloat(exp.elemSpecs.eyes[exp.responseLog[trialCount].agent].right.random.x);
+  exp.responseLog[trialCount].pupilRightRandomY = parseFloat(exp.elemSpecs.eyes[exp.responseLog[trialCount].agent].right.random.y);
 };
 
 },{"gsap":"1iecp","@parcel/transformer-js/lib/esmodule-helpers.js":"5gA8y"}],"1iecp":[function(require,module,exports) {
@@ -4290,7 +4248,7 @@ exports.default = (exp, trialCount) => {
   }
 };
 
-},{"./setCircleCenter":"3VeP8","./setTargetCenter":"51G9p","./showElement":"6pY4G","@parcel/transformer-js/lib/esmodule-helpers.js":"5gA8y","./getGazeCoords":"31xvG","./distanceViewBoxes":"5JGu5"}],"3VeP8":[function(require,module,exports) {
+},{"./setCircleCenter":"3VeP8","./setTargetCenter":"51G9p","./showElement":"6pY4G","./getGazeCoords":"31xvG","./distanceViewBoxes":"5JGu5","@parcel/transformer-js/lib/esmodule-helpers.js":"5gA8y"}],"3VeP8":[function(require,module,exports) {
 var _parcelHelpers = require("@parcel/transformer-js/lib/esmodule-helpers.js");
 _parcelHelpers.defineInteropFlag(exports);
 exports.default = (target, newCoords) => {
@@ -4660,7 +4618,7 @@ exports.default = (famNr, testNr, agentsSingle, targetsSingle, elemSpecs, subjDa
   };
 };
 
-},{"./divideWithRemainder":"6eGxl","./shuffleArray":"3hJZf","@parcel/transformer-js/lib/esmodule-helpers.js":"5gA8y","./randomNumber":"3hzGE"}],"6eGxl":[function(require,module,exports) {
+},{"./divideWithRemainder":"6eGxl","./shuffleArray":"3hJZf","./randomNumber":"3hzGE","@parcel/transformer-js/lib/esmodule-helpers.js":"5gA8y"}],"6eGxl":[function(require,module,exports) {
 var _parcelHelpers = require("@parcel/transformer-js/lib/esmodule-helpers.js");
 _parcelHelpers.defineInteropFlag(exports);
 exports.default = (dividend, divisor) => {
@@ -4732,6 +4690,18 @@ exports.default = () => {
     }
   }
   return hasTouchScreen;
+};
+
+},{"@parcel/transformer-js/lib/esmodule-helpers.js":"5gA8y"}],"50XBw":[function(require,module,exports) {
+var _parcelHelpers = require("@parcel/transformer-js/lib/esmodule-helpers.js");
+_parcelHelpers.defineInteropFlag(exports);
+exports.default = (visibleElements, hiddenElements) => {
+  visibleElements.forEach(element => {
+    element.setAttribute('visibility', 'visible');
+  });
+  hiddenElements.forEach(element => {
+    element.setAttribute('visibility', 'hidden');
+  });
 };
 
 },{"@parcel/transformer-js/lib/esmodule-helpers.js":"5gA8y"}]},["7sNyx","5rkFb"], "5rkFb", "parcelRequirebfbf")
