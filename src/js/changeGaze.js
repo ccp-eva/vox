@@ -11,7 +11,7 @@ export default (exp, trialCount) => new Promise((resolve) => {
   const pupilRight = document.getElementById(`${currentAgent}-pupil-right`);
   const irisLeft = document.getElementById(`${currentAgent}-iris-left`);
   const irisRight = document.getElementById(`${currentAgent}-iris-right`);
-
+  const boxes = document.getElementById('five-boxes');
   const timelineFam = gsap.timeline();
   const timelineTest = gsap.timeline();
 
@@ -24,7 +24,9 @@ export default (exp, trialCount) => new Promise((resolve) => {
   // for fam trials, just show full path. everything at the same time
   if (exp.trialType[trialCount] === 'fam') {
     timelineFam
-      .to(exp.targets[trialCount], {
+      .fromTo(exp.targets[trialCount], {
+        attr: { viewBox: `${exp.elemSpecs.targets.viewBoxCenter}` },
+      }, {
         delay: 1,
         duration: `${exp.responseLog[trialCount].durationAnimationTotal}`,
         ease: 'none',
@@ -34,69 +36,87 @@ export default (exp, trialCount) => new Promise((resolve) => {
         },
       })
       // animate left eye
-      .to([pupilLeft, irisLeft],
-        {
-          duration: `${exp.responseLog[trialCount].durationAnimationTotal}`,
-          ease: 'none',
-          attr: {
-            cx: `${exp.elemSpecs.eyes[currentAgent].left.random.x}`,
-            cy: `${exp.elemSpecs.eyes[currentAgent].left.random.y}`,
-          },
-          onComplete() {
-            setCircleCenter(pupilLeft, exp.elemSpecs.eyes[currentAgent].left.random);
-            setCircleCenter(irisLeft, exp.elemSpecs.eyes[currentAgent].left.random);
-          },
-        }, '<')
+      .fromTo([pupilLeft, irisLeft], {
+        attr: {
+          cx: `${exp.elemSpecs.eyes[currentAgent].left.center.x}`,
+          cy: `${exp.elemSpecs.eyes[currentAgent].left.center.y}`,
+        },
+      }, {
+        duration: `${exp.responseLog[trialCount].durationAnimationTotal}`,
+        ease: 'none',
+        attr: {
+          cx: `${exp.elemSpecs.eyes[currentAgent].left.random.x}`,
+          cy: `${exp.elemSpecs.eyes[currentAgent].left.random.y}`,
+        },
+        onComplete() {
+          setCircleCenter(pupilLeft, exp.elemSpecs.eyes[currentAgent].left.random);
+          setCircleCenter(irisLeft, exp.elemSpecs.eyes[currentAgent].left.random);
+        },
+      }, '<')
       // animate right eye
-      .to([pupilRight, irisRight],
-        {
-          duration: `${exp.responseLog[trialCount].durationAnimationTotal}`,
-          ease: 'none',
-          attr: {
-            cx: `${exp.elemSpecs.eyes[currentAgent].right.random.x}`,
-            cy: `${exp.elemSpecs.eyes[currentAgent].right.random.y}`,
-          },
-          onComplete() {
-            setCircleCenter(pupilRight, exp.elemSpecs.eyes[currentAgent].right.random);
-            setCircleCenter(irisRight, exp.elemSpecs.eyes[currentAgent].right.random);
-            console.log('animation famtrial complete');
-            resolve({
-              pupilLeft, pupilRight,
-            });
-          },
-        }, '<');
+      .fromTo([pupilRight, irisRight], {
+        attr: {
+          cx: `${exp.elemSpecs.eyes[currentAgent].right.center.x}`,
+          cy: `${exp.elemSpecs.eyes[currentAgent].right.center.y}`,
+        },
+      }, {
+        duration: `${exp.responseLog[trialCount].durationAnimationTotal}`,
+        ease: 'none',
+        attr: {
+          cx: `${exp.elemSpecs.eyes[currentAgent].right.random.x}`,
+          cy: `${exp.elemSpecs.eyes[currentAgent].right.random.y}`,
+        },
+        onComplete() {
+          setCircleCenter(pupilRight, exp.elemSpecs.eyes[currentAgent].right.random);
+          setCircleCenter(irisRight, exp.elemSpecs.eyes[currentAgent].right.random);
+          console.log('animation famtrial complete');
+          resolve();
+        },
+      }, '<');
 
     // for test trials, first hide balloon, then move to final position
   } else {
     timelineTest
       // first: hide balloon
-      .to(exp.targets[trialCount], {
+      .fromTo(exp.targets[trialCount], {
+        attr: { viewBox: `${exp.elemSpecs.targets.viewBoxCenter}` },
+      }, {
         delay: 1,
         duration: `${exp.responseLog[trialCount].durationAnimationCenterHidden}`,
         ease: 'none',
         attr: { viewBox: `${exp.elemSpecs.targets.viewBoxHidden}` },
       })
       // let eyes follow balloon already
-      .to([pupilLeft, irisLeft],
-        {
-          duration: `${exp.responseLog[trialCount].durationAnimationCenterHidden}`,
-          ease: 'none',
-          attr: {
-            cx: `${exp.elemSpecs.eyes[currentAgent].left.beginning.x}`,
-            cy: `${exp.elemSpecs.eyes[currentAgent].left.beginning.y}`,
-          },
-        }, '<')
-      .to([pupilRight, irisRight],
-        {
-          duration: `${exp.responseLog[trialCount].durationAnimationCenterHidden}`,
-          ease: 'none',
-          attr: {
-            cx: `${exp.elemSpecs.eyes[currentAgent].right.beginning.x}`,
-            cy: `${exp.elemSpecs.eyes[currentAgent].right.beginning.y}`,
-          },
-        }, '<');
+      .fromTo([pupilLeft, irisLeft], {
+        attr: {
+          cx: `${exp.elemSpecs.eyes[currentAgent].left.center.x}`,
+          cy: `${exp.elemSpecs.eyes[currentAgent].left.center.y}`,
+        },
+      }, {
+        duration: `${exp.responseLog[trialCount].durationAnimationCenterHidden}`,
+        ease: 'none',
+        attr: {
+          cx: `${exp.elemSpecs.eyes[currentAgent].left.beginning.x}`,
+          cy: `${exp.elemSpecs.eyes[currentAgent].left.beginning.y}`,
+        },
+      }, '<')
+      .fromTo([pupilRight, irisRight], {
+        attr: {
+          cx: `${exp.elemSpecs.eyes[currentAgent].right.center.x}`,
+          cy: `${exp.elemSpecs.eyes[currentAgent].right.center.y}`,
+        },
+      }, {
+        duration: `${exp.responseLog[trialCount].durationAnimationCenterHidden}`,
+        ease: 'none',
+        attr: {
+          cx: `${exp.elemSpecs.eyes[currentAgent].right.beginning.x}`,
+          cy: `${exp.elemSpecs.eyes[currentAgent].right.beginning.y}`,
+        },
+      }, '<');
     // then move balloon to final position
-    timelineTest.to(exp.targets[trialCount], {
+    timelineTest.fromTo(exp.targets[trialCount], {
+      attr: { viewBox: `${exp.elemSpecs.targets.viewBoxHidden}` },
+    }, {
       duration: `${exp.responseLog[trialCount].durationAnimationHiddenRandom}`,
       ease: 'none',
       attr: { viewBox: `${exp.positions[trialCount].viewBoxRandom}` },
@@ -105,42 +125,59 @@ export default (exp, trialCount) => new Promise((resolve) => {
       },
     })
       // eye movement from hidden to target
-      .to([pupilLeft, irisLeft],
-        {
-          duration: `${exp.responseLog[trialCount].durationAnimationHiddenRandom}`,
-          ease: 'none',
-          attr: {
-            cx: `${exp.elemSpecs.eyes[currentAgent].left.random.x}`,
-            cy: `${exp.elemSpecs.eyes[currentAgent].left.random.y}`,
-          },
-          onComplete() {
-            setCircleCenter(pupilLeft, exp.elemSpecs.eyes[currentAgent].left.random);
-            setCircleCenter(irisLeft, exp.elemSpecs.eyes[currentAgent].left.random);
-          },
-        }, '<')
-      .to([pupilRight, irisRight],
-        {
-          duration: `${exp.responseLog[trialCount].durationAnimationHiddenRandom}`,
-          ease: 'none',
-          attr: {
-            cx: `${exp.elemSpecs.eyes[currentAgent].right.random.x}`,
-            cy: `${exp.elemSpecs.eyes[currentAgent].right.random.y}`,
-          },
-          onComplete() {
-            setCircleCenter(pupilRight, exp.elemSpecs.eyes[currentAgent].right.random);
-            setCircleCenter(irisRight, exp.elemSpecs.eyes[currentAgent].right.random);
+      .fromTo([pupilLeft, irisLeft], {
+        attr: {
+          cx: `${exp.elemSpecs.eyes[currentAgent].left.beginning.x}`,
+          cy: `${exp.elemSpecs.eyes[currentAgent].left.beginning.y}`,
+        },
+      }, {
+        duration: `${exp.responseLog[trialCount].durationAnimationHiddenRandom}`,
+        ease: 'none',
+        attr: {
+          cx: `${exp.elemSpecs.eyes[currentAgent].left.random.x}`,
+          cy: `${exp.elemSpecs.eyes[currentAgent].left.random.y}`,
+        },
+        onComplete() {
+          setCircleCenter(pupilLeft, exp.elemSpecs.eyes[currentAgent].left.random);
+          setCircleCenter(irisLeft, exp.elemSpecs.eyes[currentAgent].left.random);
+        },
+      }, '<')
+      .fromTo([pupilRight, irisRight], {
+        attr: {
+          cx: `${exp.elemSpecs.eyes[currentAgent].right.beginning.x}`,
+          cy: `${exp.elemSpecs.eyes[currentAgent].right.beginning.y}`,
+        },
+      }, {
+        duration: `${exp.responseLog[trialCount].durationAnimationHiddenRandom}`,
+        ease: 'none',
+        attr: {
+          cx: `${exp.elemSpecs.eyes[currentAgent].right.random.x}`,
+          cy: `${exp.elemSpecs.eyes[currentAgent].right.random.y}`,
+        },
+        onComplete() {
+          setCircleCenter(pupilRight, exp.elemSpecs.eyes[currentAgent].right.random);
+          setCircleCenter(irisRight, exp.elemSpecs.eyes[currentAgent].right.random);
+
+          // for tablet version, don't show boxes and let hedge move a bit down
+          if (exp.subjData.touchScreen) {
+            boxes.setAttribute('visibility', 'hidden');
+            const targetY = parseFloat(exp.targets[trialCount].getAttribute('viewBox').split(' ')[1]) * -1;
+
+            timelineTest.to([hedge], {
+              duration: 0.75,
+              // BBox of hedge is a bit too high to hide balloon (some grass is higher), therefore -25
+              y: targetY - hedge.getBBox().height - 25,
+            });
 
             // for PC version, hide hedge and show boxes
-            if (!exp.subjData.touchScreen) {
-              timelineTest.add(showBoxes, '+=0.2'); // after gap
-            }
-          },
-        }, '<')
+          } else if (!exp.subjData.touchScreen) {
+            timelineTest.add(showBoxes, '+=0.2'); // after gap
+          }
+        },
+      }, '<')
       .then(() => {
         console.log('animation testtrial complete');
-        resolve({
-          pupilLeft, pupilRight,
-        });
+        resolve();
       });
   }
 });
