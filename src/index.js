@@ -68,7 +68,7 @@ elemSpecs.eyes = {};
 const agentsChar = ['pig', 'monkey', 'sheep'];
 agentsChar.forEach((agent) => {
   elemSpecs.eyes[agent] = {
-    radius: document.getElementById(`${agent}-pupil-left`).getAttribute('r'),
+    radius: document.getElementById(`${agent}-eyeline-left`).getAttribute('r'),
     left: {
       center: {
         x: document.getElementById(`${agent}-pupil-left`).getAttribute('cx'),
@@ -83,6 +83,7 @@ agentsChar.forEach((agent) => {
     },
   };
 });
+
 // calculate some target positions:
 // get position on the very right (as constraint) and mid of the screen
 const borderRight = elemSpecs.outerSVG.origViewBoxWidth - balloonBlue.getBBox().width;
@@ -157,6 +158,8 @@ const handleGoodbyeClick = (event) => {
 // RUNS WHEN TARGET IS CLICKED
 // ---------------------------------------------------------------------------------------------------------------------
 const handleTargetClick = async function tmp(event) {
+  exp.responseLog[trialCount].responseTime.t1 = new Date().getTime();
+
   exp.elemSpecs.outerSVG.ID.removeEventListener('click', handleWrongClick, false);
   event.preventDefault();
   // exp.responseLog[trialCount].responseTime = new Date().getTime() - t0;
@@ -201,11 +204,20 @@ const handleLosgehtsClick = async function tmp(event) {
   event.preventDefault();
   console.log('');
   console.log('trial: ', trialCount);
+
   await changeGaze(exp, trialCount);
-  // TODO log response time => how to pass on parameter?
-  // maybe this helps?:
-  // const handleClick = (event) => clickDistanceFromTarget(event, targets[trialCount], outerSVG, responseLog);
-  // const t0 = new Date().getTime();
+  exp.responseLog[trialCount].responseTime = {
+    t0: new Date().getTime(),
+    t1: 0,
+  };
+
+  // debugging frozen animation
+  console.log('current targetViewBox', exp.targets[trialCount].getAttribute('viewBox'));
+  console.log('center targetViewBox', exp.elemSpecs.targets.viewBoxCenter);
+  console.log('changed targetViewBox?',
+    !(exp.elemSpecs.targets.viewBoxCenter === exp.targets[trialCount].getAttribute('viewBox')));
+
+  // depending on experiment version, users click on hedge or boxes
   if (exp.subjData.touchScreen || exp.trialType[trialCount] === 'fam') {
     hedge.addEventListener('click', handleTargetClick, { capture: false, once: true });
   } else if (!exp.subjData.touchScreen) {

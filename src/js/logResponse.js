@@ -17,6 +17,7 @@ export default (event, exp, trialCount) => {
   exp.responseLog[trialCount].clickScaledX = exp.responseLog[trialCount].screenScalingWidth * exp.responseLog[trialCount].clickX;
   exp.responseLog[trialCount].clickScaledY = exp.responseLog[trialCount].screenScalingHeight * exp.responseLog[trialCount].clickY;
 
+  // user feedback where they clicked (with sound)
   const clickBubble = document.getElementById('click-bubble');
   clickBubble.setAttribute('cx', `${exp.responseLog[trialCount].clickScaledX}`);
   clickBubble.setAttribute('cy', `${exp.responseLog[trialCount].clickScaledY}`);
@@ -41,10 +42,11 @@ export default (event, exp, trialCount) => {
   exp.responseLog[trialCount].targetCenterY = exp.responseLog[trialCount].targetY + exp.targets[trialCount].getBBox().height / 2;
 
   // clicked on target?
+  // NOTE: the SVG coord system starts with 0, 0 in upper left corner
   // for x: negative values mean too far left, positive values mean too far right
-  // for y: negative values mean too low, positive values mean too high
+  // for y: negative values mean too high, positive values mean too low
   exp.responseLog[trialCount].clickDistFromTargetCenterX = exp.responseLog[trialCount].clickScaledX - exp.responseLog[trialCount].targetCenterX;
-  exp.responseLog[trialCount].clickDistFromTargetCenterY = exp.responseLog[trialCount].targetCenterY - exp.responseLog[trialCount].clickScaledY;
+  exp.responseLog[trialCount].clickDistFromTargetCenterY = exp.responseLog[trialCount].clickScaledY - exp.responseLog[trialCount].targetCenterY;
 
   exp.responseLog[trialCount].hitBBTargetX = false;
   exp.responseLog[trialCount].hitBBTargetY = false;
@@ -54,6 +56,34 @@ export default (event, exp, trialCount) => {
   }
   if (exp.responseLog[trialCount].targetY <= exp.responseLog[trialCount].clickScaledY && exp.responseLog[trialCount].clickScaledY <= (exp.responseLog[trialCount].targetY + exp.responseLog[trialCount].targetHeight)) {
     exp.responseLog[trialCount].hitBBTargetY = true;
+  }
+
+  // calculate distance between click coords and target bounding box
+  // for x axis
+  if (exp.responseLog[trialCount].hitBBTargetX === true) {
+    exp.responseLog[trialCount].clickDistFromTargetBBoxX = 0;
+  } else if (exp.responseLog[trialCount].clickScaledX < exp.responseLog[trialCount].targetX) {
+    exp.responseLog[trialCount].clickDistFromTargetBBoxX = (
+      exp.responseLog[trialCount].clickScaledX - exp.responseLog[trialCount].targetX
+    );
+  } else if (exp.responseLog[trialCount].clickScaledX > exp.responseLog[trialCount].targetX) {
+    exp.responseLog[trialCount].clickDistFromTargetBBoxX = (
+      exp.responseLog[trialCount].clickScaledX
+      - (exp.responseLog[trialCount].targetX + exp.responseLog[trialCount].targetWidth)
+    );
+  }
+  // for y axis
+  if (exp.responseLog[trialCount].hitBBTargetY === true) {
+    exp.responseLog[trialCount].clickDistFromTargetBBoxY = 0;
+  } else if (exp.responseLog[trialCount].clickScaledY < exp.responseLog[trialCount].targetY) {
+    exp.responseLog[trialCount].clickDistFromTargetBBoxY = (
+      exp.responseLog[trialCount].clickScaledY - exp.responseLog[trialCount].targetY
+    );
+  } else if (exp.responseLog[trialCount].clickScaledY > exp.responseLog[trialCount].targetY) {
+    exp.responseLog[trialCount].clickDistFromTargetBBoxY = (
+      exp.responseLog[trialCount].clickScaledY
+      - (exp.responseLog[trialCount].targetY + exp.responseLog[trialCount].targetHeight)
+    );
   }
 
   // for PC version of experiment, check which box was clicked
@@ -74,31 +104,33 @@ export default (event, exp, trialCount) => {
   exp.responseLog[trialCount].target = `${exp.targets[trialCount].getAttribute('id')}`;
   exp.responseLog[trialCount].trialType = exp.trialType[trialCount];
   exp.responseLog[trialCount].positionBin = exp.positions[trialCount].bin;
-  exp.responseLog[trialCount].pupilRadius = parseFloat(
+  exp.responseLog[trialCount].responseTime = exp.responseLog[trialCount].responseTime.t1 - exp.responseLog[trialCount].responseTime.t0;
+
+  exp.responseLog[trialCount].eyeRadius = parseFloat(
     exp.elemSpecs.eyes[exp.responseLog[trialCount].agent].radius,
   );
-  exp.responseLog[trialCount].pupilLeftCenterX = parseFloat(
+  exp.responseLog[trialCount].eyeCenterLeftX = parseFloat(
     exp.elemSpecs.eyes[exp.responseLog[trialCount].agent].left.center.x,
   );
-  exp.responseLog[trialCount].pupilLeftCenterY = parseFloat(
+  exp.responseLog[trialCount].eyeCenterLeftY = parseFloat(
     exp.elemSpecs.eyes[exp.responseLog[trialCount].agent].left.center.y,
   );
-  exp.responseLog[trialCount].pupilLeftRandomX = parseFloat(
+  exp.responseLog[trialCount].pupilTargetLeftX = parseFloat(
     exp.elemSpecs.eyes[exp.responseLog[trialCount].agent].left.random.x,
   );
-  exp.responseLog[trialCount].pupilLeftRandomY = parseFloat(
+  exp.responseLog[trialCount].pupilTargetLeftY = parseFloat(
     exp.elemSpecs.eyes[exp.responseLog[trialCount].agent].left.random.y,
   );
-  exp.responseLog[trialCount].pupilRightCenterX = parseFloat(
+  exp.responseLog[trialCount].eyeCenterRightX = parseFloat(
     exp.elemSpecs.eyes[exp.responseLog[trialCount].agent].right.center.x,
   );
-  exp.responseLog[trialCount].pupilRightCenterY = parseFloat(
+  exp.responseLog[trialCount].eyeCenterRightY = parseFloat(
     exp.elemSpecs.eyes[exp.responseLog[trialCount].agent].right.center.y,
   );
-  exp.responseLog[trialCount].pupilRightRandomX = parseFloat(
+  exp.responseLog[trialCount].pupilTargetRightX = parseFloat(
     exp.elemSpecs.eyes[exp.responseLog[trialCount].agent].right.random.x,
   );
-  exp.responseLog[trialCount].pupilRightRandomY = parseFloat(
+  exp.responseLog[trialCount].pupilTargetRightY = parseFloat(
     exp.elemSpecs.eyes[exp.responseLog[trialCount].agent].right.random.y,
   );
 };
