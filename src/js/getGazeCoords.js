@@ -1,12 +1,12 @@
-// call with getGazeCoords(document.getElementById("target"), document.getElementById("eye"))
+// ---------------------------------------------------------------------------------------------------------------------
+// FUNCTION FOR CALCULATING LINE EQUATION BETWEEN EYE CENTER AND TARGET POSITION
+// FOR MOVING PUPIL AND IRIS; LETTING THEM FOLLOW BALLOONS
+// ---------------------------------------------------------------------------------------------------------------------
 export default (target, targetViewBoxRandom, pupil, eyeline) => {
   // first, get all elements that we need
-  // get eyeline with eyeRadius
   const eyeRadius = parseFloat(eyeline.getAttribute('r'), 10);
   const eyelineCenterX = parseFloat(eyeline.getAttribute('cx'), 10);
   const eyelineCenterY = parseFloat(eyeline.getAttribute('cy'), 10);
-
-  // get pupil with pupilRadius
   const pupilRadius = parseFloat(pupil.getAttribute('r'), 10);
 
   // define max movement value for eye movement
@@ -20,6 +20,7 @@ export default (target, targetViewBoxRandom, pupil, eyeline) => {
   const targetX = Math.abs(targetViewBoxRandom.split(' ')[0]);
   const targetY = Math.abs(targetViewBoxRandom.split(' ')[1]);
 
+  // calculate where the center of the target is
   const targetCenterX = targetX + targetWidth / 2;
   const targetCenterY = targetY + targetHeight / 2;
 

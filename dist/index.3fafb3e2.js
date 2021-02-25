@@ -470,25 +470,30 @@ var _jsCheckForTouchscreen = require('./js/checkForTouchscreen');
 var _jsCheckForTouchscreenDefault = _parcelHelpers.interopDefault(_jsCheckForTouchscreen);
 var _jsShowSlide = require('./js/showSlide');
 var _jsShowSlideDefault = _parcelHelpers.interopDefault(_jsShowSlide);
-// TODO: Liste Manuel
-// TODO: response time logging
+// ---------------------------------------------------------------------------------------------------------------------
+// EXP OBJECT
+// in this object, we save all of our variables, easier to pass on to functions
+// NOTE: we do manipulate this object in our functions!
+// ---------------------------------------------------------------------------------------------------------------------
+const exp = {};
 // ---------------------------------------------------------------------------------------------------------------------
 // PARTICIPANT ID
 // ---------------------------------------------------------------------------------------------------------------------
-const subjData = {};
-subjData.subjID = 'testID';
-subjData.touchScreen = _jsCheckForTouchscreenDefault.default();
+exp.subjData = {};
+exp.subjData.subjID = 'testID';
 // ---------------------------------------------------------------------------------------------------------------------
 // SVG & SCREEN SIZE
 // TODO find more elegant solution to tell user to view on fullscreen
 // if (clientWidth < 600 || clientHeight < 200) alert('Please view on bigger screen!');
 // ---------------------------------------------------------------------------------------------------------------------
-subjData.offsetWidth = document.body.offsetWidth;
-subjData.offsetHeight = document.body.offsetHeight;
+exp.subjData.touchScreen = _jsCheckForTouchscreenDefault.default();
+exp.subjData.offsetWidth = document.body.offsetWidth;
+exp.subjData.offsetHeight = document.body.offsetHeight;
 // get viewBox size from whole SVG
-const elemSpecs = {
+exp.elemSpecs = {
   outerSVG: {
     ID: document.getElementById('outer-svg'),
+    origViewBox: document.getElementById('outer-svg').getAttribute('viewBox'),
     origViewBoxX: parseFloat(document.getElementById('outer-svg').getAttribute('viewBox').split(' ')[0]),
     origViewBoxY: parseFloat(document.getElementById('outer-svg').getAttribute('viewBox').split(' ')[1]),
     origViewBoxWidth: parseFloat(document.getElementById('outer-svg').getAttribute('viewBox').split(' ')[2]),
@@ -520,11 +525,12 @@ const balloonRed = document.getElementById('balloon-red');
 const balloonYellow = document.getElementById('balloon-yellow');
 const balloonGreen = document.getElementById('balloon-green');
 const targetsSingle = [balloonBlue, balloonRed, balloonYellow, balloonGreen];
-elemSpecs.eyes = {};
+// save the original eye positions (so when eye is in the center)
+exp.elemSpecs.eyes = {};
 const agentsChar = ['pig', 'monkey', 'sheep'];
 agentsChar.forEach(agent => {
-  elemSpecs.eyes[agent] = {
-    radius: document.getElementById(`${agent}-pupil-left`).getAttribute('r'),
+  exp.elemSpecs.eyes[agent] = {
+    radius: document.getElementById(`${agent}-eyeline-left`).getAttribute('r'),
     left: {
       center: {
         x: document.getElementById(`${agent}-pupil-left`).getAttribute('cx'),
@@ -539,33 +545,33 @@ agentsChar.forEach(agent => {
     }
   };
 });
-// calculate some target positions:
-// get position on the very right (as constraint) and mid of the screen
-const borderRight = elemSpecs.outerSVG.origViewBoxWidth - balloonBlue.getBBox().width;
-const positionMid = elemSpecs.outerSVG.origViewBoxWidth / 2 - balloonBlue.getBBox().width / 2;
-// eslint-disable-next-line max-len
-const viewBoxCenter = `-${positionMid} -${elemSpecs.outerSVG.origViewBoxHeight / 2.8} ${elemSpecs.outerSVG.origViewBoxWidth} ${elemSpecs.outerSVG.origViewBoxHeight}`;
-// calculate y coords for balloon (-10 for little distance from border)
-const hedgeMidY = elemSpecs.outerSVG.origViewBoxHeight - balloonBlue.getBBox().height - 25;
-// define from which point onwards the balloon is hidden behind hedge
-// BBox of hedge is a bit too high to hide balloon, therefore / 1.1
-// eslint-disable-next-line max-len
-const viewBoxHidden = `-${positionMid} -${elemSpecs.outerSVG.origViewBoxHeight - hedge.getBBox().height / 1.1} ${elemSpecs.outerSVG.origViewBoxWidth} ${elemSpecs.outerSVG.origViewBoxHeight}`;
-// placeholder x for random horizontal position. y value and width, height always stays same
-const viewBoxRandom = `-x -${hedgeMidY} ${elemSpecs.outerSVG.origViewBoxWidth} ${elemSpecs.outerSVG.origViewBoxHeight}`;
-elemSpecs.targets = {
-  viewBoxCenter,
-  viewBoxHidden,
-  viewBoxRandom,
-  borderRight
+// calculate some positions of the targets
+// get position on the mid of the screen
+const positionMid = exp.elemSpecs.outerSVG.origViewBoxWidth / 2 - balloonBlue.getBBox().width / 2;
+// calculate y coords for balloon (-25 for little distance from lower border)
+const hedgeMidY = exp.elemSpecs.outerSVG.origViewBoxHeight - balloonBlue.getBBox().height - 25;
+exp.elemSpecs.targets = {
+  // 2.8, so that we can still see our agents and they don't get covered by balloons
+  viewBoxCenter: `-${positionMid} -${exp.elemSpecs.outerSVG.origViewBoxHeight / 2.8} ${exp.elemSpecs.outerSVG.origViewBoxWidth} ${exp.elemSpecs.outerSVG.origViewBoxHeight}`,
+  // define from which point onwards the balloon is hidden behind hedge
+  // BBox of hedge is a bit too high to hide balloon (because of single grass halms), therefore / 1.1
+  viewBoxHidden: `-${positionMid} -${exp.elemSpecs.outerSVG.origViewBoxHeight - hedge.getBBox().height / 1.1} ${exp.elemSpecs.outerSVG.origViewBoxWidth} ${exp.elemSpecs.outerSVG.origViewBoxHeight}`,
+  // placeholder x for random horizontal position. y value and width, height always stays same
+  viewBoxRandom: `-x -${hedgeMidY} ${exp.elemSpecs.outerSVG.origViewBoxWidth} ${exp.elemSpecs.outerSVG.origViewBoxHeight}`,
+  // right side of screen as upper boundary
+  borderRight: exp.elemSpecs.outerSVG.origViewBoxWidth - balloonBlue.getBBox().width
 };
 // ---------------------------------------------------------------------------------------------------------------------
 // TRIAL NUMBER & RANDOMIZATION OF AGENTS, TARGETS AND TARGET POSITIONS
 // ---------------------------------------------------------------------------------------------------------------------
-const famNr = 2;
-const testNr = 2;
-let trialCount = 0;
-const exp = _jsRandomizeTrialsDefault.default(famNr, testNr, agentsSingle, targetsSingle, elemSpecs, subjData);
+exp.trials = {};
+exp.trials.famNr = 2;
+exp.trials.testNr = 2;
+exp.trials.totalNr = exp.trials.famNr + exp.trials.testNr;
+// this variable stores in which trial we currently are!
+exp.trials.count = 0;
+// create arrays with agents, targets, positions etc. for all the trials
+_jsRandomizeTrialsDefault.default(exp, agentsSingle, targetsSingle);
 console.log('exp object', exp);
 // ---------------------------------------------------------------------------------------------------------------------
 // DEFINE EVENTLISTENER FUNCTIONS
@@ -573,19 +579,22 @@ console.log('exp object', exp);
 // ---------------------------------------------------------------------------------------------------------------------
 // RUNS WHEN INSTRUCTION BUTTON IS CLICKED
 // ---------------------------------------------------------------------------------------------------------------------
-// in order to pass on event to function
+// save in const variables in order to pass on event to function
 const handleInstructionClick = event => {
   event.preventDefault();
+  // showSlide: first array gets shown, second array gets hidden
   _jsShowSlideDefault.default([experimentSlide], [instructionSlide, transitionSlide, goodbyeSlide, clickBubble, fiveBoxes]);
-  _jsPrepareTrialDefault.default(exp, trialCount);
+  // shows only relevant elements etc.
+  _jsPrepareTrialDefault.default(exp);
 };
 // ---------------------------------------------------------------------------------------------------------------------
-// RUNS WHEN TRANSITION BUTTON IS CLICKED
+// RUNS WHEN TRANSITION BUTTON IS CLICKED (between fam and test trials)
+// (nearly same as instruction click!)
 // ---------------------------------------------------------------------------------------------------------------------
 const handleTransitionClick = event => {
   event.preventDefault();
   _jsShowSlideDefault.default([experimentSlide, fiveBoxes], [instructionSlide, transitionSlide, goodbyeSlide, clickBubble]);
-  _jsPrepareTrialDefault.default(exp, trialCount);
+  _jsPrepareTrialDefault.default(exp);
 };
 // ---------------------------------------------------------------------------------------------------------------------
 // RUNS WHEN GOODBYE BUTTON IS CLICKED
@@ -593,28 +602,34 @@ const handleTransitionClick = event => {
 const handleGoodbyeClick = event => {
   event.preventDefault();
   _jsShowSlideDefault.default([], [goodbyeSlide]);
-  _jsDownloadDataDefault.default(exp.responseLog, subjData.subjID);
+  _jsDownloadDataDefault.default(exp.responseLog, exp.subjData.subjID);
 };
 // ---------------------------------------------------------------------------------------------------------------------
 // RUNS WHEN TARGET IS CLICKED
 // ---------------------------------------------------------------------------------------------------------------------
+// async so we can await animation!
 const handleTargetClick = async function tmp(event) {
+  // we save current time, so that we can calculate response time
+  exp.responseLog[exp.trials.count].responseTime.t1 = new Date().getTime();
+  // remove eventListener that was responsible for "wrong input" sound
   exp.elemSpecs.outerSVG.ID.removeEventListener('click', handleWrongClick, false);
   event.preventDefault();
-  // exp.responseLog[trialCount].responseTime = new Date().getTime() - t0;
-  _jsLogResponseDefault.default(event, exp, trialCount);
-  console.log('responseLog: ', exp.responseLog[trialCount]);
+  // function to save all relevant information
+  _jsLogResponseDefault.default(event, exp);
+  console.log('responseLog: ', exp.responseLog[exp.trials.count]);
+  // so that we don't rush into next trial
   await _jsPauseDefault.default(1000);
   // prepare next trial
-  trialCount += 1;
-  // still in fam trials
-  if (trialCount < famNr) {
-    _jsPrepareTrialDefault.default(exp, trialCount);
-  } else if (trialCount === famNr) {
+  exp.trials.count += 1;
+  // then depending on trialcount, decide what happens next...
+  // if still in fam trials, prepare trial
+  if (exp.trials.count < exp.trials.famNr) {
+    _jsPrepareTrialDefault.default(exp);
+  } else if (exp.trials.count === exp.trials.famNr) {
     _jsShowSlideDefault.default([transitionSlide], [experimentSlide, pig, monkey, sheep, balloonBlue, balloonRed, balloonYellow, balloonGreen]);
-  } else if (trialCount < exp.trialType.length) {
-    _jsPrepareTrialDefault.default(exp, trialCount);
-  } else if (trialCount === exp.trialType.length) {
+  } else if (exp.trials.count < exp.trials.totalNr) {
+    _jsPrepareTrialDefault.default(exp);
+  } else if (exp.trials.count === exp.trials.totalNr) {
     _jsShowSlideDefault.default([goodbyeSlide], [experimentSlide, hedge, pig, monkey, sheep, balloonBlue, balloonRed, balloonYellow, balloonGreen, fiveBoxes]);
   }
 };
@@ -623,10 +638,12 @@ const handleTargetClick = async function tmp(event) {
 // ---------------------------------------------------------------------------------------------------------------------
 const handleWrongClick = event => {
   event.preventDefault();
-  const screenScalingHeight = elemSpecs.outerSVG.origViewBoxHeight / subjData.offsetHeight;
+  // from user screen size, calculate where there was a click
+  const screenScalingHeight = exp.elemSpecs.outerSVG.origViewBoxHeight / exp.subjData.offsetHeight;
   const clickY = event.clientY - exp.elemSpecs.outerSVG.ID.getBoundingClientRect().top;
   const clickScaledY = screenScalingHeight * clickY;
-  if (clickScaledY < elemSpecs.outerSVG.origViewBoxHeight - hedge.getBBox().height) {
+  // if that is somewhere above the hedge (e.g. on the agents), play "negative" feedback sound
+  if (clickScaledY < exp.elemSpecs.outerSVG.origViewBoxHeight - hedge.getBBox().height) {
     document.getElementById('negative-sound').play();
   }
 };
@@ -636,13 +653,20 @@ const handleWrongClick = event => {
 const handleLosgehtsClick = async function tmp(event) {
   event.preventDefault();
   console.log('');
-  console.log('trial: ', trialCount);
-  await _jsChangeGazeDefault.default(exp, trialCount);
-  // TODO log response time => how to pass on parameter?
-  // maybe this helps?:
-  // const handleClick = (event) => clickDistanceFromTarget(event, targets[trialCount], outerSVG, responseLog);
-  // const t0 = new Date().getTime();
-  if (exp.subjData.touchScreen || exp.trialType[trialCount] === 'fam') {
+  console.log('trial: ', exp.trials.count);
+  // animate balloon & eye movement to randomized positions
+  await _jsChangeGazeDefault.default(exp);
+  // save current time to calculate response time later
+  exp.responseLog[exp.trials.count].responseTime = {
+    t0: new Date().getTime(),
+    t1: 0
+  };
+  // debugging frozen animation
+  console.log('current targetViewBox', exp.targets[exp.trials.count].getAttribute('viewBox'));
+  console.log('center targetViewBox', exp.elemSpecs.targets.viewBoxCenter);
+  console.log('changed targetViewBox?', !(exp.elemSpecs.targets.viewBoxCenter === exp.targets[exp.trials.count].getAttribute('viewBox')));
+  // depending on experiment version, users click on hedge or boxes
+  if (exp.subjData.touchScreen || exp.trials.type[exp.trials.count] === 'fam') {
     hedge.addEventListener('click', handleTargetClick, {
       capture: false,
       once: true
@@ -660,7 +684,7 @@ const handleLosgehtsClick = async function tmp(event) {
 // ACTUALLY RUNNING:
 // ---------------------------------------------------------------------------------------------------------------------
 // INSTRUCTION: show slide
-_jsShowSlideDefault.default([instructionSlide], [transitionSlide, experimentSlide, goodbyeSlide]);
+_jsShowSlideDefault.default([instructionSlide], [transitionSlide, experimentSlide, goodbyeSlide, pig, monkey, sheep, balloonBlue, balloonRed, balloonYellow, balloonGreen]);
 // add event listeners
 instructionButton.addEventListener('click', handleInstructionClick, {
   capture: false,
@@ -682,22 +706,24 @@ goodbyeButton.addEventListener('click', handleGoodbyeClick, {
 var _parcelHelpers = require("@parcel/transformer-js/lib/esmodule-helpers.js");
 _parcelHelpers.defineInteropFlag(exports);
 var _gsap = require('gsap');
-exports.default = (event, exp, trialCount) => {
+exports.default = (event, exp) => {
+  // get user screen size
   // in our context, offset and client same values
-  exp.responseLog[trialCount].offsetWidth = document.body.offsetWidth;
-  exp.responseLog[trialCount].offsetHeight = document.body.offsetHeight;
+  exp.responseLog[exp.trials.count].offsetWidth = document.body.offsetWidth;
+  exp.responseLog[exp.trials.count].offsetHeight = document.body.offsetHeight;
   // how much smaller/bigger is the SVG coordinate system wrt the screen size?
-  exp.responseLog[trialCount].screenScalingWidth = exp.elemSpecs.outerSVG.origViewBoxWidth / exp.responseLog[trialCount].offsetWidth;
-  exp.responseLog[trialCount].screenScalingHeight = exp.elemSpecs.outerSVG.origViewBoxHeight / exp.responseLog[trialCount].offsetHeight;
-  // click coordinates (event.offset) * scaling
+  exp.responseLog[exp.trials.count].screenScalingWidth = exp.elemSpecs.outerSVG.origViewBoxWidth / exp.responseLog[exp.trials.count].offsetWidth;
+  exp.responseLog[exp.trials.count].screenScalingHeight = exp.elemSpecs.outerSVG.origViewBoxHeight / exp.responseLog[exp.trials.count].offsetHeight;
   // originally, we used offset. Didn't work in Firefox.
-  exp.responseLog[trialCount].clickX = event.clientX - exp.elemSpecs.outerSVG.ID.getBoundingClientRect().left;
-  exp.responseLog[trialCount].clickY = event.clientY - exp.elemSpecs.outerSVG.ID.getBoundingClientRect().top;
-  exp.responseLog[trialCount].clickScaledX = exp.responseLog[trialCount].screenScalingWidth * exp.responseLog[trialCount].clickX;
-  exp.responseLog[trialCount].clickScaledY = exp.responseLog[trialCount].screenScalingHeight * exp.responseLog[trialCount].clickY;
+  exp.responseLog[exp.trials.count].clickX = event.clientX - exp.elemSpecs.outerSVG.ID.getBoundingClientRect().left;
+  exp.responseLog[exp.trials.count].clickY = event.clientY - exp.elemSpecs.outerSVG.ID.getBoundingClientRect().top;
+  // translate orig click coords into our SVG coordinate system
+  exp.responseLog[exp.trials.count].clickScaledX = exp.responseLog[exp.trials.count].screenScalingWidth * exp.responseLog[exp.trials.count].clickX;
+  exp.responseLog[exp.trials.count].clickScaledY = exp.responseLog[exp.trials.count].screenScalingHeight * exp.responseLog[exp.trials.count].clickY;
+  // user feedback where they clicked (with sound)
   const clickBubble = document.getElementById('click-bubble');
-  clickBubble.setAttribute('cx', `${exp.responseLog[trialCount].clickScaledX}`);
-  clickBubble.setAttribute('cy', `${exp.responseLog[trialCount].clickScaledY}`);
+  clickBubble.setAttribute('cx', `${exp.responseLog[exp.trials.count].clickScaledX}`);
+  clickBubble.setAttribute('cy', `${exp.responseLog[exp.trials.count].clickScaledY}`);
   // let clickBubble be visible only for 0.5 sec
   _gsap.gsap.to(clickBubble, {
     duration: 0.5,
@@ -708,53 +734,75 @@ exports.default = (event, exp, trialCount) => {
       clickBubble.setAttribute('visibility', 'hidden');
     }
   });
+  // play positive user feedback
   document.getElementById('positive-sound').play();
-  exp.responseLog[trialCount].targetX = parseFloat(exp.targets[trialCount].getAttribute('viewBox').split(' ')[0]) * -1;
-  exp.responseLog[trialCount].targetY = parseFloat(exp.targets[trialCount].getAttribute('viewBox').split(' ')[1]) * -1;
+  // get upper left corner of target
+  exp.responseLog[exp.trials.count].targetX = parseFloat(exp.targets[exp.trials.count].getAttribute('viewBox').split(' ')[0]) * -1;
+  exp.responseLog[exp.trials.count].targetY = parseFloat(exp.targets[exp.trials.count].getAttribute('viewBox').split(' ')[1]) * -1;
   // define center of target
-  exp.responseLog[trialCount].targetWidth = exp.targets[trialCount].getBBox().width;
-  exp.responseLog[trialCount].targetHeight = exp.targets[trialCount].getBBox().height;
-  exp.responseLog[trialCount].targetCenterX = exp.responseLog[trialCount].targetX + exp.targets[trialCount].getBBox().width / 2;
-  exp.responseLog[trialCount].targetCenterY = exp.responseLog[trialCount].targetY + exp.targets[trialCount].getBBox().height / 2;
+  exp.responseLog[exp.trials.count].targetWidth = exp.targets[exp.trials.count].getBBox().width;
+  exp.responseLog[exp.trials.count].targetHeight = exp.targets[exp.trials.count].getBBox().height;
+  exp.responseLog[exp.trials.count].targetCenterX = exp.responseLog[exp.trials.count].targetX + exp.targets[exp.trials.count].getBBox().width / 2;
+  exp.responseLog[exp.trials.count].targetCenterY = exp.responseLog[exp.trials.count].targetY + exp.targets[exp.trials.count].getBBox().height / 2;
   // clicked on target?
+  // NOTE: the SVG coord system starts with 0, 0 in upper left corner
   // for x: negative values mean too far left, positive values mean too far right
-  // for y: negative values mean too low, positive values mean too high
-  exp.responseLog[trialCount].clickDistFromTargetCenterX = exp.responseLog[trialCount].clickScaledX - exp.responseLog[trialCount].targetCenterX;
-  exp.responseLog[trialCount].clickDistFromTargetCenterY = exp.responseLog[trialCount].targetCenterY - exp.responseLog[trialCount].clickScaledY;
-  exp.responseLog[trialCount].hitBBTargetX = false;
-  exp.responseLog[trialCount].hitBBTargetY = false;
-  if (exp.responseLog[trialCount].targetX <= exp.responseLog[trialCount].clickScaledX && exp.responseLog[trialCount].clickScaledX <= exp.responseLog[trialCount].targetX + exp.responseLog[trialCount].targetWidth) {
-    exp.responseLog[trialCount].hitBBTargetX = true;
+  // for y: negative values mean too high, positive values mean too low
+  exp.responseLog[exp.trials.count].clickDistFromTargetCenterX = exp.responseLog[exp.trials.count].clickScaledX - exp.responseLog[exp.trials.count].targetCenterX;
+  exp.responseLog[exp.trials.count].clickDistFromTargetCenterY = exp.responseLog[exp.trials.count].clickScaledY - exp.responseLog[exp.trials.count].targetCenterY;
+  // did you click somewhere on the target?
+  exp.responseLog[exp.trials.count].hitBBTargetX = false;
+  exp.responseLog[exp.trials.count].hitBBTargetY = false;
+  if (exp.responseLog[exp.trials.count].targetX <= exp.responseLog[exp.trials.count].clickScaledX && exp.responseLog[exp.trials.count].clickScaledX <= exp.responseLog[exp.trials.count].targetX + exp.responseLog[exp.trials.count].targetWidth) {
+    exp.responseLog[exp.trials.count].hitBBTargetX = true;
   }
-  if (exp.responseLog[trialCount].targetY <= exp.responseLog[trialCount].clickScaledY && exp.responseLog[trialCount].clickScaledY <= exp.responseLog[trialCount].targetY + exp.responseLog[trialCount].targetHeight) {
-    exp.responseLog[trialCount].hitBBTargetY = true;
+  if (exp.responseLog[exp.trials.count].targetY <= exp.responseLog[exp.trials.count].clickScaledY && exp.responseLog[exp.trials.count].clickScaledY <= exp.responseLog[exp.trials.count].targetY + exp.responseLog[exp.trials.count].targetHeight) {
+    exp.responseLog[exp.trials.count].hitBBTargetY = true;
+  }
+  // calculate distance between click coords and target bounding box
+  // for x axis
+  if (exp.responseLog[exp.trials.count].hitBBTargetX === true) {
+    exp.responseLog[exp.trials.count].clickDistFromTargetBBoxX = 0;
+  } else if (exp.responseLog[exp.trials.count].clickScaledX < exp.responseLog[exp.trials.count].targetX) {
+    exp.responseLog[exp.trials.count].clickDistFromTargetBBoxX = exp.responseLog[exp.trials.count].clickScaledX - exp.responseLog[exp.trials.count].targetX;
+  } else if (exp.responseLog[exp.trials.count].clickScaledX > exp.responseLog[exp.trials.count].targetX) {
+    exp.responseLog[exp.trials.count].clickDistFromTargetBBoxX = exp.responseLog[exp.trials.count].clickScaledX - (exp.responseLog[exp.trials.count].targetX + exp.responseLog[exp.trials.count].targetWidth);
+  }
+  // for y axis
+  if (exp.responseLog[exp.trials.count].hitBBTargetY === true) {
+    exp.responseLog[exp.trials.count].clickDistFromTargetBBoxY = 0;
+  } else if (exp.responseLog[exp.trials.count].clickScaledY < exp.responseLog[exp.trials.count].targetY) {
+    exp.responseLog[exp.trials.count].clickDistFromTargetBBoxY = exp.responseLog[exp.trials.count].clickScaledY - exp.responseLog[exp.trials.count].targetY;
+  } else if (exp.responseLog[exp.trials.count].clickScaledY > exp.responseLog[exp.trials.count].targetY) {
+    exp.responseLog[exp.trials.count].clickDistFromTargetBBoxY = exp.responseLog[exp.trials.count].clickScaledY - (exp.responseLog[exp.trials.count].targetY + exp.responseLog[exp.trials.count].targetHeight);
   }
   // for PC version of experiment, check which box was clicked
   if (exp.subjData.touchScreen) {
-    if (exp.trialType[trialCount] === 'fam') exp.responseLog[trialCount].clickedArea = 'clickable-area';
-    if (exp.trialType[trialCount] === 'test') exp.responseLog[trialCount].clickedArea = 'hedge';
+    if (exp.trials.type[exp.trials.count] === 'fam') exp.responseLog[exp.trials.count].clickedArea = 'clickable-area';
+    if (exp.trials.type[exp.trials.count] === 'test') exp.responseLog[exp.trials.count].clickedArea = 'hedge';
   }
   if (!exp.subjData.touchScreen) {
-    if (exp.trialType[trialCount] === 'fam') exp.responseLog[trialCount].clickedArea = 'clickable-area';
-    if (exp.trialType[trialCount] === 'test') exp.responseLog[trialCount].clickedArea = event.path[1].getAttribute('id');
+    if (exp.trials.type[exp.trials.count] === 'fam') exp.responseLog[exp.trials.count].clickedArea = 'clickable-area';
+    if (exp.trials.type[exp.trials.count] === 'test') exp.responseLog[exp.trials.count].clickedArea = event.path[1].getAttribute('id');
   }
   // log all important trial infos
-  exp.responseLog[trialCount].subjID = exp.subjData.subjID;
-  exp.responseLog[trialCount].touchScreen = exp.subjData.touchScreen;
-  exp.responseLog[trialCount].trialNr = trialCount + 1;
-  exp.responseLog[trialCount].agent = `${exp.agents[trialCount].getAttribute('id')}`;
-  exp.responseLog[trialCount].target = `${exp.targets[trialCount].getAttribute('id')}`;
-  exp.responseLog[trialCount].trialType = exp.trialType[trialCount];
-  exp.responseLog[trialCount].positionBin = exp.positions[trialCount].bin;
-  exp.responseLog[trialCount].pupilRadius = parseFloat(exp.elemSpecs.eyes[exp.responseLog[trialCount].agent].radius);
-  exp.responseLog[trialCount].pupilLeftCenterX = parseFloat(exp.elemSpecs.eyes[exp.responseLog[trialCount].agent].left.center.x);
-  exp.responseLog[trialCount].pupilLeftCenterY = parseFloat(exp.elemSpecs.eyes[exp.responseLog[trialCount].agent].left.center.y);
-  exp.responseLog[trialCount].pupilLeftRandomX = parseFloat(exp.elemSpecs.eyes[exp.responseLog[trialCount].agent].left.random.x);
-  exp.responseLog[trialCount].pupilLeftRandomY = parseFloat(exp.elemSpecs.eyes[exp.responseLog[trialCount].agent].left.random.y);
-  exp.responseLog[trialCount].pupilRightCenterX = parseFloat(exp.elemSpecs.eyes[exp.responseLog[trialCount].agent].right.center.x);
-  exp.responseLog[trialCount].pupilRightCenterY = parseFloat(exp.elemSpecs.eyes[exp.responseLog[trialCount].agent].right.center.y);
-  exp.responseLog[trialCount].pupilRightRandomX = parseFloat(exp.elemSpecs.eyes[exp.responseLog[trialCount].agent].right.random.x);
-  exp.responseLog[trialCount].pupilRightRandomY = parseFloat(exp.elemSpecs.eyes[exp.responseLog[trialCount].agent].right.random.y);
+  exp.responseLog[exp.trials.count].subjID = exp.subjData.subjID;
+  exp.responseLog[exp.trials.count].touchScreen = exp.subjData.touchScreen;
+  exp.responseLog[exp.trials.count].trialNr = exp.trials.count + 1;
+  exp.responseLog[exp.trials.count].agent = `${exp.agents[exp.trials.count].getAttribute('id')}`;
+  exp.responseLog[exp.trials.count].target = `${exp.targets[exp.trials.count].getAttribute('id')}`;
+  exp.responseLog[exp.trials.count].trialsType = exp.trials.type[exp.trials.count];
+  exp.responseLog[exp.trials.count].positionBin = exp.positions[exp.trials.count].bin;
+  exp.responseLog[exp.trials.count].responseTime = exp.responseLog[exp.trials.count].responseTime.t1 - exp.responseLog[exp.trials.count].responseTime.t0;
+  exp.responseLog[exp.trials.count].eyeRadius = parseFloat(exp.elemSpecs.eyes[exp.responseLog[exp.trials.count].agent].radius);
+  exp.responseLog[exp.trials.count].eyeCenterLeftX = parseFloat(exp.elemSpecs.eyes[exp.responseLog[exp.trials.count].agent].left.center.x);
+  exp.responseLog[exp.trials.count].eyeCenterLeftY = parseFloat(exp.elemSpecs.eyes[exp.responseLog[exp.trials.count].agent].left.center.y);
+  exp.responseLog[exp.trials.count].pupilTargetLeftX = parseFloat(exp.elemSpecs.eyes[exp.responseLog[exp.trials.count].agent].left.random.x);
+  exp.responseLog[exp.trials.count].pupilTargetLeftY = parseFloat(exp.elemSpecs.eyes[exp.responseLog[exp.trials.count].agent].left.random.y);
+  exp.responseLog[exp.trials.count].eyeCenterRightX = parseFloat(exp.elemSpecs.eyes[exp.responseLog[exp.trials.count].agent].right.center.x);
+  exp.responseLog[exp.trials.count].eyeCenterRightY = parseFloat(exp.elemSpecs.eyes[exp.responseLog[exp.trials.count].agent].right.center.y);
+  exp.responseLog[exp.trials.count].pupilTargetRightX = parseFloat(exp.elemSpecs.eyes[exp.responseLog[exp.trials.count].agent].right.random.x);
+  exp.responseLog[exp.trials.count].pupilTargetRightY = parseFloat(exp.elemSpecs.eyes[exp.responseLog[exp.trials.count].agent].right.random.y);
 };
 
 },{"gsap":"1iecp","@parcel/transformer-js/lib/esmodule-helpers.js":"5gA8y"}],"1iecp":[function(require,module,exports) {
@@ -4184,94 +4232,75 @@ exports.export = function (dest, destName, get) {
 },{}],"7p7up":[function(require,module,exports) {
 var _parcelHelpers = require("@parcel/transformer-js/lib/esmodule-helpers.js");
 _parcelHelpers.defineInteropFlag(exports);
-var _setCircleCenter = require('./setCircleCenter');
-var _setCircleCenterDefault = _parcelHelpers.interopDefault(_setCircleCenter);
-var _setTargetCenter = require('./setTargetCenter');
-var _setTargetCenterDefault = _parcelHelpers.interopDefault(_setTargetCenter);
+var _setCircleAttr = require('./setCircleAttr');
+var _setCircleAttrDefault = _parcelHelpers.interopDefault(_setCircleAttr);
+var _setViewBoxAttr = require('./setViewBoxAttr');
+var _setViewBoxAttrDefault = _parcelHelpers.interopDefault(_setViewBoxAttr);
 var _showElement = require('./showElement');
 var _showElementDefault = _parcelHelpers.interopDefault(_showElement);
 var _getGazeCoords = require('./getGazeCoords');
 var _getGazeCoordsDefault = _parcelHelpers.interopDefault(_getGazeCoords);
 var _distanceViewBoxes = require('./distanceViewBoxes');
 var _distanceViewBoxesDefault = _parcelHelpers.interopDefault(_distanceViewBoxes);
-exports.default = (exp, trialCount) => {
+exports.default = exp => {
+  // show blurred canvas and button
   document.getElementById('experiment-button').setAttribute('visibility', 'visible');
   document.getElementById('cover-blurr').setAttribute('visibility', 'visible');
   // show agent and target of the current trial only, hide the other ones
-  _showElementDefault.default(exp.agents, trialCount);
-  _showElementDefault.default(exp.targets, trialCount);
-  const currentAgent = `${exp.agents[trialCount].getAttribute('id')}`;
+  _showElementDefault.default(exp.agents, exp.trials.count);
+  _showElementDefault.default(exp.targets, exp.trials.count);
+  // get relevant elements
+  const currentAgent = `${exp.agents[exp.trials.count].getAttribute('id')}`;
   const pupilLeft = document.getElementById(`${currentAgent}-pupil-left`);
   const pupilRight = document.getElementById(`${currentAgent}-pupil-right`);
   const irisLeft = document.getElementById(`${currentAgent}-iris-left`);
   const irisRight = document.getElementById(`${currentAgent}-iris-right`);
   const eyelineLeft = document.getElementById(`${currentAgent}-eyeline-left`);
   const eyelineRight = document.getElementById(`${currentAgent}-eyeline-right`);
-  // set exp.responseLog to center
-  _setCircleCenterDefault.default(pupilLeft, exp.elemSpecs.eyes[currentAgent].left.center);
-  _setCircleCenterDefault.default(pupilRight, exp.elemSpecs.eyes[currentAgent].right.center);
-  _setCircleCenterDefault.default(irisLeft, exp.elemSpecs.eyes[currentAgent].left.center);
-  _setCircleCenterDefault.default(irisRight, exp.elemSpecs.eyes[currentAgent].right.center);
-  // set target to center
-  _setTargetCenterDefault.default(exp.targets[trialCount], `${exp.elemSpecs.targets.viewBoxCenter}`);
-  // depending on trial type, show or hide hedge
   const hedge = document.getElementById('hedge');
-  if (exp.trialType[trialCount] === 'fam') {
+  // set eyes to center
+  _setCircleAttrDefault.default(pupilLeft, exp.elemSpecs.eyes[currentAgent].left.center);
+  _setCircleAttrDefault.default(pupilRight, exp.elemSpecs.eyes[currentAgent].right.center);
+  _setCircleAttrDefault.default(irisLeft, exp.elemSpecs.eyes[currentAgent].left.center);
+  _setCircleAttrDefault.default(irisRight, exp.elemSpecs.eyes[currentAgent].right.center);
+  // set target to center
+  _setViewBoxAttrDefault.default(exp.targets[exp.trials.count], `${exp.elemSpecs.targets.viewBoxCenter}`);
+  // set hedge back to original location
+  _setViewBoxAttrDefault.default(hedge, `${exp.elemSpecs.outerSVG.origViewBox}`);
+  // depending on trial type, show or hide hedge
+  if (exp.trials.type[exp.trials.count] === 'fam') {
     hedge.setAttribute('visibility', 'hidden');
-  } else if (exp.trialType[trialCount] === 'test') {
+  } else if (exp.trials.type[exp.trials.count] === 'test') {
     hedge.setAttribute('visibility', 'visible');
   }
   // calculate where exp.responseLog should move in the trial
-  // for test trials: first let exp.responseLog follow ballooon to middle, until balloon is hidden
-  const gazeCoordsBeginningLeft = _getGazeCoordsDefault.default(exp.targets[trialCount], exp.elemSpecs.targets.viewBoxHidden, pupilLeft, eyelineLeft);
-  const gazeCoordsBeginningRight = _getGazeCoordsDefault.default(exp.targets[trialCount], exp.elemSpecs.targets.viewBoxHidden, pupilRight, eyelineRight);
-  const gazeCoordsLeft = _getGazeCoordsDefault.default(exp.targets[trialCount], exp.positions[trialCount].viewBoxRandom, pupilLeft, eyelineLeft);
-  const gazeCoordsRight = _getGazeCoordsDefault.default(exp.targets[trialCount], exp.positions[trialCount].viewBoxRandom, pupilRight, eyelineRight);
+  // for test trials: first let eyes follow balloon to middle, until balloon is hidden
+  const gazeCoordsBeginningLeft = _getGazeCoordsDefault.default(exp.targets[exp.trials.count], exp.elemSpecs.targets.viewBoxHidden, pupilLeft, eyelineLeft);
+  const gazeCoordsBeginningRight = _getGazeCoordsDefault.default(exp.targets[exp.trials.count], exp.elemSpecs.targets.viewBoxHidden, pupilRight, eyelineRight);
+  const gazeCoordsLeft = _getGazeCoordsDefault.default(exp.targets[exp.trials.count], exp.positions[exp.trials.count].viewBoxRandom, pupilLeft, eyelineLeft);
+  const gazeCoordsRight = _getGazeCoordsDefault.default(exp.targets[exp.trials.count], exp.positions[exp.trials.count].viewBoxRandom, pupilRight, eyelineRight);
   // save calculated values in our exp object
   exp.elemSpecs.eyes[currentAgent].left.beginning = gazeCoordsBeginningLeft;
   exp.elemSpecs.eyes[currentAgent].left.random = gazeCoordsLeft;
   exp.elemSpecs.eyes[currentAgent].right.beginning = gazeCoordsBeginningRight;
   exp.elemSpecs.eyes[currentAgent].right.random = gazeCoordsRight;
   // calculate distance between middle and target position, for constant speed
-  const distanceCenterRandom = _distanceViewBoxesDefault.default(exp.elemSpecs.targets.viewBoxCenter, exp.positions[trialCount].viewBoxRandom);
+  const distanceCenterRandom = _distanceViewBoxesDefault.default(exp.elemSpecs.targets.viewBoxCenter, exp.positions[exp.trials.count].viewBoxRandom);
   const distanceCenterHidden = _distanceViewBoxesDefault.default(exp.elemSpecs.targets.viewBoxCenter, exp.elemSpecs.targets.viewBoxHidden);
-  const distanceHiddenRandom = _distanceViewBoxesDefault.default(exp.elemSpecs.targets.viewBoxHidden, exp.positions[trialCount].viewBoxRandom);
+  const distanceHiddenRandom = _distanceViewBoxesDefault.default(exp.elemSpecs.targets.viewBoxHidden, exp.positions[exp.trials.count].viewBoxRandom);
   const perSecond = 300;
-  exp.responseLog[trialCount] = {};
+  exp.responseLog[exp.trials.count] = {};
   // save animation speed in our exp object
-  if (exp.trialType[trialCount] === 'fam') {
-    exp.responseLog[trialCount].durationAnimationTotal = distanceCenterRandom / perSecond;
-  } else if (exp.trialType[trialCount] === 'test') {
-    exp.responseLog[trialCount].durationAnimationCenterHidden = distanceCenterHidden / perSecond;
-    exp.responseLog[trialCount].durationAnimationHiddenRandom = distanceHiddenRandom / perSecond;
-    exp.responseLog[trialCount].durationAnimationTotal = distanceCenterHidden / perSecond + distanceHiddenRandom / perSecond;
+  if (exp.trials.type[exp.trials.count] === 'fam') {
+    exp.responseLog[exp.trials.count].durationAnimationTotal = distanceCenterRandom / perSecond;
+  } else if (exp.trials.type[exp.trials.count] === 'test') {
+    exp.responseLog[exp.trials.count].durationAnimationCenterHidden = distanceCenterHidden / perSecond;
+    exp.responseLog[exp.trials.count].durationAnimationHiddenRandom = distanceHiddenRandom / perSecond;
+    exp.responseLog[exp.trials.count].durationAnimationTotal = distanceCenterHidden / perSecond + distanceHiddenRandom / perSecond;
   }
 };
 
-},{"./setCircleCenter":"3VeP8","./setTargetCenter":"51G9p","./showElement":"6pY4G","./getGazeCoords":"31xvG","./distanceViewBoxes":"5JGu5","@parcel/transformer-js/lib/esmodule-helpers.js":"5gA8y"}],"3VeP8":[function(require,module,exports) {
-var _parcelHelpers = require("@parcel/transformer-js/lib/esmodule-helpers.js");
-_parcelHelpers.defineInteropFlag(exports);
-exports.default = (target, newCoords) => {
-  function moveCenter() {
-    target.setAttribute('cx', newCoords.x);
-    target.setAttribute('cy', newCoords.y);
-    requestAnimationFrame(moveCenter);
-  }
-  requestAnimationFrame(moveCenter);
-};
-
-},{"@parcel/transformer-js/lib/esmodule-helpers.js":"5gA8y"}],"51G9p":[function(require,module,exports) {
-var _parcelHelpers = require("@parcel/transformer-js/lib/esmodule-helpers.js");
-_parcelHelpers.defineInteropFlag(exports);
-exports.default = (target, newViewBox) => {
-  function moveViewBox() {
-    target.setAttribute('viewBox', newViewBox);
-    requestAnimationFrame(moveViewBox);
-  }
-  requestAnimationFrame(moveViewBox);
-};
-
-},{"@parcel/transformer-js/lib/esmodule-helpers.js":"5gA8y"}],"6pY4G":[function(require,module,exports) {
+},{"./showElement":"6pY4G","./getGazeCoords":"31xvG","./distanceViewBoxes":"5JGu5","@parcel/transformer-js/lib/esmodule-helpers.js":"5gA8y","./setCircleAttr":"66zxP","./setViewBoxAttr":"54wb7"}],"6pY4G":[function(require,module,exports) {
 var _parcelHelpers = require("@parcel/transformer-js/lib/esmodule-helpers.js");
 _parcelHelpers.defineInteropFlag(exports);
 exports.default = (elements, trialCount) => {
@@ -4289,11 +4318,9 @@ var _parcelHelpers = require("@parcel/transformer-js/lib/esmodule-helpers.js");
 _parcelHelpers.defineInteropFlag(exports);
 exports.default = (target, targetViewBoxRandom, pupil, eyeline) => {
   // first, get all elements that we need
-  // get eyeline with eyeRadius
   const eyeRadius = parseFloat(eyeline.getAttribute('r'), 10);
   const eyelineCenterX = parseFloat(eyeline.getAttribute('cx'), 10);
   const eyelineCenterY = parseFloat(eyeline.getAttribute('cy'), 10);
-  // get pupil with pupilRadius
   const pupilRadius = parseFloat(pupil.getAttribute('r'), 10);
   // define max movement value for eye movement
   const maxEyeMovement = eyeRadius - pupilRadius / 1.1;
@@ -4303,6 +4330,7 @@ exports.default = (target, targetViewBoxRandom, pupil, eyeline) => {
   // use viewbox coordinates
   const targetX = Math.abs(targetViewBoxRandom.split(' ')[0]);
   const targetY = Math.abs(targetViewBoxRandom.split(' ')[1]);
+  // calculate where the center of the target is
   const targetCenterX = targetX + targetWidth / 2;
   const targetCenterY = targetY + targetHeight / 2;
   // create line equation for the path on which the pupil can move.
@@ -4345,146 +4373,273 @@ exports.default = (viewBox1, viewBox2) => {
   return Math.abs(Math.sqrt((x2 - x1) ** 2 + (y2 - y1) ** 2));
 };
 
+},{"@parcel/transformer-js/lib/esmodule-helpers.js":"5gA8y"}],"66zxP":[function(require,module,exports) {
+var _parcelHelpers = require("@parcel/transformer-js/lib/esmodule-helpers.js");
+_parcelHelpers.defineInteropFlag(exports);
+exports.default = (target, newCoords) => {
+  function moveCenter() {
+    target.setAttribute('cx', newCoords.x);
+    target.setAttribute('cy', newCoords.y);
+    requestAnimationFrame(moveCenter);
+  }
+  requestAnimationFrame(moveCenter);
+};
+
+},{"@parcel/transformer-js/lib/esmodule-helpers.js":"5gA8y"}],"54wb7":[function(require,module,exports) {
+var _parcelHelpers = require("@parcel/transformer-js/lib/esmodule-helpers.js");
+_parcelHelpers.defineInteropFlag(exports);
+exports.default = (target, newViewBox) => {
+  function moveViewBox() {
+    target.setAttribute('viewBox', newViewBox);
+    requestAnimationFrame(moveViewBox);
+  }
+  requestAnimationFrame(moveViewBox);
+};
+
 },{"@parcel/transformer-js/lib/esmodule-helpers.js":"5gA8y"}],"6YmDj":[function(require,module,exports) {
 var _parcelHelpers = require("@parcel/transformer-js/lib/esmodule-helpers.js");
 _parcelHelpers.defineInteropFlag(exports);
 var _gsap = require('gsap');
-var _setCircleCenter = require('./setCircleCenter');
-var _setCircleCenterDefault = _parcelHelpers.interopDefault(_setCircleCenter);
-var _setTargetCenter = require('./setTargetCenter');
-var _setTargetCenterDefault = _parcelHelpers.interopDefault(_setTargetCenter);
-exports.default = (exp, trialCount) => new Promise(resolve => {
+var _setCircleAttr = require('./setCircleAttr');
+var _setCircleAttrDefault = _parcelHelpers.interopDefault(_setCircleAttr);
+var _setViewBoxAttr = require('./setViewBoxAttr');
+var _setViewBoxAttrDefault = _parcelHelpers.interopDefault(_setViewBoxAttr);
+exports.default = exp => new Promise(resolve => {
+  // hide blurr canvas and button
   document.getElementById('experiment-button').setAttribute('visibility', 'hidden');
   document.getElementById('cover-blurr').setAttribute('visibility', 'hidden');
-  const currentAgent = `${exp.agents[trialCount].getAttribute('id')}`;
+  // get relevant elements
+  const currentAgent = `${exp.agents[exp.trials.count].getAttribute('id')}`;
   const hedge = document.getElementById('hedge');
   const pupilLeft = document.getElementById(`${currentAgent}-pupil-left`);
   const pupilRight = document.getElementById(`${currentAgent}-pupil-right`);
   const irisLeft = document.getElementById(`${currentAgent}-iris-left`);
   const irisRight = document.getElementById(`${currentAgent}-iris-right`);
+  const boxes = document.getElementById('five-boxes');
+  // we use gsap3 for animation
   const timelineFam = _gsap.gsap.timeline();
   const timelineTest = _gsap.gsap.timeline();
-  // need to put it in function, so that we can put delay on it in animation
-  const showBoxes = () => {
-    hedge.setAttribute('visibility', 'hidden');
-  };
   // animate target
   // for fam trials, just show full path. everything at the same time
-  if (exp.trialType[trialCount] === 'fam') {
-    timelineFam.to(exp.targets[trialCount], {
+  if (exp.trials.type[exp.trials.count] === 'fam') {
+    timelineFam.fromTo(exp.targets[exp.trials.count], {
+      attr: {
+        viewBox: `${exp.elemSpecs.targets.viewBoxCenter}`
+      }
+    }, {
       delay: 1,
-      duration: `${exp.responseLog[trialCount].durationAnimationTotal}`,
+      duration: `${exp.responseLog[exp.trials.count].durationAnimationTotal}`,
       ease: 'none',
       attr: {
-        viewBox: `${exp.positions[trialCount].viewBoxRandom}`
+        viewBox: `${exp.positions[exp.trials.count].viewBoxRandom}`
+      },
+      onInterrupt() {
+        console.log('interrupted in fam target');
       },
       onComplete() {
-        _setTargetCenterDefault.default(exp.targets[trialCount], exp.positions[trialCount].viewBoxRandom);
+        _setViewBoxAttrDefault.default(exp.targets[exp.trials.count], exp.positions[exp.trials.count].viewBoxRandom);
       }
     }).// animate left eye
-    to([pupilLeft, irisLeft], {
-      duration: `${exp.responseLog[trialCount].durationAnimationTotal}`,
+    fromTo([pupilLeft, irisLeft], {
+      attr: {
+        cx: `${exp.elemSpecs.eyes[currentAgent].left.center.x}`,
+        cy: `${exp.elemSpecs.eyes[currentAgent].left.center.y}`
+      }
+    }, {
+      duration: `${exp.responseLog[exp.trials.count].durationAnimationTotal}`,
       ease: 'none',
       attr: {
         cx: `${exp.elemSpecs.eyes[currentAgent].left.random.x}`,
         cy: `${exp.elemSpecs.eyes[currentAgent].left.random.y}`
       },
+      onInterrupt() {
+        console.log('interrupted in fam eyes left');
+      },
       onComplete() {
-        _setCircleCenterDefault.default(pupilLeft, exp.elemSpecs.eyes[currentAgent].left.random);
-        _setCircleCenterDefault.default(irisLeft, exp.elemSpecs.eyes[currentAgent].left.random);
+        _setCircleAttrDefault.default(pupilLeft, exp.elemSpecs.eyes[currentAgent].left.random);
+        _setCircleAttrDefault.default(irisLeft, exp.elemSpecs.eyes[currentAgent].left.random);
       }
     }, '<').// animate right eye
-    to([pupilRight, irisRight], {
-      duration: `${exp.responseLog[trialCount].durationAnimationTotal}`,
+    fromTo([pupilRight, irisRight], {
+      attr: {
+        cx: `${exp.elemSpecs.eyes[currentAgent].right.center.x}`,
+        cy: `${exp.elemSpecs.eyes[currentAgent].right.center.y}`
+      }
+    }, {
+      duration: `${exp.responseLog[exp.trials.count].durationAnimationTotal}`,
       ease: 'none',
       attr: {
         cx: `${exp.elemSpecs.eyes[currentAgent].right.random.x}`,
         cy: `${exp.elemSpecs.eyes[currentAgent].right.random.y}`
       },
+      onInterrupt() {
+        console.log('interrupted in fam eyes right');
+      },
       onComplete() {
-        _setCircleCenterDefault.default(pupilRight, exp.elemSpecs.eyes[currentAgent].right.random);
-        _setCircleCenterDefault.default(irisRight, exp.elemSpecs.eyes[currentAgent].right.random);
+        _setCircleAttrDefault.default(pupilRight, exp.elemSpecs.eyes[currentAgent].right.random);
+        _setCircleAttrDefault.default(irisRight, exp.elemSpecs.eyes[currentAgent].right.random);
         console.log('animation famtrial complete');
-        resolve({
-          pupilLeft,
-          pupilRight
-        });
+        resolve();
       }
     }, '<');
   } else // for test trials, first hide balloon, then move to final position
   {
     timelineTest.// first: hide balloon
-    to(exp.targets[trialCount], {
+    fromTo(exp.targets[exp.trials.count], {
+      attr: {
+        viewBox: `${exp.elemSpecs.targets.viewBoxCenter}`
+      }
+    }, {
       delay: 1,
-      duration: `${exp.responseLog[trialCount].durationAnimationCenterHidden}`,
+      duration: `${exp.responseLog[exp.trials.count].durationAnimationCenterHidden}`,
       ease: 'none',
       attr: {
         viewBox: `${exp.elemSpecs.targets.viewBoxHidden}`
+      },
+      onInterrupt() {
+        console.log('interrupted in test target hide');
       }
     }).// let eyes follow balloon already
-    to([pupilLeft, irisLeft], {
-      duration: `${exp.responseLog[trialCount].durationAnimationCenterHidden}`,
+    fromTo([pupilLeft, irisLeft], {
+      attr: {
+        cx: `${exp.elemSpecs.eyes[currentAgent].left.center.x}`,
+        cy: `${exp.elemSpecs.eyes[currentAgent].left.center.y}`
+      }
+    }, {
+      duration: `${exp.responseLog[exp.trials.count].durationAnimationCenterHidden}`,
       ease: 'none',
       attr: {
         cx: `${exp.elemSpecs.eyes[currentAgent].left.beginning.x}`,
         cy: `${exp.elemSpecs.eyes[currentAgent].left.beginning.y}`
+      },
+      onInterrupt() {
+        console.log('interrupted in test eyes left hide');
       }
-    }, '<').to([pupilRight, irisRight], {
-      duration: `${exp.responseLog[trialCount].durationAnimationCenterHidden}`,
+    }, '<').fromTo([pupilRight, irisRight], {
+      attr: {
+        cx: `${exp.elemSpecs.eyes[currentAgent].right.center.x}`,
+        cy: `${exp.elemSpecs.eyes[currentAgent].right.center.y}`
+      }
+    }, {
+      duration: `${exp.responseLog[exp.trials.count].durationAnimationCenterHidden}`,
       ease: 'none',
       attr: {
         cx: `${exp.elemSpecs.eyes[currentAgent].right.beginning.x}`,
         cy: `${exp.elemSpecs.eyes[currentAgent].right.beginning.y}`
+      },
+      onInterrupt() {
+        console.log('interrupted in test eyes right hide');
       }
     }, '<');
     // then move balloon to final position
-    timelineTest.to(exp.targets[trialCount], {
-      duration: `${exp.responseLog[trialCount].durationAnimationHiddenRandom}`,
+    timelineTest.fromTo(exp.targets[exp.trials.count], {
+      attr: {
+        viewBox: `${exp.elemSpecs.targets.viewBoxHidden}`
+      }
+    }, {
+      duration: `${exp.responseLog[exp.trials.count].durationAnimationHiddenRandom}`,
       ease: 'none',
       attr: {
-        viewBox: `${exp.positions[trialCount].viewBoxRandom}`
+        viewBox: `${exp.positions[exp.trials.count].viewBoxRandom}`
+      },
+      onInterrupt() {
+        console.log('interrupted in test target final');
       },
       onComplete() {
-        _setTargetCenterDefault.default(exp.targets[trialCount], exp.positions[trialCount].viewBoxRandom);
+        _setViewBoxAttrDefault.default(exp.targets[exp.trials.count], exp.positions[exp.trials.count].viewBoxRandom);
       }
     }).// eye movement from hidden to target
-    to([pupilLeft, irisLeft], {
-      duration: `${exp.responseLog[trialCount].durationAnimationHiddenRandom}`,
+    fromTo([pupilLeft, irisLeft], {
+      attr: {
+        cx: `${exp.elemSpecs.eyes[currentAgent].left.beginning.x}`,
+        cy: `${exp.elemSpecs.eyes[currentAgent].left.beginning.y}`
+      }
+    }, {
+      duration: `${exp.responseLog[exp.trials.count].durationAnimationHiddenRandom}`,
       ease: 'none',
       attr: {
         cx: `${exp.elemSpecs.eyes[currentAgent].left.random.x}`,
         cy: `${exp.elemSpecs.eyes[currentAgent].left.random.y}`
       },
+      onInterrupt() {
+        console.log('interrupted in test eyes left final');
+      },
       onComplete() {
-        _setCircleCenterDefault.default(pupilLeft, exp.elemSpecs.eyes[currentAgent].left.random);
-        _setCircleCenterDefault.default(irisLeft, exp.elemSpecs.eyes[currentAgent].left.random);
+        _setCircleAttrDefault.default(pupilLeft, exp.elemSpecs.eyes[currentAgent].left.random);
+        _setCircleAttrDefault.default(irisLeft, exp.elemSpecs.eyes[currentAgent].left.random);
       }
-    }, '<').to([pupilRight, irisRight], {
-      duration: `${exp.responseLog[trialCount].durationAnimationHiddenRandom}`,
+    }, '<').fromTo([pupilRight, irisRight], {
+      attr: {
+        cx: `${exp.elemSpecs.eyes[currentAgent].right.beginning.x}`,
+        cy: `${exp.elemSpecs.eyes[currentAgent].right.beginning.y}`
+      }
+    }, {
+      duration: `${exp.responseLog[exp.trials.count].durationAnimationHiddenRandom}`,
       ease: 'none',
       attr: {
         cx: `${exp.elemSpecs.eyes[currentAgent].right.random.x}`,
         cy: `${exp.elemSpecs.eyes[currentAgent].right.random.y}`
       },
+      onInterrupt() {
+        console.log('interrupted in test eyes right final');
+      },
       onComplete() {
-        _setCircleCenterDefault.default(pupilRight, exp.elemSpecs.eyes[currentAgent].right.random);
-        _setCircleCenterDefault.default(irisRight, exp.elemSpecs.eyes[currentAgent].right.random);
-        // for PC version, hide hedge and show boxes
-        if (!exp.subjData.touchScreen) {
-          timelineTest.add(showBoxes, '+=0.2');
-        }
+        _setCircleAttrDefault.default(pupilRight, exp.elemSpecs.eyes[currentAgent].right.random);
+        _setCircleAttrDefault.default(irisRight, exp.elemSpecs.eyes[currentAgent].right.random);
       }
-    }, '<').then(() => {
-      console.log('animation testtrial complete');
-      resolve({
-        pupilLeft,
-        pupilRight
+    }, '<');
+    // for tablet version, no boxes and let hedge move down a bit
+    if (exp.subjData.touchScreen) {
+      boxes.setAttribute('visibility', 'hidden');
+      const hedgeDownY = hedge.getBBox().height - exp.targets[exp.trials.count].getBBox().height - 75;
+      const hedgeDown = `0 -${hedgeDownY} 1920 1080`;
+      timelineTest.fromTo(hedge, {
+        attr: {
+          viewBox: `${exp.elemSpecs.outerSVG.origViewBox}`
+        }
+      }, {
+        duration: 1,
+        ease: 'none',
+        attr: {
+          viewBox: `${hedgeDown}`
+        },
+        onInterrupt() {
+          console.log('interrupted in test hedge');
+        },
+        onComplete() {
+          _setViewBoxAttrDefault.default(hedge, hedgeDown);
+        }
+      }).then(() => {
+        console.log('animation testtrial complete');
+        resolve();
       });
-    });
+    } else if (!exp.subjData.touchScreen) {
+      const hedgeGone = `${exp.elemSpecs.outerSVG.origViewBoxX} -${exp.elemSpecs.outerSVG.origViewBoxHeight} ${exp.elemSpecs.outerSVG.origViewBoxWidth} ${exp.elemSpecs.outerSVG.origViewBoxHeight}`;
+      timelineTest.fromTo(hedge, {
+        attr: {
+          viewBox: `${exp.elemSpecs.outerSVG.origViewBox}`
+        }
+      }, {
+        duration: 1,
+        ease: 'none',
+        attr: {
+          viewBox: `${hedgeGone}`
+        },
+        onInterrupt() {
+          console.log('interrupted in test hedge');
+        },
+        onComplete() {
+          _setViewBoxAttrDefault.default(hedge, hedgeGone);
+        }
+      }).then(() => {
+        console.log('animation testtrial complete');
+        resolve();
+      });
+    }
   }
 });
 
-},{"gsap":"1iecp","./setCircleCenter":"3VeP8","./setTargetCenter":"51G9p","@parcel/transformer-js/lib/esmodule-helpers.js":"5gA8y"}],"5HbdV":[function(require,module,exports) {
+},{"gsap":"1iecp","@parcel/transformer-js/lib/esmodule-helpers.js":"5gA8y","./setCircleAttr":"66zxP","./setViewBoxAttr":"54wb7"}],"5HbdV":[function(require,module,exports) {
 var _parcelHelpers = require("@parcel/transformer-js/lib/esmodule-helpers.js");
 _parcelHelpers.defineInteropFlag(exports);
 exports.default = ms => new Promise(resolve => setTimeout(resolve, ms));
@@ -4498,11 +4653,11 @@ var _shuffleArray = require('./shuffleArray');
 var _shuffleArrayDefault = _parcelHelpers.interopDefault(_shuffleArray);
 var _randomNumber = require('./randomNumber');
 var _randomNumberDefault = _parcelHelpers.interopDefault(_randomNumber);
-exports.default = (famNr, testNr, agentsSingle, targetsSingle, elemSpecs, subjData) => {
+exports.default = (exp, agentsSingle, targetsSingle) => {
   // create array with entry for each fam and test trial
-  const trialType = [].concat(new Array(famNr).fill('fam'), new Array(testNr).fill('test'));
+  exp.trials.type = [].concat(new Array(exp.trials.famNr).fill('fam'), new Array(exp.trials.testNr).fill('test'));
   // calculate how many times each agent should be repeated, based on trialNumber
-  const agentsDiv = _divideWithRemainderDefault.default(trialType.length, agentsSingle.length);
+  const agentsDiv = _divideWithRemainderDefault.default(exp.trials.type.length, agentsSingle.length);
   let agents = [];
   agentsSingle.forEach(agent => {
     agents = agents.concat(new Array(agentsDiv.quotient).fill(agent));
@@ -4517,8 +4672,9 @@ exports.default = (famNr, testNr, agentsSingle, targetsSingle, elemSpecs, subjDa
     agentsTmp.splice(0, agentsTmp.length - agentsDiv.remainder);
     agents = agents.concat(agentsTmp);
   }
+  exp.agents = agents;
   // SAME FOR TARGET
-  const targetsDiv = _divideWithRemainderDefault.default(trialType.length, targetsSingle.length);
+  const targetsDiv = _divideWithRemainderDefault.default(exp.trials.type.length, targetsSingle.length);
   let targets = [];
   targetsSingle.forEach(target => {
     targets = targets.concat(new Array(targetsDiv.quotient).fill(target));
@@ -4529,28 +4685,28 @@ exports.default = (famNr, testNr, agentsSingle, targetsSingle, elemSpecs, subjDa
     targetsTmp.splice(0, targetsTmp.length - targetsDiv.remainder);
     targets = targets.concat(targetsTmp);
   }
+  exp.targets = targets;
   // FOR POSITIONS OF TARGET:
   // for fam trials and touchscreen with hedge:
   // ten equally big sections, where targets can land
-  // const elemSpecs.targets.viewBoxRandom = targets[0].getAttribute('viewBoxRandom');
   let positions = [];
   const positionsSingleContinuous = [];
   let prevMax = 0;
   for (let i = 1; i <= 10; i++) {
-    const randomLocation = _randomNumberDefault.default(prevMax, elemSpecs.targets.borderRight / 10 * i);
-    const viewBoxRandom = elemSpecs.targets.viewBoxRandom.replace('x', randomLocation);
+    const randomLocation = _randomNumberDefault.default(prevMax, exp.elemSpecs.targets.borderRight / 10 * i);
+    const viewBoxRandom = exp.elemSpecs.targets.viewBoxRandom.replace('x', randomLocation);
     const section = {
       bin: i,
       type: 'randomLocation',
       viewBoxRandom
     };
-    prevMax = elemSpecs.targets.borderRight / 10 * i;
+    prevMax = exp.elemSpecs.targets.borderRight / 10 * i;
     positionsSingleContinuous.push(section);
   }
   // for touchscreen with hedge, the target lands in random locations for all trials
-  if (subjData.touchScreen) {
+  if (exp.subjData.touchScreen) {
     // how many times can we repeat each section
-    const positionsDiv = _divideWithRemainderDefault.default(trialType.length, positionsSingleContinuous.length);
+    const positionsDiv = _divideWithRemainderDefault.default(exp.trials.type.length, positionsSingleContinuous.length);
     positionsSingleContinuous.forEach(section => {
       positions = positions.concat(new Array(positionsDiv.quotient).fill(section));
     });
@@ -4561,11 +4717,11 @@ exports.default = (famNr, testNr, agentsSingle, targetsSingle, elemSpecs, subjDa
       positionsTmp.splice(0, positionsTmp.length - positionsDiv.remainder);
       positions = positions.concat(positionsTmp);
     }
-  } else if (!subjData.touchScreen) {
-    // for fam trials, random location
+  } else if (!exp.subjData.touchScreen) {
+    // for fam trials, random location (same as tablet hedge version)
     // how many times can we repeat each section
     let positionsFam = [];
-    const positionsDivFam = _divideWithRemainderDefault.default(famNr, positionsSingleContinuous.length);
+    const positionsDivFam = _divideWithRemainderDefault.default(exp.trials.famNr, positionsSingleContinuous.length);
     positionsSingleContinuous.forEach(section => {
       positionsFam = positionsFam.concat(new Array(positionsDivFam.quotient).fill(section));
     });
@@ -4589,12 +4745,11 @@ exports.default = (famNr, testNr, agentsSingle, targetsSingle, elemSpecs, subjDa
         bin: i + 1,
         type: 'boxLocation',
         // add half a target width for placing upper left balloon corner in middle of box
-        // eslint-disable-next-line max-len
-        viewBoxRandom: elemSpecs.targets.viewBoxRandom.replace('x', box.getBBox().x + box.getBBox().width / 2 - targetsSingle[0].getBBox().width / 2)
+        viewBoxRandom: exp.elemSpecs.targets.viewBoxRandom.replace('x', box.getBBox().x + box.getBBox().width / 2 - targetsSingle[0].getBBox().width / 2)
       };
       positionsSingleBoxes.push(section);
     });
-    const positionsDivTest = _divideWithRemainderDefault.default(testNr, positionsSingleBoxes.length);
+    const positionsDivTest = _divideWithRemainderDefault.default(exp.trials.testNr, positionsSingleBoxes.length);
     let positionsTest = [];
     positionsSingleBoxes.forEach(section => {
       positionsTest = positionsTest.concat(new Array(positionsDivTest.quotient).fill(section));
@@ -4605,17 +4760,11 @@ exports.default = (famNr, testNr, agentsSingle, targetsSingle, elemSpecs, subjDa
       positionsTmp.splice(0, positionsTmp.length - positionsDivTest.remainder);
       positionsTest = positionsTest.concat(positionsTmp);
     }
+    // combine fam and test trial positions
     positions = positionsFam.concat(positionsTest);
   }
-  return {
-    trialType,
-    agents,
-    targets,
-    positions,
-    elemSpecs,
-    subjData,
-    responseLog: []
-  };
+  exp.positions = positions;
+  exp.responseLog = [];
 };
 
 },{"./divideWithRemainder":"6eGxl","./shuffleArray":"3hJZf","./randomNumber":"3hzGE","@parcel/transformer-js/lib/esmodule-helpers.js":"5gA8y"}],"6eGxl":[function(require,module,exports) {

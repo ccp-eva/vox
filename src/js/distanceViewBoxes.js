@@ -1,3 +1,6 @@
+// ---------------------------------------------------------------------------------------------------------------------
+// FUNCTION FOR CALCULATING DISTANCE BETWEEN TWO VIEWBOXES
+// ---------------------------------------------------------------------------------------------------------------------
 export default (viewBox1, viewBox2) => {
   const x1 = parseFloat(viewBox1.split(' ')[0]);
   const y1 = parseFloat(viewBox1.split(' ')[1]);

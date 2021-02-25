@@ -17,7 +17,7 @@
     - add id="outer-svg" viewBox="0 0 1920 1080" to outermost svg tag
     - next line, add: <style> svg { cursor: pointer;} </style>
     - for target balloons, add separate <svg id="balloon-green" viewBox="0 0 1920 1080"> tag and delete id in g
-    - for hedge: <g id="hedge" pointer-events="all">, so that you can also click on it when it's hidden
+    - for hedge: <svg id="hedge" viewBox="0 0 1920 1080" pointer-events="all">, so that you can also click on it when it's hidden and we can animate it
     --> 
 
     <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" id="outer-svg" viewBox="0 0 1920 1080">
@@ -393,7 +393,8 @@
                 <rect x="52.89" y="799.38" width="307.23" height="9.23" fill="#926e43"/>
               </g>
             </g>
-            <g id="hedge" pointer-events="all">
+            <svg id="hedge" viewBox="0 0 1920 1080" pointer-events="all">
+              <g>
               <rect id="hedgeback" x="0.53" y="579" width="1921.84" height="505.23" stroke="#4788c9" stroke-width="1.07" fill="url(#linear-gradient-34)"/>
               <g id="hedgeleaves">
                 <g id="Ebene_1-2" data-name="Ebene 1">
@@ -2343,6 +2344,8 @@
                 </g>
               </g>
             </g>
+          </svg>
+
             <rect id="cover-blurr" x="0.53" width="1923.2" height="1084.22" fill="#f4fdff" opacity="0.9"/>
             <g id="experiment-button">
               <rect id="experiment-button-shape" x="763.29" y="412.42" width="400.9" height="125.28" rx="12" fill="#00becc"/>

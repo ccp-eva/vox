@@ -17,8 +17,8 @@
     - add id="outer-svg" viewBox="0 0 1920 1080" to outermost svg tag
     - next line, add: <style> svg { cursor: pointer;} </style>
     - for target balloons, add separate <svg id="balloon-green" viewBox="0 0 1920 1080"> tag and delete id in g
-    - for hedge: <g id="hedge" pointer-events="all">, so that you can also click on it when it's hidden
-    -->
+    - for hedge: <svg id="hedge" viewBox="0 0 1920 1080" pointer-events="all">, so that you can also click on it when it's hidden and we can animate it
+    --> 
 
     <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" id="outer-svg" viewbox="0 0 1920 1080">
       <style>svg { cursor: pointer;}
@@ -97,7 +97,7 @@
           <stop offset="0.38" stop-color="#173505" stop-opacity="0.94"></stop>
           <stop offset="0.85" stop-color="#0a1e01"></stop>
         </linearGradient>
-        <radialGradient id="radial-gradient" cx="-192.02" cy="2215.07" r="161.43" gradienttransform="matrix(0.76, 0, 0, -0.76, 260.85, 1829.33)" gradientunits="userSpaceOnUse">
+        <radialGradient id="radial-gradient" cx="-231.61" cy="2261.62" r="116.9" gradienttransform="matrix(0.76, 0, 0, -0.76, 260.85, 1829.33)" gradientunits="userSpaceOnUse">
           <stop offset="0" stop-color="#fff"></stop>
           <stop offset="0.1" stop-color="#f3f7f5"></stop>
           <stop offset="0.28" stop-color="#d4e3db"></stop>
@@ -105,7 +105,7 @@
           <stop offset="0.8" stop-color="#5d9676"></stop>
           <stop offset="1" stop-color="#29754b"></stop>
         </radialGradient>
-        <radialGradient id="radial-gradient-2" cx="114.01" cy="2030.53" r="122.91" gradienttransform="matrix(1, 0, 0, -1, 0, 2166.12)" gradientunits="userSpaceOnUse">
+        <radialGradient id="radial-gradient-2" cx="83.74" cy="2066.18" r="89.39" gradienttransform="matrix(1, 0, 0, -1, 0, 2166.12)" gradientunits="userSpaceOnUse">
           <stop offset="0" stop-color="#fff"></stop>
           <stop offset="0.12" stop-color="#fffef3"></stop>
           <stop offset="0.33" stop-color="#fefcd4"></stop>
@@ -113,7 +113,7 @@
           <stop offset="0.93" stop-color="#f9f55d"></stop>
           <stop offset="1" stop-color="#f9f44e"></stop>
         </radialGradient>
-        <radialGradient id="radial-gradient-3" cx="-196.6" cy="2218.79" r="161.52" gradienttransform="matrix(0.76, 0, 0, -0.76, 264.69, 1824.81)" gradientunits="userSpaceOnUse">
+        <radialGradient id="radial-gradient-3" cx="-237.68" cy="2265.61" r="117.41" gradienttransform="matrix(0.76, 0, 0, -0.76, 264.69, 1824.81)" gradientunits="userSpaceOnUse">
           <stop offset="0" stop-color="#fff"></stop>
           <stop offset="0.11" stop-color="#fff3f4"></stop>
           <stop offset="0.31" stop-color="#fed4d8"></stop>
@@ -121,7 +121,7 @@
           <stop offset="0.88" stop-color="#fa5d6c"></stop>
           <stop offset="1" stop-color="#f94153"></stop>
         </radialGradient>
-        <radialGradient id="radial-gradient-4" cx="114.01" cy="2030.53" r="122.91" gradienttransform="matrix(1, 0, 0, -1, 0, 2166.12)" gradientunits="userSpaceOnUse">
+        <radialGradient id="radial-gradient-4" cx="83.74" cy="2066.18" r="89.39" gradienttransform="matrix(1, 0, 0, -1, 0, 2166.12)" gradientunits="userSpaceOnUse">
           <stop offset="0" stop-color="#fff"></stop>
           <stop offset="0.1" stop-color="#f3fafd"></stop>
           <stop offset="0.28" stop-color="#d4eef9"></stop>
@@ -367,41 +367,41 @@
             
             <svg id="balloon-green" viewbox="0 0 1920 1080">
               <g>
-                <path d="M109.18,267.53c-.14.76,1.31,1,2.12,2.56s-.08,4.25-2,9.34c-2.26,6.09-3.29,9-4.34,9.39-.67.26-1.21-.13-1.66.26s-.42,1.56-.09,2.28.81,1.18,2.73,2a19.28,19.28,0,0,0,4.26,1.25,20.93,20.93,0,0,0,7.77-.06,18.59,18.59,0,0,0,5.7-2.42A2.42,2.42,0,0,0,125,290.8a2.14,2.14,0,0,0-1.06-2.42,1.92,1.92,0,0,0-1-.05c-1.66,0-2.94-4.68-4.49-8.88-2-5.44-3.26-6.71-2.52-9,.68-2.06,2.3-2.66,2-3.51C117.12,265.07,109.51,265.82,109.18,267.53Z" fill="#29754b"></path>
-                <path d="M4.44,133.54C3.1,119.1-.86,75.16,30.82,38.72,35.53,33.31,65.33.17,114.21.37c47.12.19,76.14,31.23,81.48,37.2,33.94,37.82,29.09,84.66,27.81,96.62-3.51,33.13-18.65,55.38-29.45,71.27-18,26.4-44.57,65.53-81.72,65.25-36.91-.29-62.88-39.3-79.47-64.23C22.87,191.46,7.6,167.92,4.44,133.54Z" fill="url(#radial-gradient)"></path>
-                <path d="M64.66,219.61c-2,1.4-16.52-12.26-27.07-30.86-11.35-20-14-38.5-15.9-53C20,122.64,17.6,103.5,23.75,81.51A85.86,85.86,0,0,1,34.41,57.62c6-9.17,14.76-18.71,16.61-17.52.27.17.94.91-2.37,9.89-5.2,14.11-10.19,21.36-14.1,34.17-3,9.93-1.9,11.74-1.09,12.32,3,2.17,10.42-6,13.4-4,3.22,2.1-1.89,13.81-4.51,23.31-6.36,23-1,43.43,3,59.08C52.69,202.94,66.72,218.17,64.66,219.61Z" fill="#fff" opacity="0.5" style="isolation: isolate
+                <path d="M80.24,195.52c-.1.55,1,.69,1.54,1.86s-.06,3.08-1.43,6.76c-1.63,4.41-2.38,6.5-3.15,6.8-.48.19-.87-.09-1.2.19s-.3,1.13-.06,1.65.58.86,2,1.45a14.35,14.35,0,0,0,3.08.91,15.23,15.23,0,0,0,5.63,0,13.6,13.6,0,0,0,4.13-1.75,1.77,1.77,0,0,0,.92-1,1.54,1.54,0,0,0-.77-1.75,1.25,1.25,0,0,0-.69,0c-1.2,0-2.12-3.39-3.24-6.43-1.45-3.94-2.36-4.86-1.83-6.5.49-1.49,1.67-1.93,1.41-2.54C86,193.74,80.48,194.29,80.24,195.52Z" fill="#29754b"></path>
+                <path d="M4.39,98.5C3.43,88,.56,56.23,23.5,29.84c3.4-3.93,25-27.92,60.38-27.78C118,2.2,139,24.68,142.89,29,167.46,56.39,164,90.31,163,99c-2.55,24-13.51,40.1-21.33,51.61-13,19.11-32.28,47.45-59.18,47.25C55.79,197.62,37,169.37,25,151.31,17.74,140.44,6.68,123.39,4.39,98.5Z" fill="url(#radial-gradient)"></path>
+                <path d="M48,160.82c-1.44,1-12-8.88-19.6-22.34C20.18,124,18.28,110.6,16.88,100.07c-1.25-9.47-2.95-23.32,1.5-39.25a62.06,62.06,0,0,1,7.71-17.3c4.32-6.64,10.69-13.54,12-12.69.19.13.67.66-1.72,7.16C32.64,48.22,29,53.46,26.2,62.74c-2.19,7.19-1.38,8.5-.79,8.92,2.17,1.57,7.54-4.31,9.7-2.9,2.33,1.52-1.36,10-3.26,16.88-4.61,16.66-.75,31.45,2.21,42.79C39.33,148.75,49.49,159.78,48,160.82Z" fill="#fff" opacity="0.5" style="isolation: isolate
 "></path>
               </g>
             </svg>
 
             <svg id="balloon-yellow" viewbox="0 0 1920 1080">
               <g>
-                <path d="M109.2,267c-.14.76,1.3.95,2.11,2.56s-.08,4.23-2,9.29c-2.25,6.06-3.27,8.94-4.32,9.35-.67.26-1.2-.12-1.65.26s-.42,1.55-.1,2.27.81,1.18,2.73,2a19,19,0,0,0,4.23,1.25,21,21,0,0,0,7.74-.06,18.4,18.4,0,0,0,5.68-2.42,2.41,2.41,0,0,0,1.28-1.31,2.14,2.14,0,0,0-1.07-2.41,1.77,1.77,0,0,0-.94,0c-1.66,0-2.92-4.67-4.47-8.85-2-5.41-3.24-6.68-2.5-8.93.67-2.05,2.28-2.65,1.93-3.5C117.11,264.56,109.53,265.32,109.2,267Z" fill="#f9f44e"></path>
-                <path d="M4.91,133.6C3.58,119.23-.36,75.48,31.18,39.19,35.86,33.8,65.54.8,114.21,1c46.92.19,75.81,31.1,81.13,37,33.79,37.66,29,84.3,27.69,96.21-3.49,33-18.57,55.14-29.33,71-17.88,26.28-44.37,65.25-81.36,65-36.75-.28-62.61-39.13-79.13-64C23.26,191.27,8.06,167.83,4.91,133.6Z" fill="url(#radial-gradient-2)"></path>
-                <path d="M64.87,219.3c-2,1.4-16.45-12.21-26.95-30.72C26.62,168.65,24,150.24,22.08,135.76c-1.72-13-4.06-32.07,2.06-54A85.49,85.49,0,0,1,34.75,58c5.93-9.13,14.7-18.63,16.54-17.45.27.17.93.91-2.36,9.85-5.18,14-10.14,21.26-14,34-3,9.89-1.9,11.69-1.09,12.27,3,2.16,10.37-5.92,13.34-4,3.21,2.09-1.88,13.76-4.49,23.22-6.33,22.9-1,43.24,3,58.82C53,202.7,66.92,217.86,64.87,219.3Z" fill="#fff" opacity="0.5" style="isolation: isolate
+                <path d="M80.24,195.52c-.1.55,1,.69,1.54,1.86s-.06,3.08-1.43,6.76c-1.63,4.41-2.38,6.5-3.15,6.8-.48.19-.87-.09-1.2.19s-.3,1.13-.06,1.65.58.86,2,1.45a14.35,14.35,0,0,0,3.08.91,15.23,15.23,0,0,0,5.63,0,13.6,13.6,0,0,0,4.13-1.75,1.77,1.77,0,0,0,.92-1,1.54,1.54,0,0,0-.77-1.75,1.25,1.25,0,0,0-.69,0c-1.2,0-2.12-3.39-3.24-6.43-1.45-3.94-2.36-4.86-1.83-6.5.49-1.49,1.67-1.93,1.41-2.54C86,193.74,80.48,194.29,80.24,195.52Z" fill="#f9f44e"></path>
+                <path d="M4.39,98.5C3.43,88,.56,56.23,23.5,29.84c3.4-3.93,25-27.92,60.38-27.78C118,2.2,139,24.68,142.89,29,167.46,56.39,164,90.31,163,99c-2.55,24-13.51,40.1-21.33,51.61-13,19.11-32.28,47.45-59.18,47.25C55.79,197.62,37,169.37,25,151.31,17.74,140.44,6.68,123.39,4.39,98.5Z" fill="url(#radial-gradient-2)"></path>
+                <path d="M48,160.82c-1.44,1-12-8.88-19.6-22.34C20.18,124,18.28,110.6,16.88,100.07c-1.25-9.47-2.95-23.32,1.5-39.25a62.06,62.06,0,0,1,7.71-17.3c4.32-6.64,10.69-13.54,12-12.69.19.13.67.66-1.72,7.16C32.64,48.22,29,53.46,26.2,62.74c-2.19,7.19-1.38,8.5-.79,8.92,2.17,1.57,7.54-4.31,9.7-2.9,2.33,1.52-1.36,10-3.26,16.88-4.61,16.66-.75,31.45,2.21,42.79C39.33,148.75,49.49,159.78,48,160.82Z" fill="#fff" opacity="0.5" style="isolation: isolate
 "></path>
               </g>
             </svg>
 
             <svg id="balloon-red" viewbox="0 0 1920 1080">
               <g>
-                <path d="M110.2,267.06c-.14.76,1.3.95,2.11,2.56s-.08,4.23-2,9.3c-2.25,6.06-3.28,8.94-4.33,9.35-.66.27-1.2-.12-1.65.26s-.42,1.55-.09,2.28.8,1.17,2.72,2a19.11,19.11,0,0,0,4.24,1.25A20.77,20.77,0,0,0,119,294a18.35,18.35,0,0,0,5.68-2.41,2.4,2.4,0,0,0,1.28-1.32,2.14,2.14,0,0,0-1.06-2.41,1.8,1.8,0,0,0-.95,0c-1.65,0-2.92-4.67-4.47-8.85-2-5.42-3.24-6.69-2.5-8.93.67-2.06,2.28-2.66,1.93-3.5C118.11,264.61,110.52,265.37,110.2,267.06Z" fill="#f94153"></path>
-                <path d="M5.86,133.6C4.53,119.22.59,75.44,32.14,39.15,36.83,33.75,66.52.74,115.21.94c46.94.19,75.84,31.11,81.17,37.05,33.8,37.68,29,84.34,27.7,96.25-3.5,33-18.58,55.16-29.34,71-17.9,26.3-44.4,65.28-81.4,65-36.77-.28-62.64-39.14-79.17-64C24.23,191.29,9,167.84,5.86,133.6Z" fill="url(#radial-gradient-3)"></path>
-                <path d="M65.85,219.33c-2,1.4-16.46-12.22-27-30.73C27.58,168.66,25,150.24,23,135.76c-1.72-13-4.06-32.09,2.06-54A85.22,85.22,0,0,1,35.72,58c5.93-9.13,14.7-18.63,16.55-17.45.26.17.93.9-2.37,9.84-5.18,14.07-10.15,21.28-14,34.05-3,9.89-1.9,11.69-1.09,12.27,3,2.16,10.38-5.93,13.35-4,3.21,2.09-1.88,13.76-4.49,23.22-6.34,22.91-1,43.27,3,58.85C53.93,202.72,67.9,217.89,65.85,219.33Z" fill="#fff" opacity="0.5" style="isolation: isolate
-"></path>
-              </g>
-            </svg>
-          
-            <svg id="balloon-blue" viewbox="0 0 1920 1080">
-              <g>
-                <path d="M109.2,267c-.14.76,1.3.95,2.11,2.56s-.08,4.23-2,9.29c-2.25,6.06-3.27,8.94-4.32,9.35-.67.26-1.2-.12-1.65.26s-.42,1.55-.1,2.27.81,1.18,2.73,2a19,19,0,0,0,4.23,1.25,21,21,0,0,0,7.74-.06,18.4,18.4,0,0,0,5.68-2.42,2.41,2.41,0,0,0,1.28-1.31,2.14,2.14,0,0,0-1.07-2.41,1.77,1.77,0,0,0-.94,0c-1.66,0-2.92-4.67-4.47-8.85-2-5.41-3.24-6.68-2.5-8.93.67-2.05,2.28-2.65,1.93-3.5C117.11,264.56,109.53,265.32,109.2,267Z" fill="#29abe2"></path>
-                <path d="M4.91,133.6C3.58,119.23-.36,75.48,31.18,39.19,35.86,33.8,65.54.8,114.21,1c46.92.19,75.81,31.1,81.13,37,33.79,37.66,29,84.3,27.69,96.21-3.49,33-18.57,55.14-29.33,71-17.88,26.28-44.37,65.25-81.36,65-36.75-.28-62.61-39.13-79.13-64C23.26,191.27,8.06,167.83,4.91,133.6Z" fill="url(#radial-gradient-4)"></path>
-                <path d="M64.87,219.3c-2,1.4-16.45-12.21-26.95-30.72C26.62,168.65,24,150.24,22.08,135.76c-1.72-13-4.06-32.07,2.06-54A85.49,85.49,0,0,1,34.75,58c5.93-9.13,14.7-18.63,16.54-17.45.27.17.93.91-2.36,9.85-5.18,14-10.14,21.26-14,34-3,9.89-1.9,11.69-1.09,12.27,3,2.16,10.37-5.92,13.34-4,3.21,2.09-1.88,13.76-4.49,23.22-6.33,22.9-1,43.24,3,58.82C53,202.7,66.92,217.86,64.87,219.3Z" fill="#fff" opacity="0.5" style="isolation: isolate
+                <path d="M80.24,195.52c-.1.55,1,.69,1.54,1.86s-.06,3.08-1.43,6.76c-1.63,4.41-2.38,6.5-3.15,6.8-.48.19-.87-.09-1.2.19s-.3,1.13-.06,1.65.58.86,2,1.45a14.35,14.35,0,0,0,3.08.91,15.23,15.23,0,0,0,5.63,0,13.6,13.6,0,0,0,4.13-1.75,1.77,1.77,0,0,0,.92-1,1.54,1.54,0,0,0-.77-1.75,1.25,1.25,0,0,0-.69,0c-1.2,0-2.12-3.39-3.24-6.43-1.45-3.94-2.36-4.86-1.83-6.5.49-1.49,1.67-1.93,1.41-2.54C86,193.74,80.48,194.29,80.24,195.52Z" fill="#f94153"></path>
+                <path d="M4.39,98.5C3.43,88,.56,56.23,23.5,29.84c3.4-3.93,25-27.92,60.38-27.78C118,2.2,139,24.68,142.89,29,167.46,56.39,164,90.31,163,99c-2.55,24-13.51,40.1-21.33,51.61-13,19.11-32.28,47.45-59.18,47.25C55.79,197.62,37,169.37,25,151.31,17.74,140.44,6.68,123.39,4.39,98.5Z" fill="url(#radial-gradient-3)"></path>
+                <path d="M48,160.82c-1.44,1-12-8.88-19.6-22.34C20.18,124,18.28,110.6,16.88,100.07c-1.25-9.47-2.95-23.32,1.5-39.25a62.06,62.06,0,0,1,7.71-17.3c4.32-6.64,10.69-13.54,12-12.69.19.13.67.66-1.72,7.16C32.64,48.22,29,53.46,26.2,62.74c-2.19,7.19-1.38,8.5-.79,8.92,2.17,1.57,7.54-4.31,9.7-2.9,2.33,1.52-1.36,10-3.26,16.88-4.61,16.66-.75,31.45,2.21,42.79C39.33,148.75,49.49,159.78,48,160.82Z" fill="#fff" opacity="0.5" style="isolation: isolate
 "></path>
               </g>
             </svg>
 
-            <g id="five-boxes" pointer-events="all">
+            <svg id="balloon-blue" viewbox="0 0 1920 1080">
+              <g>
+                <path d="M80.24,195.52c-.1.55,1,.69,1.54,1.86s-.06,3.08-1.43,6.76c-1.63,4.41-2.38,6.5-3.15,6.8-.48.19-.87-.09-1.2.19s-.3,1.13-.06,1.65.58.86,2,1.45a14.35,14.35,0,0,0,3.08.91,15.23,15.23,0,0,0,5.63,0,13.6,13.6,0,0,0,4.13-1.75,1.77,1.77,0,0,0,.92-1,1.54,1.54,0,0,0-.77-1.75,1.25,1.25,0,0,0-.69,0c-1.2,0-2.12-3.39-3.24-6.43-1.45-3.94-2.36-4.86-1.83-6.5.49-1.49,1.67-1.93,1.41-2.54C86,193.74,80.48,194.29,80.24,195.52Z" fill="#29abe2"></path>
+                <path d="M4.39,98.5C3.43,88,.56,56.23,23.5,29.84c3.4-3.93,25-27.92,60.38-27.78C118,2.2,139,24.68,142.89,29,167.46,56.39,164,90.31,163,99c-2.55,24-13.51,40.1-21.33,51.61-13,19.11-32.28,47.45-59.18,47.25C55.79,197.62,37,169.37,25,151.31,17.74,140.44,6.68,123.39,4.39,98.5Z" fill="url(#radial-gradient-4)"></path>
+                <path d="M48,160.82c-1.44,1-12-8.88-19.6-22.34C20.18,124,18.28,110.6,16.88,100.07c-1.25-9.47-2.95-23.32,1.5-39.25a62.06,62.06,0,0,1,7.71-17.3c4.32-6.64,10.69-13.54,12-12.69.19.13.67.66-1.72,7.16C32.64,48.22,29,53.46,26.2,62.74c-2.19,7.19-1.38,8.5-.79,8.92,2.17,1.57,7.54-4.31,9.7-2.9,2.33,1.52-1.36,10-3.26,16.88-4.61,16.66-.75,31.45,2.21,42.79C39.33,148.75,49.49,159.78,48,160.82Z" fill="#fff" opacity="0.5" style="isolation: isolate
+"></path>
+              </g>
+            </svg>
+
+            <g id="five-boxes">
               <g id="box5">
                 <path d="M1586.06,1059.91c-9.47,0-17.22-9.4-17.22-20.89V799.38h307.23V1039c0,11.54-7.71,20.89-17.23,20.89Z" fill="#a98258"></path>
                 <path d="M1754.2,865.15h-63.5a10.5,10.5,0,1,1,0-21h63.5a10.5,10.5,0,1,1,0,21Z" fill="#5b4631"></path>
@@ -438,7 +438,8 @@
                 <rect x="52.89" y="799.38" width="307.23" height="9.23" fill="#926e43"></rect>
               </g>
             </g>
-            <g id="hedge" pointer-events="all">
+            <svg id="hedge" viewbox="0 0 1920 1080" pointer-events="all">
+              <g>
               <rect id="hedgeback" x="0.53" y="579" width="1921.84" height="505.23" stroke="#4788c9" stroke-width="1.07" fill="url(#linear-gradient-34)"></rect>
               <g id="hedgeleaves">
                 <g id="Ebene_1-2" data-name="Ebene 1">
@@ -2388,41 +2389,43 @@
                 </g>
               </g>
             </g>
+          </svg>
+
             <rect id="cover-blurr" x="0.53" width="1923.2" height="1084.22" fill="#f4fdff" opacity="0.9"></rect>
             <g id="experiment-button">
               <rect id="experiment-button-shape" x="763.29" y="412.42" width="400.9" height="125.28" rx="12" fill="#00becc"></rect>
-              <text id="experiment-button-text" transform="translate(791.67 498.35) scale(0.98 1)" font-size="72" fill="#fff" font-family="ArialRoundedMTBold, Arial Rounded MT Bold" style="isolation: isolate
+              <text id="experiment-button-text" transform="translate(795.9 498.35) scale(0.98 1)" font-size="72" fill="#fff" font-family="OpenSans-Semibold, Open Sans" font-weight="600" style="isolation: isolate
 ">los geht’s!</text>
             </g>
             <ellipse id="click-bubble" cx="959.33" cy="470.25" rx="34.61" ry="37.12" fill="#fbb03b"></ellipse>
           </g>
           <g id="goodbye">
-            <text id="goodbye-text" transform="translate(404.29 513.82) scale(0.99 1)" font-size="42.4" font-family="ArialRoundedMTBold, Arial Rounded MT Bold"><tspan xml:space="preserve">Die Tiere sind schon ganz müde und glücklich vom Spielen!  </tspan><tspan x="0" y="50.88">Vielen Dank für deine Hilfe! </tspan><tspan x="0" y="152.64">Bis zum nächsten Mal! </tspan><tspan x="0" y="254.4">Liebe Grüße vom Schwein, Affen und Schaf </tspan></text>
-            <text id="goodbye-heading" transform="translate(770.09 262.71) scale(0.98 1)" font-size="74.7" font-family="ArialRoundedMTBold, Arial Rounded MT Bold" style="isolation: isolate
-">Geschafft! <tspan x="-308.61" y="89.64">Das hast du super gemacht!</tspan></text>
+            <text id="goodbye-text" transform="translate(396.75 513.82) scale(0.99 1)" font-size="42.4" font-family="OpenSans-Light, Open Sans" font-weight="300"><tspan xml:space="preserve">Die Tiere sind schon ganz müde und glücklich vom Spielen!  </tspan><tspan x="0" y="50.88">Vielen Dank für deine Hilfe! </tspan><tspan x="0" y="152.64">Bis zum nächsten Mal! </tspan><tspan x="0" y="254.4">Liebe Grüße vom Schwein, Affen und Schaf </tspan></text>
+            <text id="goodbye-heading" transform="translate(782.4 262.71) scale(0.98 1)" font-size="74.7" font-family="OpenSans, Open Sans" style="isolation: isolate
+">Geschafft! <tspan x="-300.13" y="89.64">Das hast du super gemacht!</tspan></text>
             <g id="goodbye-button">
               <rect id="goodbye-button-shape" x="800.49" y="876.72" width="326.5" height="102.03" rx="12" fill="#00becc"></rect>
-              <text id="goodbye-button-text" transform="translate(846.61 948.7) scale(0.98 1)" font-size="58.64" fill="#fff" font-family="ArialRoundedMTBold, Arial Rounded MT Bold" style="isolation: isolate
+              <text id="goodbye-button-text" transform="translate(851.73 948.7) scale(0.98 1)" font-size="58.64" fill="#fff" font-family="OpenSans-Semibold, Open Sans" font-weight="600" style="isolation: isolate
 ">tschüss!</text>
             </g>
           </g>
           <g id="transition">
-            <text id="transition-text" transform="translate(391.75 351.91) scale(0.99 1)" font-size="42.4" font-family="ArialRoundedMTBold, Arial Rounded MT Bold">Nun spielen die Tiere in einem anderen Haus. <tspan x="0" y="50.88">Deine Aufgabe ist es wieder, den Tieren ihren Ballon zu geben.</tspan><tspan x="0" y="101.76"> </tspan><tspan x="0" y="152.64">Um den Tieren ihren Ballon zurückzugeben, klickst du einfach </tspan><tspan x="0" y="203.52">auf die Stelle, an dem du glaubst, dass der Ballon liegt.</tspan><tspan x="0" y="254.4"> </tspan><tspan x="0" y="305.28">Bitte schalte deinen Ton an. </tspan><tspan x="0" y="356.16">Klicke “Los geht’s”, um das Spiel zu starten.</tspan><tspan x="0" y="407.04" xml:space="preserve">Viel Spaß!  </tspan></text>
-            <text id="transition-heading" transform="translate(545.1 214.91) scale(0.98 1)" font-size="74.7" font-family="ArialRoundedMTBold, Arial Rounded MT Bold" style="isolation: isolate
+            <text id="transition-text" transform="translate(374.46 351.91) scale(0.99 1)" font-size="42.4" font-family="OpenSans-Light, Open Sans" font-weight="300">Nun spielen die Tiere in einem anderen Haus. <tspan x="0" y="50.88">Deine Aufgabe ist es wieder, den Tieren ihren Ballon zu geben.</tspan><tspan x="0" y="101.76"> </tspan><tspan x="0" y="152.64">Um den Tieren ihren Ballon zurückzugeben, klickst du einfach </tspan><tspan x="0" y="203.52">auf die Stelle, an dem du glaubst, dass der Ballon liegt.</tspan><tspan x="0" y="254.4"> </tspan><tspan x="0" y="305.28">Bitte schalte deinen Ton an. </tspan><tspan x="0" y="356.16">Klicke “Los geht’s”, um das Spiel zu starten.</tspan><tspan x="0" y="407.04" xml:space="preserve">Viel Spaß!  </tspan></text>
+            <text id="transition-heading" transform="translate(583.88 214.91) scale(0.98 1)" font-size="74.7" font-family="OpenSans, Open Sans" style="isolation: isolate
 ">Super! Das war klasse!</text>
             <g id="transition-button">
               <rect id="transition-button-shape" x="800.49" y="865.8" width="326.5" height="102.03" rx="12" fill="#00becc"></rect>
-              <text id="transition-button-text" transform="translate(823.61 935.79) scale(0.98 1)" font-size="58.64" fill="#fff" font-family="ArialRoundedMTBold, Arial Rounded MT Bold" style="isolation: isolate
+              <text id="transition-button-text" transform="translate(827.05 935.79) scale(0.98 1)" font-size="58.64" fill="#fff" font-family="OpenSans-Semibold, Open Sans" font-weight="600" style="isolation: isolate
 ">los geht’s!</text>
             </g>
           </g>
           <g id="instructions">
-            <text id="instructions-text" transform="translate(393.38 322.55) scale(0.99 1)" font-size="42.4" font-family="ArialRoundedMTBold, Arial Rounded MT Bold">In diesem Spiel kannst du ein paar Tieren helfen, <tspan x="0" y="50.88">ihnen ihren Luftballoon zurückzugeben.</tspan><tspan x="0" y="101.76"> </tspan><tspan x="0" y="152.64">Um den Tieren ihren Ballon zurückzugeben, klickst du einfach </tspan><tspan x="0" y="203.52">die Stelle an, auf dem der Ballon liegt.</tspan><tspan x="0" y="254.4"> </tspan><tspan x="0" y="305.28">Bitte schalte deinen Ton an.</tspan><tspan x="0" y="356.16"> </tspan><tspan x="0" y="407.04">Klicke “Los geht’s”, um mit ein paar Übungen anzufangen.</tspan><tspan x="0" y="457.91" xml:space="preserve">Viel Spaß!  </tspan></text>
-            <text id="instructions-heading" transform="translate(526.02 188.25) scale(0.98 1)" font-size="74.7" font-family="ArialRoundedMTBold, Arial Rounded MT Bold" style="isolation: isolate
+            <text id="instructions-text" transform="translate(377.53 322.55) scale(0.99 1)" font-size="42.4" font-family="OpenSans-Light, Open Sans" font-weight="300">In diesem Spiel kannst du ein paar Tieren helfen, <tspan x="0" y="50.88">ihnen ihren Luftballoon zurückzugeben.</tspan><tspan x="0" y="101.76"> </tspan><tspan x="0" y="152.64">Um den Tieren ihren Ballon zurückzugeben, klickst du einfach </tspan><tspan x="0" y="203.52">die Stelle an, auf dem der Ballon liegt.</tspan><tspan x="0" y="254.4"> </tspan><tspan x="0" y="305.28">Bitte schalte deinen Ton an.</tspan><tspan x="0" y="356.16"> </tspan><tspan x="0" y="407.04">Klicke “Los geht’s”, um mit ein paar Übungen anzufangen.</tspan><tspan x="0" y="457.91" xml:space="preserve">Viel Spaß!  </tspan></text>
+            <text id="instructions-heading" transform="translate(550.71 188.25) scale(0.98 1)" font-size="74.7" font-family="OpenSans, Open Sans" style="isolation: isolate
 ">Herzlichen Willkommen!</text>
             <g id="instructions-button">
               <rect id="instructions-button-shape" x="800.49" y="887.28" width="326.5" height="102.03" rx="12" fill="#00becc"></rect>
-              <text id="instructions-button-text" transform="translate(823.61 957.27) scale(0.98 1)" font-size="58.64" fill="#fff" font-family="ArialRoundedMTBold, Arial Rounded MT Bold" style="isolation: isolate
+              <text id="instructions-button-text" transform="translate(827.61 957.27) scale(0.98 1)" font-size="58.64" fill="#fff" font-family="OpenSans-Semibold, Open Sans" font-weight="600" style="isolation: isolate
 ">los geht’s!</text>
             </g>
           </g>
