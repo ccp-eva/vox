@@ -5,11 +5,7 @@ import setViewBoxAttr from './setViewBoxAttr';
 // ---------------------------------------------------------------------------------------------------------------------
 // FUNCTION FOR ANIMATING BALLOON, EYES, HEDGE
 // ---------------------------------------------------------------------------------------------------------------------
-export default (exp) => new Promise((resolve) => {
-  // hide blurr canvas and button
-  document.getElementById('experiment-button').setAttribute('visibility', 'hidden');
-  document.getElementById('cover-blurr').setAttribute('visibility', 'hidden');
-
+export default (exp) => {
   // get relevant elements
   const pupilLeft = document.getElementById('monkey-pupil-left');
   const pupilRight = document.getElementById('monkey-pupil-right');
@@ -124,11 +120,11 @@ export default (exp) => new Promise((resolve) => {
     onComplete() {
       setCircleAttr(pupilRight, exp.elemSpecs.eyes.right.random);
       setCircleAttr(irisRight, exp.elemSpecs.eyes.right.random);
-      resolve();
     },
   }, '<');
 
   // add timelines together
   mainTimeline.add([timelineHide, timelineFinal]);
   mainTimeline.play();
-});
+  return (mainTimeline);
+};
