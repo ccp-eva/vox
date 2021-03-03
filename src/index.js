@@ -88,6 +88,13 @@ for (let i = 1; i <= 10; i++) {
   exp.positions.push(section);
 }
 
+// prepare first trial: next will be prepared after target click
+// shows only relevant elements, calculate pupil locations etc.
+prepareTrial(exp);
+let timeline = null;
+timeline = gsap.timeline({ paused: true });
+timeline.add(changeGaze(exp));
+
 // ---------------------------------------------------------------------------------------------------------------------
 // DEFINE EVENTLISTENER FUNCTIONS
 // ---------------------------------------------------------------------------------------------------------------------
@@ -102,7 +109,8 @@ const handleTargetClick = async function tmp(event) {
   exp.trials.count += 1;
   if (exp.trials.count < exp.trials.totalNr) {
     prepareTrial(exp);
-    timeline = gsap.timeline({paused: true});
+    // paused so that animation doesn't play yet
+    timeline = gsap.timeline({ paused: true });
     timeline.add(changeGaze(exp));
   }
 };
@@ -114,7 +122,7 @@ const handleLosgehtsClick = async function tmp(event) {
   // hide blurr canvas and button
   document.getElementById('experiment-button').setAttribute('visibility', 'hidden');
   document.getElementById('cover-blurr').setAttribute('visibility', 'hidden');
-
+  // let animation play (which we prepared already before/ in handleTargetClick for trial > 0)
   await timeline.play();
 
   hedge.addEventListener('click', handleTargetClick, { capture: false, once: true });
@@ -122,11 +130,4 @@ const handleLosgehtsClick = async function tmp(event) {
 // ---------------------------------------------------------------------------------------------------------------------
 // ADD EVENT LISTENER
 // ---------------------------------------------------------------------------------------------------------------------
-// prepare first trial: next will be prepared after target click
-// shows only relevant elements, calculate pupil locations etc.
-prepareTrial(exp);
-let timeline = null;
-timeline = gsap.timeline({paused: true});
-timeline.add(changeGaze(exp));
-
 losgehtsButton.addEventListener('click', handleLosgehtsClick, { capture: false });
