@@ -12,119 +12,122 @@ export default (exp) => {
   const irisLeft = document.getElementById('monkey-iris-left');
   const irisRight = document.getElementById('monkey-iris-right');
 
-  const mainTimeline = gsap.timeline({ paused: true });
-  const timelineHide = gsap.timeline();
-  const timelineFinal = gsap.timeline();
+  const timeline = gsap.timeline({ paused: true });
 
   // first: hide balloon
-  timelineHide.fromTo(exp.balloons[exp.trials.count], {
-    attr: { viewBox: `${exp.elemSpecs.balloons.viewBoxCenter}` },
-  }, {
+  timeline.to(exp.balloons[exp.trials.count], {
     duration: 1,
     ease: 'none',
-    attr: { viewBox: `${exp.elemSpecs.balloons.viewBoxHidden}` },
-    onInterrupt() {
-      console.log('interrupted in balloon hide');
-    },
+    attr: { viewBox: exp.elemSpecs.balloons.viewBoxHidden },
   });
 
   // let eyes follow balloon already
-  timelineHide.fromTo([pupilLeft, irisLeft], {
-    attr: {
-      cx: `${exp.elemSpecs.eyes.left.center.x}`,
-      cy: `${exp.elemSpecs.eyes.left.center.y}`,
-    },
-  }, {
+  timeline.to([pupilLeft, irisLeft], {
     duration: 1,
     ease: 'none',
     attr: {
-      cx: `${exp.elemSpecs.eyes.left.beginning.x}`,
-      cy: `${exp.elemSpecs.eyes.left.beginning.y}`,
-    },
-    onInterrupt() {
-      console.log('interrupted in test eyes left hide');
+      cx: exp.elemSpecs.eyes.left.beginning.x,
+      cy: exp.elemSpecs.eyes.left.beginning.y,
     },
   }, '<');
 
   // same for right eye
-  timelineHide.fromTo([pupilRight, irisRight], {
-    attr: {
-      cx: `${exp.elemSpecs.eyes.right.center.x}`,
-      cy: `${exp.elemSpecs.eyes.right.center.y}`,
-    },
-  }, {
+  timeline.to([pupilRight, irisRight], {
     duration: 1,
     ease: 'none',
     attr: {
-      cx: `${exp.elemSpecs.eyes.right.beginning.x}`,
-      cy: `${exp.elemSpecs.eyes.right.beginning.y}`,
-    },
-    onInterrupt() {
-      console.log('interrupted in test eyes right hide');
+      cx: exp.elemSpecs.eyes.right.beginning.x,
+      cy: exp.elemSpecs.eyes.right.beginning.y,
     },
   }, '<');
 
   // then move balloon to final position
-  timelineFinal.fromTo(exp.balloons[exp.trials.count], {
-    attr: { viewBox: `${exp.elemSpecs.balloons.viewBoxHidden}` },
-  }, {
-    delay: 1,
+  timeline.to(exp.balloons[exp.trials.count], {
     duration: 1,
     ease: 'none',
-    attr: { viewBox: `${exp.positions[exp.trials.count].viewBoxRandom}` },
-    onInterrupt() {
-      console.log('interrupted in balloon hide');
-    },
-    onComplete() {
-      setViewBoxAttr(exp.balloons[exp.trials.count], exp.positions[exp.trials.count].viewBoxRandom);
-    },
+    attr: { viewBox: exp.positions[exp.trials.count].viewBoxRandom },
   });
 
   // eye movement from hidden to target
-  timelineFinal.fromTo([pupilLeft, irisLeft], {
-    attr: {
-      cx: `${exp.elemSpecs.eyes.left.beginning.x}`,
-      cy: `${exp.elemSpecs.eyes.left.beginning.y}`,
-    },
-  }, {
+  timeline.to([pupilLeft, irisLeft], {
     duration: 1,
     ease: 'none',
     attr: {
-      cx: `${exp.elemSpecs.eyes.left.random.x}`,
-      cy: `${exp.elemSpecs.eyes.left.random.y}`,
+      cx: exp.elemSpecs.eyes.left.random.x,
+      cy: exp.elemSpecs.eyes.left.random.y,
+    },
+  }, '<');
+
+  timeline.to([pupilRight, irisRight], {
+    duration: 1,
+    ease: 'none',
+    attr: {
+      cx: exp.elemSpecs.eyes.right.random.x,
+      cy: exp.elemSpecs.eyes.right.random.y,
     },
     onInterrupt() {
-      console.log('interrupted in test eyes left final');
+      console.log('got interrupted while animating!');
     },
     onComplete() {
+      //----------------------------
+      // WITHOUT ANY SETTING: MOVE BACK TO CENTER/ ORIGINAL POSITION
+      //----------------------------
+
+      //----------------------------
+      // WITH GSAP.SET():
+      // ERROR: THERE IS NO GSAP SETTER METHOD FOR THE VIEWBOX ATTRIBUTE
+      //----------------------------
+      // gsap.set(exp.balloons[exp.trials.count], { viewBox: exp.positions[exp.trials.count].viewBoxRandom })
+      //----------------------------
+
+      //----------------------------
+      // WITH RAF ONCE; DOESN'T WORK
+      //----------------------------
+      // const setToAnimatedVal = () => {
+      //   exp.balloons[exp.trials.count].setAttribute('viewBox', exp.positions[exp.trials.count].viewBoxRandom);
+      //   pupilLeft.setAttribute('cx', exp.elemSpecs.eyes.left.random.x);
+      //   pupilLeft.setAttribute('cy', exp.elemSpecs.eyes.left.random.y);
+      //   irisLeft.setAttribute('cx', exp.elemSpecs.eyes.left.random.x);
+      //   irisLeft.setAttribute('cy', exp.elemSpecs.eyes.left.random.y);
+      //   pupilRight.setAttribute('cx', exp.elemSpecs.eyes.right.random.x);
+      //   pupilRight.setAttribute('cy', exp.elemSpecs.eyes.right.random.y);
+      //   irisRight.setAttribute('cx', exp.elemSpecs.eyes.right.random.x);
+      //   irisRight.setAttribute('cy', exp.elemSpecs.eyes.right.random.y);
+      // }
+      // requestAnimationFrame(setToAnimatedVal);
+      //----------------------------
+
+      //----------------------------
+      // WITHOUT RAF; DOESN'T WORK
+      //----------------------------
+      // exp.balloons[exp.trials.count].setAttribute('viewBox', exp.positions[exp.trials.count].viewBoxRandom);
+      // pupilLeft.setAttribute('cx', exp.elemSpecs.eyes.left.random.x);
+      // pupilLeft.setAttribute('cy', exp.elemSpecs.eyes.left.random.y);
+      // irisLeft.setAttribute('cx', exp.elemSpecs.eyes.left.random.x);
+      // irisLeft.setAttribute('cy', exp.elemSpecs.eyes.left.random.y);
+      // pupilRight.setAttribute('cx', exp.elemSpecs.eyes.right.random.x);
+      // pupilRight.setAttribute('cy', exp.elemSpecs.eyes.right.random.y);
+      // irisRight.setAttribute('cx', exp.elemSpecs.eyes.right.random.x);
+      // irisRight.setAttribute('cy', exp.elemSpecs.eyes.right.random.y);
+
+      //----------------------------
+      // WORKING SOLUTION
+      //----------------------------
+      // set viewBox to where it has been animated to
+      setViewBoxAttr(exp.balloons[exp.trials.count], exp.positions[exp.trials.count].viewBoxRandom);
+
+      // set left eyes to where they have been animated to
       setCircleAttr(pupilLeft, exp.elemSpecs.eyes.left.random);
       setCircleAttr(irisLeft, exp.elemSpecs.eyes.left.random);
-    },
-  }, '<');
 
-  timelineFinal.fromTo([pupilRight, irisRight], {
-    attr: {
-      cx: `${exp.elemSpecs.eyes.right.beginning.x}`,
-      cy: `${exp.elemSpecs.eyes.right.beginning.y}`,
-    },
-  }, {
-    duration: 1,
-    ease: 'none',
-    attr: {
-      cx: `${exp.elemSpecs.eyes.right.random.x}`,
-      cy: `${exp.elemSpecs.eyes.right.random.y}`,
-    },
-    onInterrupt() {
-      console.log('interrupted in test eyes right final');
-    },
-    onComplete() {
+      // same for right eye
       setCircleAttr(pupilRight, exp.elemSpecs.eyes.right.random);
       setCircleAttr(irisRight, exp.elemSpecs.eyes.right.random);
+      //----------------------------
     },
   }, '<');
 
-  // add timelines together
-  mainTimeline.add([timelineHide, timelineFinal]);
-  mainTimeline.play();
-  return (mainTimeline);
+  // return timeline
+  timeline.play();
+  return (timeline);
 };
