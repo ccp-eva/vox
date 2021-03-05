@@ -84,19 +84,19 @@ export default (exp, agentsSingle, targetsSingle) => {
   } else if (!exp.subjData.touchScreen) {
     // for fam trials, random location (same as tablet hedge version)
     // how many times can we repeat each section
-    let positionsFam = [];
-    const positionsDivFam = divideWithRemainder(exp.trials.famNr, positionsSingleContinuous.length);
-    positionsSingleContinuous.forEach((section) => {
-      positionsFam = positionsFam.concat(new Array(positionsDivFam.quotient).fill(section));
-    });
-    positionsFam = shuffleArray(positionsFam);
+    // let positionsFam = [];
+    // const positionsDivFam = divideWithRemainder(exp.trials.famNr, positionsSingleContinuous.length);
+    // positionsSingleContinuous.forEach((section) => {
+    //   positionsFam = positionsFam.concat(new Array(positionsDivFam.quotient).fill(section));
+    // });
+    // positionsFam = shuffleArray(positionsFam);
 
-    // if division with remainder, fill up array
-    if (positionsDivFam.remainder > 0) {
-      const positionsTmp = shuffleArray(positionsSingleContinuous);
-      positionsTmp.splice(0, positionsTmp.length - positionsDivFam.remainder);
-      positionsFam = positionsFam.concat(positionsTmp);
-    }
+    // // if division with remainder, fill up array
+    // if (positionsDivFam.remainder > 0) {
+    //   const positionsTmp = shuffleArray(positionsSingleContinuous);
+    //   positionsTmp.splice(0, positionsTmp.length - positionsDivFam.remainder);
+    //   positionsFam = positionsFam.concat(positionsTmp);
+    // }
 
     // for test trials, target can only land in boxes
     const positionsSingleBoxes = [];
@@ -113,7 +113,6 @@ export default (exp, agentsSingle, targetsSingle) => {
         type: 'boxLocation',
         // add half a target width for placing upper left balloon corner in middle of box
         viewBoxRandom: exp.elemSpecs.targets.viewBoxRandom.replace('x', ((box.getBBox().x + box.getBBox().width / 2) - targetsSingle[0].getBBox().width / 2)),
-
       };
       positionsSingleBoxes.push(section);
     });
@@ -133,7 +132,8 @@ export default (exp, agentsSingle, targetsSingle) => {
     }
 
     // combine fam and test trial positions
-    positions = positionsFam.concat(positionsTest);
+    // positions = positionsFam.concat(positionsTest);
+    positions = positionsTest;
   }
   exp.positions = positions;
   exp.responseLog = [];

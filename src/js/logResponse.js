@@ -107,7 +107,7 @@ export default (event, exp) => {
   exp.responseLog[exp.trials.count].trialNr = exp.trials.count + 1;
   exp.responseLog[exp.trials.count].agent = `${exp.agents[exp.trials.count].getAttribute('id')}`;
   exp.responseLog[exp.trials.count].target = `${exp.targets[exp.trials.count].getAttribute('id')}`;
-  exp.responseLog[exp.trials.count].trialsType = exp.trials.type[exp.trials.count];
+  exp.responseLog[exp.trials.count].trialType = exp.trials.type[exp.trials.count];
   exp.responseLog[exp.trials.count].positionBin = exp.positions[exp.trials.count].bin;
   exp.responseLog[exp.trials.count].responseTime = exp.responseLog[exp.trials.count].responseTime.t1 - exp.responseLog[exp.trials.count].responseTime.t0;
 

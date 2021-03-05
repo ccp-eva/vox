@@ -565,7 +565,7 @@ exp.elemSpecs.targets = {
 // TRIAL NUMBER & RANDOMIZATION OF AGENTS, TARGETS AND TARGET POSITIONS
 // ---------------------------------------------------------------------------------------------------------------------
 exp.trials = {};
-exp.trials.famNr = 2;
+exp.trials.famNr = 1;
 exp.trials.testNr = 2;
 exp.trials.totalNr = exp.trials.famNr + exp.trials.testNr;
 // this variable stores in which trial we currently are!
@@ -583,7 +583,7 @@ console.log('exp object', exp);
 const handleInstructionClick = event => {
   event.preventDefault();
   // showSlide: first array gets shown, second array gets hidden
-  _jsShowSlideDefault.default([experimentSlide], [instructionSlide, transitionSlide, goodbyeSlide, clickBubble, fiveBoxes]);
+  _jsShowSlideDefault.default([experimentSlide, fiveBoxes], [instructionSlide, transitionSlide, goodbyeSlide, clickBubble]);
   // shows only relevant elements etc.
   _jsPrepareTrialDefault.default(exp);
 };
@@ -626,7 +626,7 @@ const handleTargetClick = async function tmp(event) {
   if (exp.trials.count < exp.trials.famNr) {
     _jsPrepareTrialDefault.default(exp);
   } else if (exp.trials.count === exp.trials.famNr) {
-    _jsShowSlideDefault.default([transitionSlide], [experimentSlide, pig, monkey, sheep, balloonBlue, balloonRed, balloonYellow, balloonGreen]);
+    _jsShowSlideDefault.default([transitionSlide], [experimentSlide, pig, monkey, sheep, balloonBlue, balloonRed, balloonYellow, balloonGreen, fiveBoxes]);
   } else if (exp.trials.count < exp.trials.totalNr) {
     _jsPrepareTrialDefault.default(exp);
   } else if (exp.trials.count === exp.trials.totalNr) {
@@ -791,7 +791,7 @@ exports.default = (event, exp) => {
   exp.responseLog[exp.trials.count].trialNr = exp.trials.count + 1;
   exp.responseLog[exp.trials.count].agent = `${exp.agents[exp.trials.count].getAttribute('id')}`;
   exp.responseLog[exp.trials.count].target = `${exp.targets[exp.trials.count].getAttribute('id')}`;
-  exp.responseLog[exp.trials.count].trialsType = exp.trials.type[exp.trials.count];
+  exp.responseLog[exp.trials.count].trialType = exp.trials.type[exp.trials.count];
   exp.responseLog[exp.trials.count].positionBin = exp.positions[exp.trials.count].bin;
   exp.responseLog[exp.trials.count].responseTime = exp.responseLog[exp.trials.count].responseTime.t1 - exp.responseLog[exp.trials.count].responseTime.t0;
   exp.responseLog[exp.trials.count].eyeRadius = parseFloat(exp.elemSpecs.eyes[exp.responseLog[exp.trials.count].agent].radius);
@@ -4300,7 +4300,30 @@ exports.default = exp => {
   }
 };
 
-},{"./showElement":"6pY4G","./getGazeCoords":"31xvG","./distanceViewBoxes":"5JGu5","@parcel/transformer-js/lib/esmodule-helpers.js":"5gA8y","./setCircleAttr":"66zxP","./setViewBoxAttr":"54wb7"}],"6pY4G":[function(require,module,exports) {
+},{"./setCircleAttr":"66zxP","./setViewBoxAttr":"54wb7","./showElement":"6pY4G","./getGazeCoords":"31xvG","./distanceViewBoxes":"5JGu5","@parcel/transformer-js/lib/esmodule-helpers.js":"5gA8y"}],"66zxP":[function(require,module,exports) {
+var _parcelHelpers = require("@parcel/transformer-js/lib/esmodule-helpers.js");
+_parcelHelpers.defineInteropFlag(exports);
+exports.default = (target, newCoords) => {
+  function moveCenter() {
+    target.setAttribute('cx', newCoords.x);
+    target.setAttribute('cy', newCoords.y);
+    requestAnimationFrame(moveCenter);
+  }
+  requestAnimationFrame(moveCenter);
+};
+
+},{"@parcel/transformer-js/lib/esmodule-helpers.js":"5gA8y"}],"54wb7":[function(require,module,exports) {
+var _parcelHelpers = require("@parcel/transformer-js/lib/esmodule-helpers.js");
+_parcelHelpers.defineInteropFlag(exports);
+exports.default = (target, newViewBox) => {
+  function moveViewBox() {
+    target.setAttribute('viewBox', newViewBox);
+    requestAnimationFrame(moveViewBox);
+  }
+  requestAnimationFrame(moveViewBox);
+};
+
+},{"@parcel/transformer-js/lib/esmodule-helpers.js":"5gA8y"}],"6pY4G":[function(require,module,exports) {
 var _parcelHelpers = require("@parcel/transformer-js/lib/esmodule-helpers.js");
 _parcelHelpers.defineInteropFlag(exports);
 exports.default = (elements, trialCount) => {
@@ -4373,29 +4396,6 @@ exports.default = (viewBox1, viewBox2) => {
   return Math.abs(Math.sqrt((x2 - x1) ** 2 + (y2 - y1) ** 2));
 };
 
-},{"@parcel/transformer-js/lib/esmodule-helpers.js":"5gA8y"}],"66zxP":[function(require,module,exports) {
-var _parcelHelpers = require("@parcel/transformer-js/lib/esmodule-helpers.js");
-_parcelHelpers.defineInteropFlag(exports);
-exports.default = (target, newCoords) => {
-  function moveCenter() {
-    target.setAttribute('cx', newCoords.x);
-    target.setAttribute('cy', newCoords.y);
-    requestAnimationFrame(moveCenter);
-  }
-  requestAnimationFrame(moveCenter);
-};
-
-},{"@parcel/transformer-js/lib/esmodule-helpers.js":"5gA8y"}],"54wb7":[function(require,module,exports) {
-var _parcelHelpers = require("@parcel/transformer-js/lib/esmodule-helpers.js");
-_parcelHelpers.defineInteropFlag(exports);
-exports.default = (target, newViewBox) => {
-  function moveViewBox() {
-    target.setAttribute('viewBox', newViewBox);
-    requestAnimationFrame(moveViewBox);
-  }
-  requestAnimationFrame(moveViewBox);
-};
-
 },{"@parcel/transformer-js/lib/esmodule-helpers.js":"5gA8y"}],"6YmDj":[function(require,module,exports) {
 var _parcelHelpers = require("@parcel/transformer-js/lib/esmodule-helpers.js");
 _parcelHelpers.defineInteropFlag(exports);
@@ -4419,6 +4419,8 @@ exports.default = exp => new Promise(resolve => {
   // we use gsap3 for animation
   const timelineFam = _gsap.gsap.timeline();
   const timelineTest = _gsap.gsap.timeline();
+  // const timelineFam = gsap.timeline({ paused: true });
+  // const timelineTest = gsap.timeline({ paused: true });
   // animate target
   // for fam trials, just show full path. everything at the same time
   if (exp.trials.type[exp.trials.count] === 'fam') {
@@ -4639,7 +4641,7 @@ exports.default = exp => new Promise(resolve => {
   }
 });
 
-},{"gsap":"1iecp","@parcel/transformer-js/lib/esmodule-helpers.js":"5gA8y","./setCircleAttr":"66zxP","./setViewBoxAttr":"54wb7"}],"5HbdV":[function(require,module,exports) {
+},{"gsap":"1iecp","./setCircleAttr":"66zxP","./setViewBoxAttr":"54wb7","@parcel/transformer-js/lib/esmodule-helpers.js":"5gA8y"}],"5HbdV":[function(require,module,exports) {
 var _parcelHelpers = require("@parcel/transformer-js/lib/esmodule-helpers.js");
 _parcelHelpers.defineInteropFlag(exports);
 exports.default = ms => new Promise(resolve => setTimeout(resolve, ms));
@@ -4720,18 +4722,18 @@ exports.default = (exp, agentsSingle, targetsSingle) => {
   } else if (!exp.subjData.touchScreen) {
     // for fam trials, random location (same as tablet hedge version)
     // how many times can we repeat each section
-    let positionsFam = [];
-    const positionsDivFam = _divideWithRemainderDefault.default(exp.trials.famNr, positionsSingleContinuous.length);
-    positionsSingleContinuous.forEach(section => {
-      positionsFam = positionsFam.concat(new Array(positionsDivFam.quotient).fill(section));
-    });
-    positionsFam = _shuffleArrayDefault.default(positionsFam);
-    // if division with remainder, fill up array
-    if (positionsDivFam.remainder > 0) {
-      const positionsTmp = _shuffleArrayDefault.default(positionsSingleContinuous);
-      positionsTmp.splice(0, positionsTmp.length - positionsDivFam.remainder);
-      positionsFam = positionsFam.concat(positionsTmp);
-    }
+    // let positionsFam = [];
+    // const positionsDivFam = divideWithRemainder(exp.trials.famNr, positionsSingleContinuous.length);
+    // positionsSingleContinuous.forEach((section) => {
+    // positionsFam = positionsFam.concat(new Array(positionsDivFam.quotient).fill(section));
+    // });
+    // positionsFam = shuffleArray(positionsFam);
+    // // if division with remainder, fill up array
+    // if (positionsDivFam.remainder > 0) {
+    // const positionsTmp = shuffleArray(positionsSingleContinuous);
+    // positionsTmp.splice(0, positionsTmp.length - positionsDivFam.remainder);
+    // positionsFam = positionsFam.concat(positionsTmp);
+    // }
     // for test trials, target can only land in boxes
     const positionsSingleBoxes = [];
     const box1 = document.getElementById('box1');
@@ -4761,7 +4763,8 @@ exports.default = (exp, agentsSingle, targetsSingle) => {
       positionsTest = positionsTest.concat(positionsTmp);
     }
     // combine fam and test trial positions
-    positions = positionsFam.concat(positionsTest);
+    // positions = positionsFam.concat(positionsTest);
+    positions = positionsTest;
   }
   exp.positions = positions;
   exp.responseLog = [];

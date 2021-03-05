@@ -113,7 +113,7 @@ exp.elemSpecs.targets = {
 // TRIAL NUMBER & RANDOMIZATION OF AGENTS, TARGETS AND TARGET POSITIONS
 // ---------------------------------------------------------------------------------------------------------------------
 exp.trials = {};
-exp.trials.famNr = 2;
+exp.trials.famNr = 1;
 exp.trials.testNr = 2;
 exp.trials.totalNr = exp.trials.famNr + exp.trials.testNr;
 // this variable stores in which trial we currently are!
@@ -134,8 +134,8 @@ const handleInstructionClick = (event) => {
   event.preventDefault();
 
   // showSlide: first array gets shown, second array gets hidden
-  showSlide([experimentSlide],
-    [instructionSlide, transitionSlide, goodbyeSlide, clickBubble, fiveBoxes]);
+  showSlide([experimentSlide, fiveBoxes],
+    [instructionSlide, transitionSlide, goodbyeSlide, clickBubble]);
 
   // shows only relevant elements etc.
   prepareTrial(exp);
@@ -192,7 +192,7 @@ const handleTargetClick = async function tmp(event) {
   // if transition between fam and test trials, show that transition slide
   } else if (exp.trials.count === exp.trials.famNr) {
     showSlide([transitionSlide],
-      [experimentSlide, pig, monkey, sheep, balloonBlue, balloonRed, balloonYellow, balloonGreen]);
+      [experimentSlide, pig, monkey, sheep, balloonBlue, balloonRed, balloonYellow, balloonGreen, fiveBoxes]);
 
   // if test trial, prepare trial
   } else if (exp.trials.count < exp.trials.totalNr) {
