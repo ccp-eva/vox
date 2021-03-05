@@ -1,3 +1,6 @@
+// ---------------------------------------------------------------------------------------------------------------------
+// FUNCTION FOR DOWNLOADING DATA LOCALLY; WITH BLOB
+// ---------------------------------------------------------------------------------------------------------------------
 export default (safe, ID) => {
   const toSave = new Blob([JSON.stringify(safe, null, 1)]);
   const day = new Date().toISOString().substr(0, 10);

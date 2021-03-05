@@ -1,5 +1,4 @@
 // ---------------------------------------------------------------------------------------------------------------------
-// FUNCTION FOR LETTING THE BROWSER PAUSE/SLEEP
-// with Promise, so that we can wait for it
+// FUNCTION FOR CALCULATING DISTANCE BETWEEN TWO POINTS
 // ---------------------------------------------------------------------------------------------------------------------
-export default (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+export default (coord1, coord2) => (Math.abs(Math.sqrt((coord2.x - coord1.x) ** 2 + (coord2.y - coord1.y) ** 2)));
