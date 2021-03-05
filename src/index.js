@@ -130,8 +130,8 @@ exp.elemSpecs.targets = {
 // TRIAL NUMBER & RANDOMIZATION OF AGENTS, TARGETS AND TARGET POSITIONS
 // ---------------------------------------------------------------------------------------------------------------------
 exp.trials = {};
-exp.trials.famNr = 1;
-exp.trials.testNr = 2;
+exp.trials.famNr = 10;
+exp.trials.testNr = 10;
 exp.trials.totalNr = exp.trials.famNr + exp.trials.testNr;
 // this variable stores in which trial we currently are!
 exp.trials.count = 0;

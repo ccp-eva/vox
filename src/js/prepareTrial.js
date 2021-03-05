@@ -113,7 +113,7 @@ export default (exp) => {
     exp.elemSpecs.targets.halfway,
     { x: exp.positions[exp.trials.count].x, y: exp.positions[exp.trials.count].y },
   );
-  const perSecond = 600;
+  const perSecond = 400;
 
   exp.responseLog[exp.trials.count] = {};
   // save animation speed in our exp object
