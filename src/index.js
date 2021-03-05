@@ -1,3 +1,4 @@
+import { gsap } from 'gsap';
 import logResponse from './js/logResponse';
 import prepareTrial from './js/prepareTrial';
 import changeGaze from './js/changeGaze';
@@ -11,6 +12,7 @@ import showSlide from './js/showSlide';
 // EXP OBJECT
 // in this object, we save all of our variables, easier to pass on to functions
 // NOTE: we do manipulate this object in our functions!
+// TODO set attribute pointerevents = all
 // ---------------------------------------------------------------------------------------------------------------------
 const exp = {};
 
@@ -57,6 +59,10 @@ const clickBubble = document.getElementById('click-bubble');
 const fiveBoxes = document.getElementById('five-boxes');
 const hedge = document.getElementById('hedge');
 
+// TODO see whether hedge animation is smoother without all the leave paths
+// const hedgeleaves = document.getElementById('hedgeleaves');
+// hedgeleaves.setAttribute('visibility', 'hidden');
+
 // if you change animal agents or targets, then change ID here...
 const pig = document.getElementById('pig');
 const monkey = document.getElementById('monkey');
@@ -81,32 +87,43 @@ agentsChar.forEach((agent) => {
         x: document.getElementById(`${agent}-pupil-left`).getAttribute('cx'),
         y: document.getElementById(`${agent}-pupil-left`).getAttribute('cy'),
       },
+      bbox: {
+        x: document.getElementById(`${agent}-pupil-left`).getBBox().x, // same as cx - r
+        y: document.getElementById(`${agent}-pupil-left`).getBBox().y, // same as cy - r
+      },
     },
     right: {
       center: {
         x: document.getElementById(`${agent}-pupil-right`).getAttribute('cx'),
         y: document.getElementById(`${agent}-pupil-right`).getAttribute('cy'),
       },
+      bbox: {
+        x: document.getElementById(`${agent}-pupil-right`).getBBox().x, // same as cx - r
+        y: document.getElementById(`${agent}-pupil-right`).getBBox().y, // same as cy - r
+      },
     },
   };
 });
 
 // calculate some positions of the targets
-// get position on the mid of the screen
-const positionMid = exp.elemSpecs.outerSVG.origViewBoxWidth / 2 - balloonBlue.getBBox().width / 2;
-// calculate y coords for balloon (-25 for little distance from lower border)
-const hedgeMidY = exp.elemSpecs.outerSVG.origViewBoxHeight - balloonBlue.getBBox().height - 25;
-
 exp.elemSpecs.targets = {
-  // 2.8, so that we can still see our agents and they don't get covered by balloons
-  viewBoxCenter: `-${positionMid} -${exp.elemSpecs.outerSVG.origViewBoxHeight / 2.8} ${exp.elemSpecs.outerSVG.origViewBoxWidth} ${exp.elemSpecs.outerSVG.origViewBoxHeight}`,
+  center: {
+    // position mid
+    x: exp.elemSpecs.outerSVG.origViewBoxWidth / 2 - balloonBlue.getBBox().width / 2,
+    // 2.8, so that we can still see our agents and they don't get covered by balloons
+    y: exp.elemSpecs.outerSVG.origViewBoxHeight / 2.8,
+  },
   // define from which point onwards the balloon is hidden behind hedge
-  // BBox of hedge is a bit too high to hide balloon (because of single grass halms), therefore / 1.1
-  viewBoxHidden: `-${positionMid} -${exp.elemSpecs.outerSVG.origViewBoxHeight - hedge.getBBox().height / 1.1} ${exp.elemSpecs.outerSVG.origViewBoxWidth} ${exp.elemSpecs.outerSVG.origViewBoxHeight}`,
-  // placeholder x for random horizontal position. y value and width, height always stays same
-  viewBoxRandom: `-x -${hedgeMidY} ${exp.elemSpecs.outerSVG.origViewBoxWidth} ${exp.elemSpecs.outerSVG.origViewBoxHeight}`,
+  halfway: {
+    // position mid, same as in center.x
+    x: exp.elemSpecs.outerSVG.origViewBoxWidth / 2 - balloonBlue.getBBox().width / 2,
+    // BBox of hedge is a bit too high to hide balloon (because of single grass halms), therefore / 1.1
+    y: exp.elemSpecs.outerSVG.origViewBoxHeight - hedge.getBBox().height / 1.1,
+  },
   // right side of screen as upper boundary
   borderRight: exp.elemSpecs.outerSVG.origViewBoxWidth - balloonBlue.getBBox().width,
+  // calculate y coords for balloon (-30 for little distance from lower border)
+  groundY: exp.elemSpecs.outerSVG.origViewBoxHeight - balloonBlue.getBBox().height - 30,
 };
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -118,6 +135,7 @@ exp.trials.testNr = 2;
 exp.trials.totalNr = exp.trials.famNr + exp.trials.testNr;
 // this variable stores in which trial we currently are!
 exp.trials.count = 0;
+let timeline = null;
 
 // create arrays with agents, targets, positions etc. for all the trials
 randomizeTrials(exp, agentsSingle, targetsSingle);
@@ -134,11 +152,13 @@ const handleInstructionClick = (event) => {
   event.preventDefault();
 
   // showSlide: first array gets shown, second array gets hidden
-  showSlide([experimentSlide, fiveBoxes],
+  showSlide([experimentSlide],
     [instructionSlide, transitionSlide, goodbyeSlide, clickBubble]);
 
   // shows only relevant elements etc.
   prepareTrial(exp);
+  timeline = gsap.timeline({ paused: true });
+  timeline.add(changeGaze(exp));
 };
 // ---------------------------------------------------------------------------------------------------------------------
 // RUNS WHEN TRANSITION BUTTON IS CLICKED (between fam and test trials)
@@ -151,6 +171,8 @@ const handleTransitionClick = (event) => {
     [instructionSlide, transitionSlide, goodbyeSlide, clickBubble]);
 
   prepareTrial(exp);
+  timeline = gsap.timeline({ paused: true });
+  timeline.add(changeGaze(exp));
 };
 // ---------------------------------------------------------------------------------------------------------------------
 // RUNS WHEN GOODBYE BUTTON IS CLICKED
@@ -179,7 +201,7 @@ const handleTargetClick = async function tmp(event) {
   console.log('responseLog: ', exp.responseLog[exp.trials.count]);
 
   // so that we don't rush into next trial
-  await pause(1000);
+  await pause(500);
 
   // prepare next trial
   exp.trials.count += 1;
@@ -188,6 +210,8 @@ const handleTargetClick = async function tmp(event) {
   // if still in fam trials, prepare trial
   if (exp.trials.count < exp.trials.famNr) {
     prepareTrial(exp);
+    timeline = gsap.timeline({ paused: true });
+    timeline.add(changeGaze(exp));
 
   // if transition between fam and test trials, show that transition slide
   } else if (exp.trials.count === exp.trials.famNr) {
@@ -197,6 +221,8 @@ const handleTargetClick = async function tmp(event) {
   // if test trial, prepare trial
   } else if (exp.trials.count < exp.trials.totalNr) {
     prepareTrial(exp);
+    timeline = gsap.timeline({ paused: true });
+    timeline.add(changeGaze(exp));
 
   // if all trials done, show goodbye slide
   } else if (exp.trials.count === exp.trials.totalNr) {
@@ -214,7 +240,14 @@ const handleWrongClick = (event) => {
   const clickY = event.clientY - exp.elemSpecs.outerSVG.ID.getBoundingClientRect().top;
   const clickScaledY = screenScalingHeight * clickY;
   // if that is somewhere above the hedge (e.g. on the agents), play "negative" feedback sound
-  if (clickScaledY < (exp.elemSpecs.outerSVG.origViewBoxHeight - hedge.getBBox().height)) {
+  // this is how much we move the hedge down in changeGaze
+  const hedgeMoved = hedge.getBBox().height - exp.targets[exp.trials.count].getBBox().height - 75;
+  // this is the y coord of the upper corner of the hedge after the animation
+  const hedgeDown = hedge.getBBox().y - hedgeMoved;
+  // then, we need to define what is above the hedge
+  const cornerHedge = exp.elemSpecs.outerSVG.origViewBoxHeight - hedgeDown;
+  // if user clicked above hedge, play negative feedback sound
+  if (clickScaledY < cornerHedge) {
     document.getElementById('negative-sound').play();
   }
 };
@@ -226,20 +259,18 @@ const handleLosgehtsClick = async function tmp(event) {
   console.log('');
   console.log('trial: ', exp.trials.count);
 
+  // hide blurr canvas and button
+  document.getElementById('experiment-button').setAttribute('visibility', 'hidden');
+  document.getElementById('cover-blurr').setAttribute('visibility', 'hidden');
+
   // animate balloon & eye movement to randomized positions
-  await changeGaze(exp);
+  await timeline.play();
 
   // save current time to calculate response time later
   exp.responseLog[exp.trials.count].responseTime = {
     t0: new Date().getTime(),
     t1: 0,
   };
-
-  // debugging frozen animation
-  console.log('current targetViewBox', exp.targets[exp.trials.count].getAttribute('viewBox'));
-  console.log('center targetViewBox', exp.elemSpecs.targets.viewBoxCenter);
-  console.log('changed targetViewBox?',
-    !(exp.elemSpecs.targets.viewBoxCenter === exp.targets[exp.trials.count].getAttribute('viewBox')));
 
   // depending on experiment version, users click on hedge or boxes
   if (exp.subjData.touchScreen || exp.trials.type[exp.trials.count] === 'fam') {

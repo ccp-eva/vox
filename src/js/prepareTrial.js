@@ -1,8 +1,7 @@
-import setCircleAttr from './setCircleAttr';
-import setViewBoxAttr from './setViewBoxAttr';
+import { gsap } from 'gsap';
 import showElement from './showElement';
 import getGazeCoords from './getGazeCoords';
-import distanceViewBoxes from './distanceViewBoxes';
+import distancePoints from './distancePoints';
 
 // ---------------------------------------------------------------------------------------------------------------------
 // FUNCTION THAT PREPARES EACH TRIAL
@@ -26,18 +25,23 @@ export default (exp) => {
   const eyelineLeft = document.getElementById(`${currentAgent}-eyeline-left`);
   const eyelineRight = document.getElementById(`${currentAgent}-eyeline-right`);
   const hedge = document.getElementById('hedge');
+  const fiveBoxes = document.getElementById('five-boxes');
 
   // set eyes to center
-  setCircleAttr(pupilLeft, exp.elemSpecs.eyes[currentAgent].left.center);
-  setCircleAttr(pupilRight, exp.elemSpecs.eyes[currentAgent].right.center);
-  setCircleAttr(irisLeft, exp.elemSpecs.eyes[currentAgent].left.center);
-  setCircleAttr(irisRight, exp.elemSpecs.eyes[currentAgent].right.center);
+  // original value stored in e.g. pupilLeft.getBBox().x
+  // but we just need to remove the transform attribute
+  gsap.set([pupilLeft, pupilRight, irisLeft, irisRight, hedge], {
+    x: 0,
+    y: 0,
+  });
 
   // set target to center
-  setViewBoxAttr(exp.targets[exp.trials.count], `${exp.elemSpecs.targets.viewBoxCenter}`);
-
-  // set hedge back to original location
-  setViewBoxAttr(hedge, `${exp.elemSpecs.outerSVG.origViewBox}`);
+  // TODO just set balloon to middle in SVG Illustrator already!!
+  // set target to center
+  gsap.set(exp.targets[exp.trials.count], {
+    x: exp.elemSpecs.targets.center.x,
+    y: exp.elemSpecs.targets.center.y,
+  });
 
   // depending on trial type, show or hide hedge
   if (exp.trials.type[exp.trials.count] === 'fam') {
@@ -46,52 +50,78 @@ export default (exp) => {
     hedge.setAttribute('visibility', 'visible');
   }
 
-  // calculate where exp.responseLog should move in the trial
+  // for PC version show boxes, for touchscreen hide them
+  if (exp.subjData.touchScreen === false) {
+    fiveBoxes.setAttribute('visibility', 'visible');
+  } else if (exp.subjData.touchScreen === true) {
+    fiveBoxes.setAttribute('visibility', 'hidden');
+  }
+  // calculate where eyes should move in the trial
   // for test trials: first let eyes follow balloon to middle, until balloon is hidden
-  const gazeCoordsBeginningLeft = getGazeCoords(
-    exp.targets[exp.trials.count], exp.elemSpecs.targets.viewBoxHidden,
+  const gazeCoordsHalfwayLeft = getGazeCoords(
+    exp.targets[exp.trials.count], exp.elemSpecs.targets.halfway,
     pupilLeft, eyelineLeft,
   );
-  const gazeCoordsBeginningRight = getGazeCoords(
-    exp.targets[exp.trials.count], exp.elemSpecs.targets.viewBoxHidden,
+  const gazeCoordsHalfwayRight = getGazeCoords(
+    exp.targets[exp.trials.count], exp.elemSpecs.targets.halfway,
     pupilRight, eyelineRight,
   );
 
   const gazeCoordsLeft = getGazeCoords(
-    exp.targets[exp.trials.count], exp.positions[exp.trials.count].viewBoxRandom,
+    exp.targets[exp.trials.count], exp.positions[exp.trials.count],
     pupilLeft, eyelineLeft,
   );
 
   const gazeCoordsRight = getGazeCoords(
-    exp.targets[exp.trials.count], exp.positions[exp.trials.count].viewBoxRandom,
+    exp.targets[exp.trials.count], exp.positions[exp.trials.count],
     pupilRight, eyelineRight,
   );
 
   // save calculated values in our exp object
-  exp.elemSpecs.eyes[currentAgent].left.beginning = gazeCoordsBeginningLeft;
-  exp.elemSpecs.eyes[currentAgent].left.random = gazeCoordsLeft;
-  exp.elemSpecs.eyes[currentAgent].right.beginning = gazeCoordsBeginningRight;
-  exp.elemSpecs.eyes[currentAgent].right.random = gazeCoordsRight;
+  exp.elemSpecs.eyes[currentAgent].left.halfway = gazeCoordsHalfwayLeft;
+  exp.elemSpecs.eyes[currentAgent].left.centerHalfway = {
+    x: gazeCoordsHalfwayLeft.x - exp.elemSpecs.eyes[currentAgent].left.center.x,
+    y: gazeCoordsHalfwayLeft.y - exp.elemSpecs.eyes[currentAgent].left.center.y,
+  };
+  exp.elemSpecs.eyes[currentAgent].left.final = gazeCoordsLeft;
+  exp.elemSpecs.eyes[currentAgent].left.centerFinal = {
+    x: gazeCoordsLeft.x - exp.elemSpecs.eyes[currentAgent].left.center.x,
+    y: gazeCoordsLeft.y - exp.elemSpecs.eyes[currentAgent].left.center.y,
+  };
 
-  // calculate distance between middle and target position, for constant speed
-  const distanceCenterRandom = distanceViewBoxes(
-    exp.elemSpecs.targets.viewBoxCenter, exp.positions[exp.trials.count].viewBoxRandom,
+  exp.elemSpecs.eyes[currentAgent].right.halfway = gazeCoordsHalfwayRight;
+  exp.elemSpecs.eyes[currentAgent].right.centerHalfway = {
+    x: gazeCoordsHalfwayRight.x - exp.elemSpecs.eyes[currentAgent].right.center.x,
+    y: gazeCoordsHalfwayRight.y - exp.elemSpecs.eyes[currentAgent].right.center.y,
+  };
+  exp.elemSpecs.eyes[currentAgent].right.final = gazeCoordsRight;
+  exp.elemSpecs.eyes[currentAgent].right.centerFinal = {
+    x: gazeCoordsRight.x - exp.elemSpecs.eyes[currentAgent].right.center.x,
+    y: gazeCoordsRight.y - exp.elemSpecs.eyes[currentAgent].right.center.y,
+  };
+
+  // calculate distance between center and target position, for constant speed
+  const distanceCenterFinal = distancePoints(
+    exp.elemSpecs.targets.center,
+    { x: exp.positions[exp.trials.count].x, y: exp.positions[exp.trials.count].y },
   );
-  const distanceCenterHidden = distanceViewBoxes(
-    exp.elemSpecs.targets.viewBoxCenter, exp.elemSpecs.targets.viewBoxHidden,
+  const distanceCenterHalfway = distancePoints(
+    exp.elemSpecs.targets.center,
+    exp.elemSpecs.targets.halfway,
   );
-  const distanceHiddenRandom = distanceViewBoxes(
-    exp.elemSpecs.targets.viewBoxHidden, exp.positions[exp.trials.count].viewBoxRandom,
+  const distanceHalfwayFinal = distancePoints(
+    exp.elemSpecs.targets.halfway,
+    { x: exp.positions[exp.trials.count].x, y: exp.positions[exp.trials.count].y },
   );
-  const perSecond = 300;
+  const perSecond = 600;
 
   exp.responseLog[exp.trials.count] = {};
   // save animation speed in our exp object
   if (exp.trials.type[exp.trials.count] === 'fam') {
-    exp.responseLog[exp.trials.count].durationAnimationTotal = distanceCenterRandom / perSecond;
+    exp.responseLog[exp.trials.count].durationAnimationTotal = distanceCenterFinal / perSecond;
   } else if (exp.trials.type[exp.trials.count] === 'test') {
-    exp.responseLog[exp.trials.count].durationAnimationCenterHidden = distanceCenterHidden / perSecond;
-    exp.responseLog[exp.trials.count].durationAnimationHiddenRandom = distanceHiddenRandom / perSecond;
-    exp.responseLog[exp.trials.count].durationAnimationTotal = (distanceCenterHidden / perSecond) + (distanceHiddenRandom / perSecond);
+    exp.responseLog[exp.trials.count].durationAnimationCenterHalfway = distanceCenterHalfway / perSecond;
+    exp.responseLog[exp.trials.count].durationAnimationHalfwayFinal = distanceHalfwayFinal / perSecond;
+    exp.responseLog[exp.trials.count].durationAnimationTotal = (distanceCenterHalfway / perSecond) + (distanceHalfwayFinal / perSecond);
   }
 };

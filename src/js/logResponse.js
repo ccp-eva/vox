@@ -36,8 +36,8 @@ export default (event, exp) => {
   document.getElementById('positive-sound').play();
 
   // get upper left corner of target
-  exp.responseLog[exp.trials.count].targetX = parseFloat(exp.targets[exp.trials.count].getAttribute('viewBox').split(' ')[0]) * -1;
-  exp.responseLog[exp.trials.count].targetY = parseFloat(exp.targets[exp.trials.count].getAttribute('viewBox').split(' ')[1]) * -1;
+  exp.responseLog[exp.trials.count].targetX = exp.positions[exp.trials.count].x;
+  exp.responseLog[exp.trials.count].targetY = exp.positions[exp.trials.count].y;
 
   // define center of target
   exp.responseLog[exp.trials.count].targetWidth = exp.targets[exp.trials.count].getBBox().width;
@@ -120,11 +120,11 @@ export default (event, exp) => {
   exp.responseLog[exp.trials.count].eyeCenterLeftY = parseFloat(
     exp.elemSpecs.eyes[exp.responseLog[exp.trials.count].agent].left.center.y,
   );
-  exp.responseLog[exp.trials.count].pupilTargetLeftX = parseFloat(
-    exp.elemSpecs.eyes[exp.responseLog[exp.trials.count].agent].left.random.x,
+  exp.responseLog[exp.trials.count].pupilFinalLeftX = parseFloat(
+    exp.elemSpecs.eyes[exp.responseLog[exp.trials.count].agent].left.final.x,
   );
-  exp.responseLog[exp.trials.count].pupilTargetLeftY = parseFloat(
-    exp.elemSpecs.eyes[exp.responseLog[exp.trials.count].agent].left.random.y,
+  exp.responseLog[exp.trials.count].pupilFinalLeftY = parseFloat(
+    exp.elemSpecs.eyes[exp.responseLog[exp.trials.count].agent].left.final.y,
   );
   exp.responseLog[exp.trials.count].eyeCenterRightX = parseFloat(
     exp.elemSpecs.eyes[exp.responseLog[exp.trials.count].agent].right.center.x,
@@ -132,10 +132,10 @@ export default (event, exp) => {
   exp.responseLog[exp.trials.count].eyeCenterRightY = parseFloat(
     exp.elemSpecs.eyes[exp.responseLog[exp.trials.count].agent].right.center.y,
   );
-  exp.responseLog[exp.trials.count].pupilTargetRightX = parseFloat(
-    exp.elemSpecs.eyes[exp.responseLog[exp.trials.count].agent].right.random.x,
+  exp.responseLog[exp.trials.count].pupilFinalRightX = parseFloat(
+    exp.elemSpecs.eyes[exp.responseLog[exp.trials.count].agent].right.final.x,
   );
-  exp.responseLog[exp.trials.count].pupilTargetRightY = parseFloat(
-    exp.elemSpecs.eyes[exp.responseLog[exp.trials.count].agent].right.random.y,
+  exp.responseLog[exp.trials.count].pupilFinalRightY = parseFloat(
+    exp.elemSpecs.eyes[exp.responseLog[exp.trials.count].agent].right.final.y,
   );
 };

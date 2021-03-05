@@ -22,10 +22,10 @@
 | offsetHeight               | client screen size height (px)                                                     |
 | offsetWidth                | client screen size width (px)                                                      |
 | positionBin                | in which area the target landed (1-10 for hedge version, 1-5 for box version)      |
-| pupilTargetLeftX           | X coordinate of the current agent's left pupil center after following target       |
-| pupilTargetLeftY           | Y coordinate of the current agent's left pupil center after following target       |
-| pupilTargetRightX          | X coordinate of the current agent's right pupil center after following target      |
-| pupilTargetRightY          | Y coordinate of the current agent's right pupil center after following target      |
+| pupilFinalLeftX            | X coordinate of the current agent's left pupil center after following target       |
+| pupilFinalLeftY            | Y coordinate of the current agent's left pupil center after following target       |
+| pupilFinalRightX           | X coordinate of the current agent's right pupil center after following target      |
+| pupilFinalRightY           | Y coordinate of the current agent's right pupil center after following target      |
 | responseTime               | msec between end of the animation and user click                                   |
 | screenScalingHeight        | how much taller/shorter client screen size is compared to SVG coordinates          |
 | screenScalingWidth         | how much wider/narrower client screen size is compared to SVG coordinates          |

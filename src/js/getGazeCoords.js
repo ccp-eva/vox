@@ -2,7 +2,7 @@
 // FUNCTION FOR CALCULATING LINE EQUATION BETWEEN EYE CENTER AND TARGET POSITION
 // FOR MOVING PUPIL AND IRIS; LETTING THEM FOLLOW BALLOONS
 // ---------------------------------------------------------------------------------------------------------------------
-export default (target, targetViewBoxRandom, pupil, eyeline) => {
+export default (target, targetLocation, pupil, eyeline) => {
   // first, get all elements that we need
   const eyeRadius = parseFloat(eyeline.getAttribute('r'), 10);
   const eyelineCenterX = parseFloat(eyeline.getAttribute('cx'), 10);
@@ -15,10 +15,8 @@ export default (target, targetViewBoxRandom, pupil, eyeline) => {
   // define target’s center point, use bounding box
   const targetWidth = target.getBBox().width;
   const targetHeight = target.getBBox().height;
-
-  // use viewbox coordinates
-  const targetX = Math.abs(targetViewBoxRandom.split(' ')[0]);
-  const targetY = Math.abs(targetViewBoxRandom.split(' ')[1]);
+  const targetX = targetLocation.x;
+  const targetY = targetLocation.y;
 
   // calculate where the center of the target is
   const targetCenterX = targetX + targetWidth / 2;

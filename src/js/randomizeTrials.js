@@ -53,12 +53,11 @@ export default (exp, agentsSingle, targetsSingle) => {
   const positionsSingleContinuous = [];
   let prevMax = 0;
   for (let i = 1; i <= 10; i++) {
-    const randomLocation = randomNumber(prevMax, (exp.elemSpecs.targets.borderRight / 10) * i);
-    const viewBoxRandom = exp.elemSpecs.targets.viewBoxRandom.replace('x', randomLocation);
     const section = {
       bin: i,
       type: 'randomLocation',
-      viewBoxRandom,
+      x: randomNumber(prevMax, (exp.elemSpecs.targets.borderRight / 10) * i),
+      y: exp.elemSpecs.targets.groundY,
     };
     prevMax = (exp.elemSpecs.targets.borderRight / 10) * i;
     positionsSingleContinuous.push(section);
@@ -80,25 +79,8 @@ export default (exp, agentsSingle, targetsSingle) => {
       positions = positions.concat(positionsTmp);
     }
 
-    // for PC version with boxes:
+    // for PC version with boxes: target can only land in boxes
   } else if (!exp.subjData.touchScreen) {
-    // for fam trials, random location (same as tablet hedge version)
-    // how many times can we repeat each section
-    // let positionsFam = [];
-    // const positionsDivFam = divideWithRemainder(exp.trials.famNr, positionsSingleContinuous.length);
-    // positionsSingleContinuous.forEach((section) => {
-    //   positionsFam = positionsFam.concat(new Array(positionsDivFam.quotient).fill(section));
-    // });
-    // positionsFam = shuffleArray(positionsFam);
-
-    // // if division with remainder, fill up array
-    // if (positionsDivFam.remainder > 0) {
-    //   const positionsTmp = shuffleArray(positionsSingleContinuous);
-    //   positionsTmp.splice(0, positionsTmp.length - positionsDivFam.remainder);
-    //   positionsFam = positionsFam.concat(positionsTmp);
-    // }
-
-    // for test trials, target can only land in boxes
     const positionsSingleBoxes = [];
     const box1 = document.getElementById('box1');
     const box2 = document.getElementById('box2');
@@ -112,28 +94,24 @@ export default (exp, agentsSingle, targetsSingle) => {
         bin: i + 1,
         type: 'boxLocation',
         // add half a target width for placing upper left balloon corner in middle of box
-        viewBoxRandom: exp.elemSpecs.targets.viewBoxRandom.replace('x', ((box.getBBox().x + box.getBBox().width / 2) - targetsSingle[0].getBBox().width / 2)),
+        x: box.getBBox().x + box.getBBox().width / 2 - targetsSingle[0].getBBox().width / 2,
+        y: exp.elemSpecs.targets.groundY,
       };
       positionsSingleBoxes.push(section);
     });
 
-    const positionsDivTest = divideWithRemainder(exp.trials.testNr, positionsSingleBoxes.length);
+    const positionsDiv = divideWithRemainder(exp.trials.totalNr, positionsSingleBoxes.length);
 
-    let positionsTest = [];
     positionsSingleBoxes.forEach((section) => {
-      positionsTest = positionsTest.concat(new Array(positionsDivTest.quotient).fill(section));
+      positions = positions.concat(new Array(positionsDiv.quotient).fill(section));
     });
-    positionsTest = shuffleArray(positionsTest);
+    positions = shuffleArray(positions);
 
-    if (positionsDivTest.remainder > 0) {
+    if (positionsDiv.remainder > 0) {
       const positionsTmp = shuffleArray(positionsSingleBoxes);
-      positionsTmp.splice(0, positionsTmp.length - positionsDivTest.remainder);
-      positionsTest = positionsTest.concat(positionsTmp);
+      positionsTmp.splice(0, positionsTmp.length - positionsDiv.remainder);
+      positions = positions.concat(positionsTmp);
     }
-
-    // combine fam and test trial positions
-    // positions = positionsFam.concat(positionsTest);
-    positions = positionsTest;
   }
   exp.positions = positions;
   exp.responseLog = [];
