@@ -15,7 +15,7 @@ The rules of Responsive Web Design (RWD)—a beautiful thing in general—do not
 2. `npm run dev`
 
 
-### Deply Application To A Server
+### Deploy Application To A Server
 1. `git clone git@github.com:ccp-eva/vox.git`
 1. `npm install`
 2. `npm run build`
