@@ -1,8 +1,8 @@
 <?php
-  // $jsonString = file_get_contents("php://input");
-  $jsonString = $_POST['data'];
-	$subjId = $_POST['subjId'];
+  $jsonString = json_decode(file_get_contents('php://input'), true);
+  $data = $jsonString["data"];
+  $fname = $jsonString["fname"];
   $time = date("Y-m-d-H-i-s");
-  file_put_contents('gafo-' . $subjId . '-' . $time . '.json', $jsonString);
+  file_put_contents('gafo-' . $fname . '-' . $time . '.json', $data, true);
   echo '{ "success": true }';
 ?>

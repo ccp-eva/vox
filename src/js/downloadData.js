@@ -7,7 +7,7 @@ export default (safe, ID) => {
     headers: {
       'Content-Type': 'application/json',
     },
-    body: { data: JSON.stringify(safe), subjId: ID },
+    body: JSON.stringify({ data: JSON.stringify(safe), fname: ID }),
   })
     .then((response) => response.json())
     .then((data) => {
