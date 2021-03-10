@@ -116,6 +116,7 @@ export default (exp) => {
   const perSecond = 400;
 
   exp.responseLog[exp.trials.count] = {};
+  exp.responseLog[exp.trials.count].wrongClick = 0;
   // save animation speed in our exp object
   if (exp.trials.type[exp.trials.count] === 'fam') {
     exp.responseLog[exp.trials.count].durationAnimationTotal = distanceCenterFinal / perSecond;

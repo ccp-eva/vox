@@ -27,7 +27,7 @@ exp.subjData.subjID = 'testID';
 // TODO find more elegant solution to tell user to view on fullscreen
 // if (clientWidth < 600 || clientHeight < 200) alert('Please view on bigger screen!');
 // ---------------------------------------------------------------------------------------------------------------------
-exp.subjData.touchScreen = checkForTouchscreen();
+exp.subjData.touchScreen = !checkForTouchscreen();
 exp.subjData.offsetWidth = document.body.offsetWidth;
 exp.subjData.offsetHeight = document.body.offsetHeight;
 
@@ -242,12 +242,17 @@ const handleWrongClick = (event) => {
   // if that is somewhere above the hedge (e.g. on the agents), play "negative" feedback sound
   // this is how much we move the hedge down in changeGaze
   const hedgeMoved = hedge.getBBox().height - exp.targets[exp.trials.count].getBBox().height - 75;
+  console.log('hedgeMoved', hedgeMoved);
   // this is the y coord of the upper corner of the hedge after the animation
   const hedgeDown = hedge.getBBox().y - hedgeMoved;
+  console.log('hedge.getBBox().y', hedge.getBBox().y);
+  console.log('hedgeDown', hedgeDown);
   // then, we need to define what is above the hedge
   const cornerHedge = exp.elemSpecs.outerSVG.origViewBoxHeight - hedgeDown;
   // if user clicked above hedge, play negative feedback sound
   if (clickScaledY < cornerHedge) {
+    // count how often a participant clicked in the wrong area
+    exp.responseLog[exp.trials.count].wrongClick++;
     document.getElementById('negative-sound').play();
   }
 };
@@ -273,7 +278,8 @@ const handleLosgehtsClick = async function tmp(event) {
   };
 
   // depending on experiment version, users click on hedge or boxes
-  if (exp.subjData.touchScreen || exp.trials.type[exp.trials.count] === 'fam') {
+  if (exp.subjData.touchScreen) {
+    hedge.setAttribute('pointer-events', 'all');
     hedge.addEventListener('click', handleTargetClick, { capture: false, once: true });
   } else if (!exp.subjData.touchScreen) {
     hedge.setAttribute('pointer-events', 'none');
