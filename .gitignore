@@ -1,6 +1,5 @@
 ### Our stuff
 # Configs
-*.npmrc
 
 # data (hide all json files)
 src/data/*.json
