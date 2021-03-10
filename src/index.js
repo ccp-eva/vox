@@ -7,6 +7,8 @@ import randomizeTrials from './js/randomizeTrials';
 import downloadData from './js/downloadData';
 import checkForTouchscreen from './js/checkForTouchscreen';
 import showSlide from './js/showSlide';
+import openFullscreen from './js/openFullscreen';
+import closeFullscreen from './js/closeFullscreen';
 
 // ---------------------------------------------------------------------------------------------------------------------
 // EXP OBJECT
@@ -27,7 +29,7 @@ exp.subjData.subjID = 'testID';
 // TODO find more elegant solution to tell user to view on fullscreen
 // if (clientWidth < 600 || clientHeight < 200) alert('Please view on bigger screen!');
 // ---------------------------------------------------------------------------------------------------------------------
-exp.subjData.touchScreen = !checkForTouchscreen();
+exp.subjData.touchScreen = checkForTouchscreen();
 exp.subjData.offsetWidth = document.body.offsetWidth;
 exp.subjData.offsetHeight = document.body.offsetHeight;
 
@@ -150,6 +152,7 @@ console.log('exp object', exp);
 // save in const variables in order to pass on event to function
 const handleInstructionClick = (event) => {
   event.preventDefault();
+  openFullscreen();
 
   // showSlide: first array gets shown, second array gets hidden
   showSlide([experimentSlide],
@@ -226,6 +229,7 @@ const handleTargetClick = async function tmp(event) {
 
   // if all trials done, show goodbye slide
   } else if (exp.trials.count === exp.trials.totalNr) {
+    closeFullscreen();
     showSlide([goodbyeSlide],
       [experimentSlide, hedge, pig, monkey, sheep, balloonBlue, balloonRed, balloonYellow, balloonGreen, fiveBoxes]);
   }
