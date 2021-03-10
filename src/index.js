@@ -26,7 +26,6 @@ exp.subjData.subjID = 'testID';
 
 // ---------------------------------------------------------------------------------------------------------------------
 // SVG & SCREEN SIZE
-// TODO find more elegant solution to tell user to view on fullscreen
 // if (clientWidth < 600 || clientHeight < 200) alert('Please view on bigger screen!');
 // ---------------------------------------------------------------------------------------------------------------------
 exp.subjData.touchScreen = checkForTouchscreen();

@@ -97,8 +97,20 @@ export default (event, exp) => {
     if (exp.trials.type[exp.trials.count] === 'test') exp.responseLog[exp.trials.count].clickedArea = 'hedge';
   }
   if (!exp.subjData.touchScreen) {
-    if (exp.trials.type[exp.trials.count] === 'fam') exp.responseLog[exp.trials.count].clickedArea = 'clickable-area';
-    if (exp.trials.type[exp.trials.count] === 'test') exp.responseLog[exp.trials.count].clickedArea = event.path[1].getAttribute('id');
+    // get all boxes (by taking all child elements)
+    const boxes = document.getElementById('five-boxes').children;
+    const boxIDs = [];
+    // get all box IDs
+    for (let i = 0; i < boxes.length; i++) {
+      boxIDs.push(boxes[i].id);
+    }
+    // for each box, see whether it was clicked or not
+    // save the id of the one box that owas clicked
+    boxIDs.forEach((box) => {
+      if (event.target.closest(`#${box}`) !== null) {
+        exp.responseLog[exp.trials.count].clickedArea = box;
+      }
+    });
   }
 
   // log all important trial infos
