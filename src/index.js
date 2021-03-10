@@ -17,49 +17,50 @@ showSlide([textSlide], [experimentSlide]);
 // ------------------------------------------------------------------------------------
 // ADDING TEXT VIA RECT => FOREIGNOBJECT => INNERHTML
 // ------------------------------------------------------------------------------------
+
+// ------------------------------------------------------------------------------------
+// HEADINGS
 // we created rects in our HTML, in which we want to type text
 // for that, we need to convert rects into foreignObjects
-const headingRect = document.getElementById('foreign-object-heading');
+const instrHeadingRect = document.getElementById('foreign-object-heading');
 // remove filling color
-headingRect.removeAttribute('fill');
+instrHeadingRect.removeAttribute('fill');
 // get HTML of rect
-let rectHeadingHTML = headingRect.outerHTML;
+let instrHeadingHTML = instrHeadingRect.outerHTML;
 // replace rect tag by foreign object tag
-rectHeadingHTML = rectHeadingHTML.replace('<rect', '<foreignObject');
-rectHeadingHTML = rectHeadingHTML.replace('</rect>', '</foreignObject>');
+instrHeadingHTML = instrHeadingHTML.replace('<rect', '<foreignObject');
+instrHeadingHTML = instrHeadingHTML.replace('</rect>', '</foreignObject>');
 // replace html
-headingRect.outerHTML = rectHeadingHTML;
+instrHeadingRect.outerHTML = instrHeadingHTML;
 
 // place text into foreignObject
-const headingDiv = document.createElement('div');
-headingDiv.innerHTML = '<h1> Text über foreign objects! </h1> <p> Hier gehts weiter </p>';
-const headingFO = document.getElementById('foreign-object-heading');
-headingFO.appendChild(headingDiv);
-// ------------------------------------------------------------------------------------
+const instrHeadingDiv = document.createElement('div');
+instrHeadingDiv.innerHTML = '<h1> Herzlich Willkommen!';
+const instrHeadingFO = document.getElementById('foreign-object-heading');
+instrHeadingFO.appendChild(instrHeadingDiv);
 
 // ------------------------------------------------------------------------------------
-// ADDING TEXT VIA NEW CHILD TO SVG
-// ------------------------------------------------------------------------------------
-const ourSVG = document.getElementById('our-svg');
-const text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
-text.setAttribute('x', 100);
-text.setAttribute('y', 300);
-text.setAttribute('width', 500);
-text.setAttribute('height', 500);
-text.setAttribute('font-weight', 'bold');
-text.style.fontSize = '60';
-text.innerHTML = 'Text über text nodes';
-ourSVG.appendChild(text);
+// INSTRUCTIONS LEFT
+// same procedure as with headings
+const instrParagraphRect = document.getElementById('foreign-object-center-left');
+instrParagraphRect.removeAttribute('fill');
+let instrParagraphHTML = instrParagraphRect.outerHTML;
+instrParagraphHTML = instrParagraphHTML.replace('<rect', '<foreignObject');
+instrParagraphHTML = instrParagraphHTML.replace('</rect>', '</foreignObject>');
+instrParagraphRect.outerHTML = instrParagraphHTML;
 
-const instr = document.createElementNS('http://www.w3.org/2000/svg', 'text');
-instr.setAttribute('x', 100);
-instr.setAttribute('y', 400);
-instr.setAttribute('width', 500);
-instr.setAttribute('height', 500);
-instr.style.fontSize = '60';
-instr.innerHTML = 'Unsere Instruktionen stehen... <tspan x="100" y="500"> ...in einer neuen Zeile </tspan>';
-ourSVG.appendChild(instr);
-// ------------------------------------------------------------------------------------
+const instrParagraphDiv = document.createElement('div');
+instrParagraphDiv.innerHTML = `<p> In diesem Spiel kannst du ein paar Tiere und Luftballoons sehen. 
+<br> <br> Deine Aufgabe ist es, den Ballon zu finden. 
+<br> Der Ballon fliegt immer zu einer Kiste. 
+<br> Das Tier hilft dir und schaut den Ballon an. 
+<br> <br> Klicke auf die Kiste mit dem Ballon - 
+<br> die Tiere schauen immer den Ballon an. 
+<br> <br> Bitte schalte deinen Ton an. 
+<br> Klicke "los gehts!", 
+<br> um mit ein paar Übungen anzufangen. </p>`;
+const instrParagraphFO = document.getElementById('foreign-object-center-left');
+instrParagraphFO.appendChild(instrParagraphDiv);
 
 // // ---------------------------------------------------------------------------------------------------------------------
 // // EXP OBJECT
