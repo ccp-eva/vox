@@ -8,10 +8,12 @@
   },
   "main": "dist/index.html",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
     "dev": "parcel serve ./src/index.html",
-    "build": "rm -rf dist && rm -rf .parcel-cache && parcel build ./src/index.html --public-url='./'",
-    "deploy": "npm run build && rsync -vrP dist/ $npm_config_deploy_user@$npm_config_deploy_path"
+    "cleanup": "rm -rf dist && rm -rf .parcel-cache", 
+    "copydata": "rsync -a src/data dist/",
+    "build": "npm run cleanup && npm run copydata && parcel build ./src/index.html --public-url='./'",
+    "deploy": "npm run build && npm run copydata && rsync -vrP dist/ $npm_config_deploy_user@$npm_config_deploy_path",
+    "fetchdata": "rsync -vraP $npm_config_deploy_user@$npm_config_data_path src/data/"
   },
   "keywords": [
     "vectorized",
