@@ -10,7 +10,7 @@ import showSlide from './js/showSlide';
 import openFullscreen from './js/openFullscreen';
 import closeFullscreen from './js/closeFullscreen';
 import convertToForeignObject from './js/convertToForeignObject';
-import hedgeImg from './images/hedge.png';
+import experimentalInstructions from './js/experimentalInstructions';
 
 // ---------------------------------------------------------------------------------------------------------------------
 // EXP OBJECT
@@ -43,99 +43,14 @@ foreignObjects.forEach((elem) => {
   convertToForeignObject(elem);
 });
 
-// ------------------------------------------------------------------------------------
-// HEADINGS
-// place text into foreignObject
-const instructionsHeadingDiv = document.createElement('div');
-const transitionHeadingDiv = document.createElement('div');
-const goodbyeHeadingDiv = document.createElement('div');
-
-instructionsHeadingDiv.innerHTML = '<h1> Herzlich Willkommen! </h1>';
-transitionHeadingDiv.innerHTML = '<h1> Super! Das war klasse! </h1>';
-goodbyeHeadingDiv.innerHTML = '<h1> Geschafft! Das hast du super gemacht! </h1>';
-
-// ------------------------------------------------------------------------------------
-// ACTUAL TEXT
-const instructionsParagraphDiv = document.createElement('div');
-const transitionParagraphDiv = document.createElement('div');
-const goodbyeParagraphDiv = document.createElement('div');
-
-if (exp.subjData.touchScreen) {
-  // instruction for hedge version
-  instructionsParagraphDiv.innerHTML = `<p>
-  In diesem Spiel kannst du ein paar Tiere und Luftballoons sehen. <br> <br>
-  Deine Aufgabe ist es, den Ballon zu finden. <br>
-  Der Ballon fliegt immer auf den Boden. <br>
-  Das Tier hilft dir und schaut den Ballon an. <br> <br>
-  Klicke auf den Ballon - <br>
-  die Tiere schauen immer den Ballon an. <br> <br>
-  Bitte schalte deinen Ton an. <br>
-  Klicke "los geht's!", <br>
-  um mit ein paar Übungen anzufangen. 
-  </p>`;
-
-  // transition for hedge version
-  transitionParagraphDiv.innerHTML = `<p> 
-  Die Tiere spielen nun in einem neuen Haus. <br> 
-  Hier fällt der Ballon immer hinter eine Hecke. <br> <br> 
-  Deine Aufgabe ist es zu raten, <br> 
-  wo der Ballon ist. <br> 
-  Der Ballon fliegt immer hinter die Hecke. <br> 
-  Das Tier hilft dir und schaut den Ballon an. <br> <br> 
-  Klicke auf die Stelle auf der Hecke, <br> 
-  wo sich der Ballon versteckt - <br> 
-  die Tiere schauen immer den Ballon an. <br> <br> 
-  Klicke "los geht's!", um das Spiel zu starten.
-  </p>`;
-} else if (!exp.subjData.touchScreen) {
-  // instruction for box version
-  instructionsParagraphDiv.innerHTML = `<p> 
-  In diesem Spiel kannst du ein paar Tiere und Luftballoons sehen. <br> <br> 
-  Deine Aufgabe ist es, den Ballon zu finden. <br> 
-  Der Ballon fliegt immer zu einer Kiste. <br> 
-  Das Tier hilft dir und schaut den Ballon an. <br> <br> 
-  Klicke auf die Kiste mit dem Ballon - <br> 
-  die Tiere schauen immer den Ballon an. <br> <br> 
-  Bitte schalte deinen Ton an. <br> 
-  Klicke "los geht's!", <br> 
-  um mit ein paar Übungen anzufangen. 
-  </p>`;
-
-  // transition for box version
-  transitionParagraphDiv.innerHTML = `<p> 
-  Die Tiere spielen nun in einem neuen Haus. <br> 
-  Hier fällt der Ballon immer hinter eine Hecke. <br> 
-  Hinter der Hecke stehen Kisten. <br> <br> 
-  Deine Aufgabe ist es zu raten, <br> 
-  in welcher Kiste der Ballon ist. <br> 
-  Der Ballon fliegt immer in eine Kiste. <br> 
-  Das Tier hilft dir und schaut den Ballon an. <br> <br> 
-  Klicke auf die Kiste, <br> 
-  in der sich der Ballon versteckt - <br> 
-  die Tiere schauen immer den Ballon an. <br> <br> 
-  Klicke "los geht's!", um das Spiel zu starten.
-  </p>`;
-}
-
-// goodbye text
-goodbyeParagraphDiv.innerHTML = `<p> 
-<br> <br> <br>
-Die Tiere sind schon ganz müde und glücklich vom Spielen! <br> <br>
-Vielen Dank für deine Hilfe! <br> <br>
-Bis zum nächsten Mal! <br> <br>
-Liebe Grüße vom Schwein, Affen und Schaf
-</p>`;
-
-// ACTUALLY ADDING TEXT TO THE DOM
-// THIS IS WHAT WE DO THEN IN OUR EVENTLISTENER TARGET CLICK FUNCTION
-// document.getElementById('foreign-object-heading').appendChild(instructionsHeadingDiv);
-// document.getElementById('foreign-object-center-left').appendChild(instructionsParagraphDiv);
-
-// document.getElementById('foreign-object-heading').appendChild(transitionHeadingDiv);
-// document.getElementById('foreign-object-center-left').appendChild(transitionParagraphDiv);
-
-// document.getElementById('foreign-object-heading').appendChild(goodbyeHeadingDiv);
-// document.getElementById('foreign-object-center-left').appendChild(goodbyeParagraphDiv);
+const {
+  instructionsHeading,
+  instructionsParagraph,
+  transitionHeading,
+  transitionParagraph,
+  goodbyeHeading,
+  goodbyeParagraph,
+} = experimentalInstructions(exp);
 
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------
@@ -321,8 +236,8 @@ showSlide([textSlide], [experimentSlide]);
 
 //   // if transition between fam and test trials, show that transition slide
 //   } else if (exp.trials.count === exp.trials.famNr) {
-//      document.getElementById('foreign-object-heading').appendChild(transitionHeadingDiv);
-//      document.getElementById('foreign-object-center-left').appendChild(transitionParagraphDiv);
+//      document.getElementById('foreign-object-heading').appendChild(transitionHeading);
+//      document.getElementById('foreign-object-center-left').appendChild(transitionParagraph);
 //      TODO maybe need to hide balloons and agents separately!
 //      showSlide([textSlide], [experimentSlide]);
 
@@ -335,8 +250,8 @@ showSlide([textSlide], [experimentSlide]);
 //   // if all trials done, show goodbye slide
 //   } else if (exp.trials.count === exp.trials.totalNr) {
 //     closeFullscreen();
-//     document.getElementById('foreign-object-heading').appendChild(goodbyeHeadingDiv);
-//     document.getElementById('foreign-object-center-left').appendChild(goodbyeParagraphDiv);
+//     document.getElementById('foreign-object-heading').appendChild(goodbyeHeading);
+//     document.getElementById('foreign-object-center-left').appendChild(goodbyeParagraph);
 //     showSlide([textSlide], [experimentSlide]);
 //     TODO maybe need to blend out targets and agents separately
 // //     showSlide([goodbyeSlide],
@@ -404,8 +319,8 @@ showSlide([textSlide], [experimentSlide]);
 // ACTUALLY RUNNING:
 // ---------------------------------------------------------------------------------------------------------------------
 // INSTRUCTION: show slide
-document.getElementById('foreign-object-heading').appendChild(instructionsHeadingDiv);
-document.getElementById('foreign-object-center-left').appendChild(instructionsParagraphDiv);
+document.getElementById('foreign-object-heading').appendChild(instructionsHeading);
+document.getElementById('foreign-object-center-left').appendChild(instructionsParagraph);
 showSlide([textSlide], [experimentSlide]);
 
 // add event listeners
