@@ -30,7 +30,7 @@ exp.subjData.subjID = 'testID';
 // TOUCHSCREEN & SCREEN SIZE
 // if (clientWidth < 600 || clientHeight < 200) alert('Please view on bigger screen!');
 // ---------------------------------------------------------------------------------------------------------------------
-exp.subjData.touchScreen = checkForTouchscreen();
+exp.subjData.touchScreen = !checkForTouchscreen();
 exp.subjData.offsetWidth = document.body.offsetWidth;
 exp.subjData.offsetHeight = document.body.offsetHeight;
 
@@ -72,249 +72,274 @@ exp.elemSpecs = {
 // ---------------------------------------------------------------------------------------------------------------------
 const textSlide = document.getElementById('text-slide');
 const experimentSlide = document.getElementById('experiment-slide');
-showSlide([textSlide], [experimentSlide]);
-// showSlide([experimentSlide], [textSlide]);
 
-// const instructionButton = document.getElementById('instructions-button');
-// const transitionButton = document.getElementById('transition-button');
-// const goodbyeButton = document.getElementById('goodbye-button');
-// const losgehtsButton = document.getElementById('experiment-button');
-// const clickBubble = document.getElementById('click-bubble');
-// const boxes8Front = document.getElementById('boxes8-front');
-// const boxes8Back = document.getElementById('boxes8-back');
-// const hedge = document.getElementById('hedge');
+const instructionButton = document.getElementById('instructions-button');
+const transitionButton = document.getElementById('transition-button');
+const goodbyeButton = document.getElementById('goodbye-button');
+const losgehtsButton = document.getElementById('experiment-button');
+const clickBubble = document.getElementById('click-bubble');
+const clickableArea = document.getElementById('clickable-area');
+const hedge = document.getElementById('hedge');
 
-// // if you change animal agents or targets, then change ID here...
-// const pig = document.getElementById('pig');
-// const monkey = document.getElementById('monkey');
-// const sheep = document.getElementById('sheep');
-// const agentsSingle = [pig, monkey, sheep];
+const boxes1Front = document.getElementById('boxes1-front');
+const boxes1Back = document.getElementById('boxes1-back');
+const boxes2Front = document.getElementById('boxes2-front');
+const boxes2Back = document.getElementById('boxes2-back');
+const boxes3Front = document.getElementById('boxes3-front');
+const boxes3Back = document.getElementById('boxes3-back');
+const boxes4Front = document.getElementById('boxes4-front');
+const boxes4Back = document.getElementById('boxes4-back');
+const boxes5Front = document.getElementById('boxes5-front');
+const boxes5Back = document.getElementById('boxes5-back');
+const boxes6Front = document.getElementById('boxes6-front');
+const boxes6Back = document.getElementById('boxes6-back');
+const boxes7Front = document.getElementById('boxes7-front');
+const boxes7Back = document.getElementById('boxes7-back');
 
-// // NOTE: we believe that all target objects are the same size here!!
-// const balloonBlue = document.getElementById('balloon-blue');
-// const balloonRed = document.getElementById('balloon-red');
-// const balloonYellow = document.getElementById('balloon-yellow');
-// const balloonGreen = document.getElementById('balloon-green');
-// const targetsSingle = [balloonBlue, balloonRed, balloonYellow, balloonGreen];
+[boxes1Front, boxes1Back,
+  boxes2Front, boxes2Back,
+  boxes3Front, boxes3Back,
+  boxes4Front, boxes4Back,
+  boxes5Front, boxes5Back,
+  boxes6Front, boxes6Back,
+  boxes7Front, boxes7Back]
+  .forEach((box) => {
+    box.setAttribute('visibility', 'hidden');
+  });
+const boxes8Front = document.getElementById('boxes8-front');
+const boxes8Back = document.getElementById('boxes8-back');
 
-// // save the original eye positions (so when eye is in the center)
-// exp.elemSpecs.eyes = {};
-// const agentsChar = ['pig', 'monkey', 'sheep'];
-// agentsChar.forEach((agent) => {
-//   exp.elemSpecs.eyes[agent] = {
-//     radius: document.getElementById(`${agent}-eyeline-left`).getAttribute('r'),
-//     left: {
-//       center: {
-//         x: document.getElementById(`${agent}-pupil-left`).getAttribute('cx'),
-//         y: document.getElementById(`${agent}-pupil-left`).getAttribute('cy'),
-//       },
-//       bbox: {
-//         x: document.getElementById(`${agent}-pupil-left`).getBBox().x, // same as cx - r
-//         y: document.getElementById(`${agent}-pupil-left`).getBBox().y, // same as cy - r
-//       },
-//     },
-//     right: {
-//       center: {
-//         x: document.getElementById(`${agent}-pupil-right`).getAttribute('cx'),
-//         y: document.getElementById(`${agent}-pupil-right`).getAttribute('cy'),
-//       },
-//       bbox: {
-//         x: document.getElementById(`${agent}-pupil-right`).getBBox().x, // same as cx - r
-//         y: document.getElementById(`${agent}-pupil-right`).getBBox().y, // same as cy - r
-//       },
-//     },
-//   };
-// });
+// boxes8Front.setEnabled
 
-// // calculate some positions of the targets
-// exp.elemSpecs.targets = {
-//   center: {
-//     // position mid
-//     x: exp.elemSpecs.outerSVG.origViewBoxWidth / 2 - balloonBlue.getBBox().width / 2,
-//     // 2.8, so that we can still see our agents and they don't get covered by balloons
-//     y: exp.elemSpecs.outerSVG.origViewBoxHeight / 2.8,
-//   },
-//   // define from which point onwards the balloon is hidden behind hedge
-//   halfway: {
-//     // position mid, same as in center.x
-//     x: exp.elemSpecs.outerSVG.origViewBoxWidth / 2 - balloonBlue.getBBox().width / 2,
-//     // BBox of hedge is a bit too high to hide balloon (because of single grass halms), therefore / 1.1
-//     y: exp.elemSpecs.outerSVG.origViewBoxHeight - hedge.getBBox().height / 1.1,
-//   },
-//   // right side of screen as upper boundary
-//   borderRight: exp.elemSpecs.outerSVG.origViewBoxWidth - balloonBlue.getBBox().width,
-//   // calculate y coords for balloon (-30 for little distance from lower border)
-//   groundY: exp.elemSpecs.outerSVG.origViewBoxHeight - balloonBlue.getBBox().height - 30,
-// };
+// if you change animal agents or targets, then change ID here...
+const pig = document.getElementById('pig');
+const monkey = document.getElementById('monkey');
+const sheep = document.getElementById('sheep');
+const agentsSingle = [pig, monkey, sheep];
 
-// // ---------------------------------------------------------------------------------------------------------------------
-// // TRIAL NUMBER & RANDOMIZATION OF AGENTS, TARGETS AND TARGET POSITIONS
-// // ---------------------------------------------------------------------------------------------------------------------
-// exp.trials = {};
-// exp.trials.famNr = 2;
-// exp.trials.testNr = 2;
-// exp.trials.totalNr = exp.trials.famNr + exp.trials.testNr;
-// // this variable stores in which trial we currently are!
-// exp.trials.count = 0;
-// const timeline = null;
+// NOTE: we believe that all target objects are the same size here!!
+const balloonBlue = document.getElementById('balloon-blue');
+const balloonRed = document.getElementById('balloon-red');
+const balloonYellow = document.getElementById('balloon-yellow');
+const balloonGreen = document.getElementById('balloon-green');
+const targetsSingle = [balloonBlue, balloonRed, balloonYellow, balloonGreen];
 
-// // create arrays with agents, targets, positions etc. for all the trials
-// randomizeTrials(exp, agentsSingle, targetsSingle);
-// console.log('exp object', exp);
+// save the original eye positions (so when eye is in the center)
+exp.elemSpecs.eyes = {};
+const agentsChar = ['pig', 'monkey', 'sheep'];
+agentsChar.forEach((agent) => {
+  exp.elemSpecs.eyes[agent] = {
+    radius: document.getElementById(`${agent}-eyeline-left`).getAttribute('r'),
+    left: {
+      center: {
+        x: document.getElementById(`${agent}-pupil-left`).getAttribute('cx'),
+        y: document.getElementById(`${agent}-pupil-left`).getAttribute('cy'),
+      },
+      bbox: {
+        x: document.getElementById(`${agent}-pupil-left`).getBBox().x, // same as cx - r
+        y: document.getElementById(`${agent}-pupil-left`).getBBox().y, // same as cy - r
+      },
+    },
+    right: {
+      center: {
+        x: document.getElementById(`${agent}-pupil-right`).getAttribute('cx'),
+        y: document.getElementById(`${agent}-pupil-right`).getAttribute('cy'),
+      },
+      bbox: {
+        x: document.getElementById(`${agent}-pupil-right`).getBBox().x, // same as cx - r
+        y: document.getElementById(`${agent}-pupil-right`).getBBox().y, // same as cy - r
+      },
+    },
+  };
+});
 
-// // ---------------------------------------------------------------------------------------------------------------------
-// // DEFINE EVENTLISTENER FUNCTIONS
-// // ---------------------------------------------------------------------------------------------------------------------
-// // ---------------------------------------------------------------------------------------------------------------------
-// // RUNS WHEN INSTRUCTION BUTTON IS CLICKED
-// // ---------------------------------------------------------------------------------------------------------------------
-// // save in const variables in order to pass on event to function
-// const handleInstructionClick = (event) => {
-//   event.preventDefault();
-//   openFullscreen();
+// calculate some positions of the targets
+exp.elemSpecs.targets = {
+  center: {
+    x: balloonBlue.getBBox().x,
+    y: balloonBlue.getBBox().y,
+  },
+  // define from which point onwards the balloon is hidden behind hedge
+  halfway: {
+    // position mid, same as in center.x
+    x: balloonBlue.getBBox().x,
+    // BBox of hedge is a bit too high to hide balloon (because of single grass halms), therefore / 1.1
+    y: exp.elemSpecs.outerSVG.origViewBoxHeight - hedge.getBBox().height / 1.1,
+  },
+  // right side of screen as upper boundary
+  borderRight: exp.elemSpecs.outerSVG.origViewBoxWidth - balloonBlue.getBBox().width,
+  // calculate y coords for balloon (-30 for little distance from lower border)
+  groundY: exp.elemSpecs.outerSVG.origViewBoxHeight - balloonBlue.getBBox().height - 30,
+};
 
-//   // showSlide: first array gets shown, second array gets hidden
-//   showSlide([experimentSlide], [textSlide, clickBubble]);
+// ---------------------------------------------------------------------------------------------------------------------
+// TRIAL NUMBER & RANDOMIZATION OF AGENTS, TARGETS AND TARGET POSITIONS
+// ---------------------------------------------------------------------------------------------------------------------
+exp.trials = {};
+exp.trials.famNr = 2;
+exp.trials.testNr = 2;
+exp.trials.totalNr = exp.trials.famNr + exp.trials.testNr;
+// this variable stores in which trial we currently are!
+exp.trials.count = 0;
+let timeline = null;
 
-//   // shows only relevant elements etc.
-//   prepareTrial(exp);
-//   timeline = gsap.timeline({ paused: true });
-//   timeline.add(changeGaze(exp));
-// };
-// // ---------------------------------------------------------------------------------------------------------------------
-// // RUNS WHEN TRANSITION BUTTON IS CLICKED (between fam and test trials)
-// // (nearly same as instruction click!)
-// // ---------------------------------------------------------------------------------------------------------------------
-// const handleTransitionClick = (event) => {
-//   event.preventDefault();
+// create arrays with agents, targets, positions etc. for all the trials
+randomizeTrials(exp, agentsSingle, targetsSingle);
+console.log('exp object', exp);
 
-//   showSlide([experimentSlide, fiveBoxes],
-//     [instructionSlide, transitionSlide, goodbyeSlide, clickBubble]);
+// ---------------------------------------------------------------------------------------------------------------------
+// DEFINE EVENTLISTENER FUNCTIONS
+// ---------------------------------------------------------------------------------------------------------------------
+// ---------------------------------------------------------------------------------------------------------------------
+// RUNS WHEN INSTRUCTION BUTTON IS CLICKED
+// ---------------------------------------------------------------------------------------------------------------------
+// save in const variables in order to pass on event to function
+const handleInstructionClick = (event) => {
+  event.preventDefault();
+  // openFullscreen();
 
-//   prepareTrial(exp);
-//   timeline = gsap.timeline({ paused: true });
-//   timeline.add(changeGaze(exp));
-// };
-// // ---------------------------------------------------------------------------------------------------------------------
-// // RUNS WHEN GOODBYE BUTTON IS CLICKED
-// // ---------------------------------------------------------------------------------------------------------------------
-// const handleGoodbyeClick = (event) => {
-//   event.preventDefault();
+  // showSlide: first array gets shown, second array gets hidden
+  showSlide([experimentSlide],
+    [textSlide, clickBubble, clickableArea, instructionButton]);
 
-//   showSlide([],
-//     [goodbyeSlide]);
+  // shows only relevant elements etc.
+  prepareTrial(exp);
+  timeline = gsap.timeline({ paused: true });
+  timeline.add(changeGaze(exp));
+};
+// ---------------------------------------------------------------------------------------------------------------------
+// RUNS WHEN TRANSITION BUTTON IS CLICKED (between fam and test trials)
+// (nearly same as instruction click!)
+// ---------------------------------------------------------------------------------------------------------------------
+const handleTransitionClick = (event) => {
+  event.preventDefault();
 
-//   downloadData(exp.responseLog, exp.subjData.subjID);
-// };
-// // ---------------------------------------------------------------------------------------------------------------------
-// // RUNS WHEN TARGET IS CLICKED
-// // ---------------------------------------------------------------------------------------------------------------------
-// // async so we can await animation!
-// const handleTargetClick = async function tmp(event) {
-//   // we save current time, so that we can calculate response time
-//   exp.responseLog[exp.trials.count].responseTime.t1 = new Date().getTime();
-//   // remove eventListener that was responsible for "wrong input" sound
-//   exp.elemSpecs.outerSVG.ID.removeEventListener('click', handleWrongClick, false);
-//   event.preventDefault();
+  showSlide([experimentSlide],
+    [textSlide, clickBubble]);
 
-//   // function to save all relevant information
-//   logResponse(event, exp);
-//   console.log('responseLog: ', exp.responseLog[exp.trials.count]);
+  prepareTrial(exp);
+  timeline = gsap.timeline({ paused: true });
+  timeline.add(changeGaze(exp));
+};
+// ---------------------------------------------------------------------------------------------------------------------
+// RUNS WHEN GOODBYE BUTTON IS CLICKED
+// ---------------------------------------------------------------------------------------------------------------------
+const handleGoodbyeClick = (event) => {
+  event.preventDefault();
 
-//   // so that we don't rush into next trial
-//   await pause(500);
+  showSlide([],
+    [textSlide]);
 
-//   // prepare next trial
-//   exp.trials.count += 1;
+  downloadData(exp.responseLog, exp.subjData.subjID);
+};
+// ---------------------------------------------------------------------------------------------------------------------
+// RUNS WHEN TARGET IS CLICKED
+// ---------------------------------------------------------------------------------------------------------------------
+// async so we can await animation!
+const handleTargetClick = async function tmp(event) {
+  // we save current time, so that we can calculate response time
+  exp.responseLog[exp.trials.count].responseTime.t1 = new Date().getTime();
+  // remove eventListener that was responsible for "wrong input" sound
+  exp.elemSpecs.outerSVG.ID.removeEventListener('click', handleWrongClick, false);
+  event.preventDefault();
 
-//   // then depending on trialcount, decide what happens next...
-//   // if still in fam trials, prepare trial
-//   if (exp.trials.count < exp.trials.famNr) {
-//     prepareTrial(exp);
-//     timeline = gsap.timeline({ paused: true });
-//     timeline.add(changeGaze(exp));
+  // function to save all relevant information
+  logResponse(event, exp);
+  console.log('responseLog: ', exp.responseLog[exp.trials.count]);
 
-//   // if transition between fam and test trials, show that transition slide
-//   } else if (exp.trials.count === exp.trials.famNr) {
-//      document.getElementById('foreign-object-heading').appendChild(transitionHeading);
-//      document.getElementById('foreign-object-center-left').appendChild(transitionParagraph);
-//      TODO maybe need to hide balloons and agents separately!
-//      showSlide([textSlide], [experimentSlide]);
+  // so that we don't rush into next trial
+  await pause(500);
 
-//   // if test trial, prepare trial
-//   } else if (exp.trials.count < exp.trials.totalNr) {
-//     prepareTrial(exp);
-//     timeline = gsap.timeline({ paused: true });
-//     timeline.add(changeGaze(exp));
+  // prepare next trial
+  exp.trials.count += 1;
 
-//   // if all trials done, show goodbye slide
-//   } else if (exp.trials.count === exp.trials.totalNr) {
-//     closeFullscreen();
-//     document.getElementById('foreign-object-heading').appendChild(goodbyeHeading);
-//     document.getElementById('foreign-object-center-left').appendChild(goodbyeParagraph);
-//     showSlide([textSlide], [experimentSlide]);
-//     TODO maybe need to blend out targets and agents separately
-// //     showSlide([goodbyeSlide],
-// //       [experimentSlide, hedge, pig, monkey, sheep, balloonBlue, balloonRed, balloonYellow, balloonGreen, fiveBoxes]);
-//   }
-// };
-// // ---------------------------------------------------------------------------------------------------------------------
-// // RUNS WHEN WRONG CLICK
-// // ---------------------------------------------------------------------------------------------------------------------
-// const handleWrongClick = (event) => {
-//   event.preventDefault();
-//   // from user screen size, calculate where there was a click
-//   const screenScalingHeight = exp.elemSpecs.outerSVG.origViewBoxHeight / exp.subjData.offsetHeight;
-//   const clickY = event.clientY - exp.elemSpecs.outerSVG.ID.getBoundingClientRect().top;
-//   const clickScaledY = screenScalingHeight * clickY;
-//   // if that is somewhere above the hedge (e.g. on the agents), play "negative" feedback sound
-//   // this is how much we move the hedge down in changeGaze
-//   const hedgeMoved = hedge.getBBox().height - exp.targets[exp.trials.count].getBBox().height - 75;
-//   console.log('hedgeMoved', hedgeMoved);
-//   // this is the y coord of the upper corner of the hedge after the animation
-//   const hedgeDown = hedge.getBBox().y - hedgeMoved;
-//   console.log('hedge.getBBox().y', hedge.getBBox().y);
-//   console.log('hedgeDown', hedgeDown);
-//   // then, we need to define what is above the hedge
-//   const cornerHedge = exp.elemSpecs.outerSVG.origViewBoxHeight - hedgeDown;
-//   // if user clicked above hedge, play negative feedback sound
-//   if (clickScaledY < cornerHedge) {
-//     // count how often a participant clicked in the wrong area
-//     exp.responseLog[exp.trials.count].wrongClick++;
-//     document.getElementById('negative-sound').play();
-//   }
-// };
-// // ---------------------------------------------------------------------------------------------------------------------
-// // RUNS WHEN "los geht's" BUTTON IS CLICKED
-// // ---------------------------------------------------------------------------------------------------------------------
-// const handleLosgehtsClick = async function tmp(event) {
-//   event.preventDefault();
-//   console.log('');
-//   console.log('trial: ', exp.trials.count);
+  // then depending on trialcount, decide what happens next...
+  // if still in fam trials, prepare trial
+  if (exp.trials.count < exp.trials.famNr) {
+    prepareTrial(exp);
+    timeline = gsap.timeline({ paused: true });
+    timeline.add(changeGaze(exp));
 
-//   // hide blurr canvas and button
-//   document.getElementById('experiment-button').setAttribute('visibility', 'hidden');
-//   document.getElementById('cover-blurr').setAttribute('visibility', 'hidden');
+  // if transition between fam and test trials, show that transition slide
+  } else if (exp.trials.count === exp.trials.famNr) {
+    document.getElementById('foreign-object-heading').replaceChild(transitionHeading, instructionsHeading);
+    document.getElementById('foreign-object-center-left').replaceChild(transitionParagraph, instructionsParagraph);
+    showSlide([textSlide],
+      [experimentSlide, hedge, pig, monkey, sheep, balloonBlue, balloonRed, balloonYellow, balloonGreen, boxes8Front, boxes8Back]);
 
-//   // animate balloon & eye movement to randomized positions
-//   await timeline.play();
+  // if test trial, prepare trial
+  } else if (exp.trials.count < exp.trials.totalNr) {
+    prepareTrial(exp);
+    timeline = gsap.timeline({ paused: true });
+    timeline.add(changeGaze(exp));
 
-//   // save current time to calculate response time later
-//   exp.responseLog[exp.trials.count].responseTime = {
-//     t0: new Date().getTime(),
-//     t1: 0,
-//   };
+  // if all trials done, show goodbye slide
+  } else if (exp.trials.count === exp.trials.totalNr) {
+    closeFullscreen();
+    document.getElementById('foreign-object-heading').replaceChild(goodbyeHeading, transitionHeading);
+    document.getElementById('foreign-object-center-left').replaceChild(goodbyeParagraph, transitionParagraph);
+    showSlide([textSlide],
+      [experimentSlide, hedge, pig, monkey, sheep, balloonBlue, balloonRed, balloonYellow, balloonGreen, boxes8Front, boxes8Back]);
+  }
+};
+// ---------------------------------------------------------------------------------------------------------------------
+// RUNS WHEN WRONG CLICK
+// ---------------------------------------------------------------------------------------------------------------------
+const handleWrongClick = (event) => {
+  event.preventDefault();
+  // from user screen size, calculate where there was a click
+  const screenScalingHeight = exp.elemSpecs.outerSVG.origViewBoxHeight / exp.subjData.offsetHeight;
+  const clickY = event.clientY - exp.elemSpecs.outerSVG.ID.getBoundingClientRect().top;
+  const clickScaledY = screenScalingHeight * clickY;
+  // if that is somewhere above the hedge (e.g. on the agents), play "negative" feedback sound
+  // this is how much we move the hedge down in changeGaze
+  const hedgeMoved = hedge.getBBox().height - exp.targets[exp.trials.count].getBBox().height - 75;
+  console.log('hedgeMoved', hedgeMoved);
+  // this is the y coord of the upper corner of the hedge after the animation
+  const hedgeDown = hedge.getBBox().y - hedgeMoved;
+  console.log('hedge.getBBox().y', hedge.getBBox().y);
+  console.log('hedgeDown', hedgeDown);
+  // then, we need to define what is above the hedge
+  const cornerHedge = exp.elemSpecs.outerSVG.origViewBoxHeight - hedgeDown;
+  // if user clicked above hedge, play negative feedback sound
+  if (clickScaledY < cornerHedge) {
+    // count how often a participant clicked in the wrong area
+    exp.responseLog[exp.trials.count].wrongClick++;
+    document.getElementById('negative-sound').play();
+  }
+};
+// ---------------------------------------------------------------------------------------------------------------------
+// RUNS WHEN "los geht's" BUTTON IS CLICKED
+// ---------------------------------------------------------------------------------------------------------------------
+const handleLosgehtsClick = async function tmp(event) {
+  event.preventDefault();
+  console.log('');
+  console.log('trial: ', exp.trials.count);
 
-//   // depending on experiment version, users click on hedge or boxes
-//   if (exp.subjData.touchScreen) {
-//     hedge.setAttribute('pointer-events', 'all');
-//     hedge.addEventListener('click', handleTargetClick, { capture: false, once: true });
-//   } else if (!exp.subjData.touchScreen) {
-//     hedge.setAttribute('pointer-events', 'none');
-//     fiveBoxes.addEventListener('click', handleTargetClick, { capture: false, once: true });
-//   }
-//   exp.elemSpecs.outerSVG.ID.addEventListener('click', handleWrongClick, false);
-// };
+  // hide blurr canvas and button
+  document.getElementById('experiment-button').setAttribute('visibility', 'hidden');
+  document.getElementById('cover-blurr').setAttribute('visibility', 'hidden');
+
+  // animate balloon & eye movement to randomized positions
+  await timeline.play();
+
+  // save current time to calculate response time later
+  exp.responseLog[exp.trials.count].responseTime = {
+    t0: new Date().getTime(),
+    t1: 0,
+  };
+
+  // depending on experiment version, users click on hedge or boxes
+  if (exp.subjData.touchScreen) {
+    hedge.setAttribute('pointer-events', 'all');
+    hedge.addEventListener('click', handleTargetClick, { capture: false, once: true });
+  } else if (!exp.subjData.touchScreen) {
+    hedge.setAttribute('pointer-events', 'none');
+    boxes8Front.addEventListener('click', handleTargetClick, { capture: false, once: true });
+    boxes8Back.addEventListener('click', handleTargetClick, { capture: false, once: true });
+  }
+  exp.elemSpecs.outerSVG.ID.addEventListener('click', handleWrongClick, false);
+};
 // ---------------------------------------------------------------------------------------------------------------------
 // ACTUALLY RUNNING:
 // ---------------------------------------------------------------------------------------------------------------------
@@ -324,7 +349,7 @@ document.getElementById('foreign-object-center-left').appendChild(instructionsPa
 showSlide([textSlide], [experimentSlide]);
 
 // add event listeners
-// instructionButton.addEventListener('click', handleInstructionClick, { capture: false, once: true });
-// losgehtsButton.addEventListener('click', handleLosgehtsClick, { capture: false });
-// transitionButton.addEventListener('click', handleTransitionClick, { capture: false, once: true });
-// goodbyeButton.addEventListener('click', handleGoodbyeClick, { capture: false, once: true });
+instructionButton.addEventListener('click', handleInstructionClick, { capture: false, once: true });
+losgehtsButton.addEventListener('click', handleLosgehtsClick, { capture: false });
+transitionButton.addEventListener('click', handleTransitionClick, { capture: false, once: true });
+goodbyeButton.addEventListener('click', handleGoodbyeClick, { capture: false, once: true });

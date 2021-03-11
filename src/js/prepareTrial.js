@@ -25,22 +25,15 @@ export default (exp) => {
   const eyelineLeft = document.getElementById(`${currentAgent}-eyeline-left`);
   const eyelineRight = document.getElementById(`${currentAgent}-eyeline-right`);
   const hedge = document.getElementById('hedge');
-  const fiveBoxes = document.getElementById('five-boxes');
+  const boxes8Front = document.getElementById('boxes8-front');
+  const boxes8Back = document.getElementById('boxes8-back');
 
   // set eyes to center
   // original value stored in e.g. pupilLeft.getBBox().x
   // but we just need to remove the transform attribute
-  gsap.set([pupilLeft, pupilRight, irisLeft, irisRight, hedge], {
+  gsap.set([pupilLeft, pupilRight, irisLeft, irisRight, hedge, exp.targets[exp.trials.count]], {
     x: 0,
     y: 0,
-  });
-
-  // set target to center
-  // TODO just set balloon to middle in SVG Illustrator already!!
-  // set target to center
-  gsap.set(exp.targets[exp.trials.count], {
-    x: exp.elemSpecs.targets.center.x,
-    y: exp.elemSpecs.targets.center.y,
   });
 
   // depending on trial type, show or hide hedge
@@ -51,11 +44,30 @@ export default (exp) => {
   }
 
   // for PC version show boxes, for touchscreen hide them
-  if (exp.subjData.touchScreen === false) {
-    fiveBoxes.setAttribute('visibility', 'visible');
-  } else if (exp.subjData.touchScreen === true) {
-    fiveBoxes.setAttribute('visibility', 'hidden');
+  if (exp.subjData.touchScreen) {
+    boxes8Front.setAttribute('visibility', 'hidden');
+    boxes8Back.setAttribute('visibility', 'hidden');
+  } else if (!exp.subjData.touchScreen) {
+    boxes8Front.setAttribute('visibility', 'visible');
+    boxes8Back.setAttribute('visibility', 'visible');
   }
+
+  // calculate how far the balloon will fly
+  exp.elemSpecs.targets.centerHalfway = {
+    x: exp.elemSpecs.targets.halfway.x - exp.elemSpecs.targets.center.x,
+    y: exp.elemSpecs.targets.halfway.y - exp.elemSpecs.targets.center.y,
+  };
+
+  exp.elemSpecs.targets.halfwayFinal = {
+    x: exp.positions[exp.trials.count].x - exp.elemSpecs.targets.halfway.x,
+    y: exp.positions[exp.trials.count].y - exp.elemSpecs.targets.halfway.y,
+  };
+
+  exp.elemSpecs.targets.centerFinal = {
+    x: exp.positions[exp.trials.count].x - exp.elemSpecs.targets.center.x,
+    y: exp.positions[exp.trials.count].y - exp.elemSpecs.targets.center.y,
+  };
+
   // calculate where eyes should move in the trial
   // for test trials: first let eyes follow balloon to middle, until balloon is hidden
   const gazeCoordsHalfwayLeft = getGazeCoords(

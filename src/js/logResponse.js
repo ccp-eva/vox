@@ -98,7 +98,9 @@ export default (event, exp) => {
   }
   if (!exp.subjData.touchScreen) {
     // get all boxes (by taking all child elements)
-    const boxes = document.getElementById('five-boxes').children;
+    // Array.from(document.querySelectorAll('[id^="foreign-object"]'))
+    // const boxes = document.getElementById('boxes8').children;
+    const boxes = document.getElementById('boxes8').children;
     const boxIDs = [];
     // get all box IDs
     for (let i = 0; i < boxes.length; i++) {
