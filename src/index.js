@@ -9,112 +9,165 @@ import checkForTouchscreen from './js/checkForTouchscreen';
 import showSlide from './js/showSlide';
 import openFullscreen from './js/openFullscreen';
 import closeFullscreen from './js/closeFullscreen';
+import convertToForeignObject from './js/convertToForeignObject';
+import hedgeImg from './images/hedge.png';
 
-const textSlide = document.getElementById('text-slide');
-const experimentSlide = document.getElementById('experiment-slide');
-showSlide([textSlide], [experimentSlide]);
+// ---------------------------------------------------------------------------------------------------------------------
+// EXP OBJECT
+// in this object, we save all of our variables, easier to pass on to functions
+// NOTE: we do manipulate this object in our functions!
+// TODO set attribute pointerevents = all
+// ---------------------------------------------------------------------------------------------------------------------
+const exp = {};
 
-// ------------------------------------------------------------------------------------
-// ADDING TEXT VIA RECT => FOREIGNOBJECT => INNERHTML
-// ------------------------------------------------------------------------------------
+// ---------------------------------------------------------------------------------------------------------------------
+// PARTICIPANT ID
+// ---------------------------------------------------------------------------------------------------------------------
+exp.subjData = {};
+exp.subjData.subjID = 'testID';
+
+// ---------------------------------------------------------------------------------------------------------------------
+// TOUCHSCREEN & SCREEN SIZE
+// if (clientWidth < 600 || clientHeight < 200) alert('Please view on bigger screen!');
+// ---------------------------------------------------------------------------------------------------------------------
+exp.subjData.touchScreen = checkForTouchscreen();
+exp.subjData.offsetWidth = document.body.offsetWidth;
+exp.subjData.offsetHeight = document.body.offsetHeight;
+
+// ---------------------------------------------------------------------------------------------------------------------
+// ADD INSTRUCTION TEXT
+// ---------------------------------------------------------------------------------------------------------------------
+// add text via rect => foreignObject => innerHTML
+const foreignObjects = Array.from(document.querySelectorAll('[id^="foreign-object"]'));
+foreignObjects.forEach((elem) => {
+  convertToForeignObject(elem);
+});
 
 // ------------------------------------------------------------------------------------
 // HEADINGS
-// we created rects in our HTML, in which we want to type text
-// for that, we need to convert rects into foreignObjects
-const instrHeadingRect = document.getElementById('foreign-object-heading');
-// remove filling color
-instrHeadingRect.removeAttribute('fill');
-// get HTML of rect
-let instrHeadingHTML = instrHeadingRect.outerHTML;
-// replace rect tag by foreign object tag
-instrHeadingHTML = instrHeadingHTML.replace('<rect', '<foreignObject');
-instrHeadingHTML = instrHeadingHTML.replace('</rect>', '</foreignObject>');
-// replace html
-instrHeadingRect.outerHTML = instrHeadingHTML;
-
 // place text into foreignObject
-const instrHeadingDiv = document.createElement('div');
-instrHeadingDiv.innerHTML = '<h1> Herzlich Willkommen! </h1>';
-const instrHeadingFO = document.getElementById('foreign-object-heading');
-instrHeadingFO.appendChild(instrHeadingDiv);
+const instructionsHeadingDiv = document.createElement('div');
+const transitionHeadingDiv = document.createElement('div');
+const goodbyeHeadingDiv = document.createElement('div');
+
+instructionsHeadingDiv.innerHTML = '<h1> Herzlich Willkommen! </h1>';
+transitionHeadingDiv.innerHTML = '<h1> Super! Das war klasse! </h1>';
+goodbyeHeadingDiv.innerHTML = '<h1> Geschafft! Das hast du super gemacht! </h1>';
 
 // ------------------------------------------------------------------------------------
-// INSTRUCTIONS LEFT
-// same procedure as with headings
-const instrParagraphRect = document.getElementById('foreign-object-center-left');
-instrParagraphRect.removeAttribute('fill');
-let instrParagraphHTML = instrParagraphRect.outerHTML;
-instrParagraphHTML = instrParagraphHTML.replace('<rect', '<foreignObject');
-instrParagraphHTML = instrParagraphHTML.replace('</rect>', '</foreignObject>');
-instrParagraphRect.outerHTML = instrParagraphHTML;
+// ACTUAL TEXT
+const instructionsParagraphDiv = document.createElement('div');
+const transitionParagraphDiv = document.createElement('div');
+const goodbyeParagraphDiv = document.createElement('div');
 
-const instrParagraphDiv = document.createElement('div');
-instrParagraphDiv.innerHTML = `<p> In diesem Spiel kannst du ein paar Tiere und Luftballoons sehen. 
-<br> <br> Deine Aufgabe ist es, den Ballon zu finden. 
-<br> Der Ballon fliegt immer zu einer Kiste. 
-<br> Das Tier hilft dir und schaut den Ballon an. 
-<br> <br> Klicke auf die Kiste mit dem Ballon - 
-<br> die Tiere schauen immer den Ballon an. 
-<br> <br> Bitte schalte deinen Ton an. 
-<br> Klicke "los gehts!", 
-<br> um mit ein paar Übungen anzufangen. </p>`;
-const instrParagraphFO = document.getElementById('foreign-object-center-left');
-instrParagraphFO.appendChild(instrParagraphDiv);
+if (exp.subjData.touchScreen) {
+  // instruction for hedge version
+  instructionsParagraphDiv.innerHTML = `<p>
+  In diesem Spiel kannst du ein paar Tiere und Luftballoons sehen. <br> <br>
+  Deine Aufgabe ist es, den Ballon zu finden. <br>
+  Der Ballon fliegt immer auf den Boden. <br>
+  Das Tier hilft dir und schaut den Ballon an. <br> <br>
+  Klicke auf den Ballon - <br>
+  die Tiere schauen immer den Ballon an. <br> <br>
+  Bitte schalte deinen Ton an. <br>
+  Klicke "los geht's!", <br>
+  um mit ein paar Übungen anzufangen. 
+  </p>`;
 
-// // ---------------------------------------------------------------------------------------------------------------------
-// // EXP OBJECT
-// // in this object, we save all of our variables, easier to pass on to functions
-// // NOTE: we do manipulate this object in our functions!
-// // TODO set attribute pointerevents = all
-// // ---------------------------------------------------------------------------------------------------------------------
-// const exp = {};
+  // transition for hedge version
+  transitionParagraphDiv.innerHTML = `<p> 
+  Die Tiere spielen nun in einem neuen Haus. <br> 
+  Hier fällt der Ballon immer hinter eine Hecke. <br> <br> 
+  Deine Aufgabe ist es zu raten, <br> 
+  wo der Ballon ist. <br> 
+  Der Ballon fliegt immer hinter die Hecke. <br> 
+  Das Tier hilft dir und schaut den Ballon an. <br> <br> 
+  Klicke auf die Stelle auf der Hecke, <br> 
+  wo sich der Ballon versteckt - <br> 
+  die Tiere schauen immer den Ballon an. <br> <br> 
+  Klicke "los geht's!", um das Spiel zu starten.
+  </p>`;
+} else if (!exp.subjData.touchScreen) {
+  // instruction for box version
+  instructionsParagraphDiv.innerHTML = `<p> 
+  In diesem Spiel kannst du ein paar Tiere und Luftballoons sehen. <br> <br> 
+  Deine Aufgabe ist es, den Ballon zu finden. <br> 
+  Der Ballon fliegt immer zu einer Kiste. <br> 
+  Das Tier hilft dir und schaut den Ballon an. <br> <br> 
+  Klicke auf die Kiste mit dem Ballon - <br> 
+  die Tiere schauen immer den Ballon an. <br> <br> 
+  Bitte schalte deinen Ton an. <br> 
+  Klicke "los geht's!", <br> 
+  um mit ein paar Übungen anzufangen. 
+  </p>`;
 
-// // ---------------------------------------------------------------------------------------------------------------------
-// // PARTICIPANT ID
-// // ---------------------------------------------------------------------------------------------------------------------
-// exp.subjData = {};
-// exp.subjData.subjID = 'testID';
+  // transition for box version
+  transitionParagraphDiv.innerHTML = `<p> 
+  Die Tiere spielen nun in einem neuen Haus. <br> 
+  Hier fällt der Ballon immer hinter eine Hecke. <br> 
+  Hinter der Hecke stehen Kisten. <br> <br> 
+  Deine Aufgabe ist es zu raten, <br> 
+  in welcher Kiste der Ballon ist. <br> 
+  Der Ballon fliegt immer in eine Kiste. <br> 
+  Das Tier hilft dir und schaut den Ballon an. <br> <br> 
+  Klicke auf die Kiste, <br> 
+  in der sich der Ballon versteckt - <br> 
+  die Tiere schauen immer den Ballon an. <br> <br> 
+  Klicke "los geht's!", um das Spiel zu starten.
+  </p>`;
+}
 
-// // ---------------------------------------------------------------------------------------------------------------------
-// // SVG & SCREEN SIZE
-// // if (clientWidth < 600 || clientHeight < 200) alert('Please view on bigger screen!');
-// // ---------------------------------------------------------------------------------------------------------------------
-// exp.subjData.touchScreen = checkForTouchscreen();
-// exp.subjData.offsetWidth = document.body.offsetWidth;
-// exp.subjData.offsetHeight = document.body.offsetHeight;
+// goodbye text
+goodbyeParagraphDiv.innerHTML = `<p> 
+<br> <br> <br>
+Die Tiere sind schon ganz müde und glücklich vom Spielen! <br> <br>
+Vielen Dank für deine Hilfe! <br> <br>
+Bis zum nächsten Mal! <br> <br>
+Liebe Grüße vom Schwein, Affen und Schaf
+</p>`;
 
-// // get viewBox size from whole SVG
-// exp.elemSpecs = {
-//   outerSVG: {
-//     ID: document.getElementById('outer-svg'),
-//     origViewBox: document.getElementById('outer-svg').getAttribute('viewBox'),
-//     origViewBoxX: parseFloat(document.getElementById('outer-svg').getAttribute('viewBox').split(' ')[0]),
-//     origViewBoxY: parseFloat(document.getElementById('outer-svg').getAttribute('viewBox').split(' ')[1]),
-//     origViewBoxWidth: parseFloat(document.getElementById('outer-svg').getAttribute('viewBox').split(' ')[2]),
-//     origViewBoxHeight: parseFloat(document.getElementById('outer-svg').getAttribute('viewBox').split(' ')[3]),
-//   },
-// };
+// ACTUALLY ADDING TEXT TO THE DOM
+// THIS IS WHAT WE DO THEN IN OUR EVENTLISTENER TARGET CLICK FUNCTION
+// document.getElementById('foreign-object-heading').appendChild(instructionsHeadingDiv);
+// document.getElementById('foreign-object-center-left').appendChild(instructionsParagraphDiv);
 
-// // ---------------------------------------------------------------------------------------------------------------------
-// // GET ALL RELEVANT ELEMENTS IN SVG
-// // ---------------------------------------------------------------------------------------------------------------------
-// const instructionSlide = document.getElementById('instructions');
-// const transitionSlide = document.getElementById('transition');
-// const goodbyeSlide = document.getElementById('goodbye');
-// const experimentSlide = document.getElementById('experiment');
+// document.getElementById('foreign-object-heading').appendChild(transitionHeadingDiv);
+// document.getElementById('foreign-object-center-left').appendChild(transitionParagraphDiv);
+
+// document.getElementById('foreign-object-heading').appendChild(goodbyeHeadingDiv);
+// document.getElementById('foreign-object-center-left').appendChild(goodbyeParagraphDiv);
+
+// ---------------------------------------------------------------------------------------------------------------------
+// ---------------------------------------------------------------------------------------------------------------------
+
+// get viewBox size from whole SVG
+exp.elemSpecs = {
+  outerSVG: {
+    ID: document.getElementById('outer-svg'),
+    origViewBox: document.getElementById('outer-svg').getAttribute('viewBox'),
+    origViewBoxX: parseFloat(document.getElementById('outer-svg').getAttribute('viewBox').split(' ')[0]),
+    origViewBoxY: parseFloat(document.getElementById('outer-svg').getAttribute('viewBox').split(' ')[1]),
+    origViewBoxWidth: parseFloat(document.getElementById('outer-svg').getAttribute('viewBox').split(' ')[2]),
+    origViewBoxHeight: parseFloat(document.getElementById('outer-svg').getAttribute('viewBox').split(' ')[3]),
+  },
+};
+
+// ---------------------------------------------------------------------------------------------------------------------
+// GET ALL RELEVANT ELEMENTS IN SVG
+// ---------------------------------------------------------------------------------------------------------------------
+const textSlide = document.getElementById('text-slide');
+const experimentSlide = document.getElementById('experiment-slide');
+showSlide([textSlide], [experimentSlide]);
+// showSlide([experimentSlide], [textSlide]);
 
 // const instructionButton = document.getElementById('instructions-button');
 // const transitionButton = document.getElementById('transition-button');
 // const goodbyeButton = document.getElementById('goodbye-button');
 // const losgehtsButton = document.getElementById('experiment-button');
 // const clickBubble = document.getElementById('click-bubble');
-// const fiveBoxes = document.getElementById('five-boxes');
+// const boxes8Front = document.getElementById('boxes8-front');
+// const boxes8Back = document.getElementById('boxes8-back');
 // const hedge = document.getElementById('hedge');
-
-// // TODO see whether hedge animation is smoother without all the leave paths
-// // const hedgeleaves = document.getElementById('hedgeleaves');
-// // hedgeleaves.setAttribute('visibility', 'hidden');
 
 // // if you change animal agents or targets, then change ID here...
 // const pig = document.getElementById('pig');
@@ -188,7 +241,7 @@ instrParagraphFO.appendChild(instrParagraphDiv);
 // exp.trials.totalNr = exp.trials.famNr + exp.trials.testNr;
 // // this variable stores in which trial we currently are!
 // exp.trials.count = 0;
-// let timeline = null;
+// const timeline = null;
 
 // // create arrays with agents, targets, positions etc. for all the trials
 // randomizeTrials(exp, agentsSingle, targetsSingle);
@@ -206,8 +259,7 @@ instrParagraphFO.appendChild(instrParagraphDiv);
 //   openFullscreen();
 
 //   // showSlide: first array gets shown, second array gets hidden
-//   showSlide([experimentSlide],
-//     [instructionSlide, transitionSlide, goodbyeSlide, clickBubble]);
+//   showSlide([experimentSlide], [textSlide, clickBubble]);
 
 //   // shows only relevant elements etc.
 //   prepareTrial(exp);
@@ -269,8 +321,10 @@ instrParagraphFO.appendChild(instrParagraphDiv);
 
 //   // if transition between fam and test trials, show that transition slide
 //   } else if (exp.trials.count === exp.trials.famNr) {
-//     showSlide([transitionSlide],
-//       [experimentSlide, pig, monkey, sheep, balloonBlue, balloonRed, balloonYellow, balloonGreen, fiveBoxes]);
+//      document.getElementById('foreign-object-heading').appendChild(transitionHeadingDiv);
+//      document.getElementById('foreign-object-center-left').appendChild(transitionParagraphDiv);
+//      TODO maybe need to hide balloons and agents separately!
+//      showSlide([textSlide], [experimentSlide]);
 
 //   // if test trial, prepare trial
 //   } else if (exp.trials.count < exp.trials.totalNr) {
@@ -281,8 +335,12 @@ instrParagraphFO.appendChild(instrParagraphDiv);
 //   // if all trials done, show goodbye slide
 //   } else if (exp.trials.count === exp.trials.totalNr) {
 //     closeFullscreen();
-//     showSlide([goodbyeSlide],
-//       [experimentSlide, hedge, pig, monkey, sheep, balloonBlue, balloonRed, balloonYellow, balloonGreen, fiveBoxes]);
+//     document.getElementById('foreign-object-heading').appendChild(goodbyeHeadingDiv);
+//     document.getElementById('foreign-object-center-left').appendChild(goodbyeParagraphDiv);
+//     showSlide([textSlide], [experimentSlide]);
+//     TODO maybe need to blend out targets and agents separately
+// //     showSlide([goodbyeSlide],
+// //       [experimentSlide, hedge, pig, monkey, sheep, balloonBlue, balloonRed, balloonYellow, balloonGreen, fiveBoxes]);
 //   }
 // };
 // // ---------------------------------------------------------------------------------------------------------------------
@@ -342,14 +400,15 @@ instrParagraphFO.appendChild(instrParagraphDiv);
 //   }
 //   exp.elemSpecs.outerSVG.ID.addEventListener('click', handleWrongClick, false);
 // };
-// // ---------------------------------------------------------------------------------------------------------------------
-// // ACTUALLY RUNNING:
-// // ---------------------------------------------------------------------------------------------------------------------
-// // INSTRUCTION: show slide
-// showSlide([instructionSlide],
-//   [transitionSlide, experimentSlide, goodbyeSlide, pig, monkey, sheep, balloonBlue, balloonRed, balloonYellow, balloonGreen]);
+// ---------------------------------------------------------------------------------------------------------------------
+// ACTUALLY RUNNING:
+// ---------------------------------------------------------------------------------------------------------------------
+// INSTRUCTION: show slide
+document.getElementById('foreign-object-heading').appendChild(instructionsHeadingDiv);
+document.getElementById('foreign-object-center-left').appendChild(instructionsParagraphDiv);
+showSlide([textSlide], [experimentSlide]);
 
-// // add event listeners
+// add event listeners
 // instructionButton.addEventListener('click', handleInstructionClick, { capture: false, once: true });
 // losgehtsButton.addEventListener('click', handleLosgehtsClick, { capture: false });
 // transitionButton.addEventListener('click', handleTransitionClick, { capture: false, once: true });
