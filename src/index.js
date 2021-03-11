@@ -35,7 +35,7 @@ instrHeadingRect.outerHTML = instrHeadingHTML;
 
 // place text into foreignObject
 const instrHeadingDiv = document.createElement('div');
-instrHeadingDiv.innerHTML = '<h1> Herzlich Willkommen!';
+instrHeadingDiv.innerHTML = '<h1> Herzlich Willkommen! </h1>';
 const instrHeadingFO = document.getElementById('foreign-object-heading');
 instrHeadingFO.appendChild(instrHeadingDiv);
 
