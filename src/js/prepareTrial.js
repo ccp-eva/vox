@@ -53,64 +53,131 @@ export default (exp) => {
   }
 
   // calculate how far the balloon will fly
-  exp.elemSpecs.targets.centerHalfway = {
-    x: exp.elemSpecs.targets.halfway.x - exp.elemSpecs.targets.center.x,
-    y: exp.elemSpecs.targets.halfway.y - exp.elemSpecs.targets.center.y,
-  };
-
+  // for tablet fam trials where balloon directly goes to final position
   exp.elemSpecs.targets.centerFinal = {
     x: exp.positions[exp.trials.count].x - exp.elemSpecs.targets.center.x,
     y: exp.positions[exp.trials.count].y - exp.elemSpecs.targets.center.y,
   };
 
-  // calculate where eyes should move in the trial
-  // for test trials: first let eyes follow balloon to middle, until balloon is hidden
-  const gazeCoordsHalfwayLeft = getGazeCoords(
-    exp.targets[exp.trials.count], exp.elemSpecs.targets.halfway,
-    pupilLeft, eyelineLeft,
-  );
-  const gazeCoordsHalfwayRight = getGazeCoords(
-    exp.targets[exp.trials.count], exp.elemSpecs.targets.halfway,
-    pupilRight, eyelineRight,
-  );
+  // for PC fam trials where balloon first lands above boxes
+  exp.elemSpecs.targets.centerBox = {
+    x: exp.positions[exp.trials.count].x - exp.elemSpecs.targets.center.x,
+    y: exp.elemSpecs.targets.aboveBoxesY - exp.elemSpecs.targets.center.y,
+  };
+  exp.elemSpecs.targets.BoxFinal = {
+    x: exp.positions[exp.trials.count].x - exp.elemSpecs.targets.center.x,
+    y: exp.elemSpecs.targets.partlyInBoxesY - exp.elemSpecs.targets.center.y,
+  };
 
+  // for test trials where balloon first hides under hedge
+  exp.elemSpecs.targets.centerHalfway = {
+    x: exp.elemSpecs.targets.halfway.x - exp.elemSpecs.targets.center.x,
+    y: exp.elemSpecs.targets.halfway.y - exp.elemSpecs.targets.center.y,
+  };
+
+  // calculate where eyes should move in the trial
   const gazeCoordsLeft = getGazeCoords(
     exp.targets[exp.trials.count], exp.positions[exp.trials.count],
     pupilLeft, eyelineLeft,
   );
+  exp.elemSpecs.eyes[currentAgent].left.final = gazeCoordsLeft;
 
   const gazeCoordsRight = getGazeCoords(
     exp.targets[exp.trials.count], exp.positions[exp.trials.count],
     pupilRight, eyelineRight,
   );
-
-  // save calculated values in our exp object
-  exp.elemSpecs.eyes[currentAgent].left.halfway = gazeCoordsHalfwayLeft;
-  exp.elemSpecs.eyes[currentAgent].left.centerHalfway = {
-    x: gazeCoordsHalfwayLeft.x - exp.elemSpecs.eyes[currentAgent].left.center.x,
-    y: gazeCoordsHalfwayLeft.y - exp.elemSpecs.eyes[currentAgent].left.center.y,
-  };
-  exp.elemSpecs.eyes[currentAgent].left.final = gazeCoordsLeft;
-  exp.elemSpecs.eyes[currentAgent].left.centerFinal = {
-    x: gazeCoordsLeft.x - exp.elemSpecs.eyes[currentAgent].left.center.x,
-    y: gazeCoordsLeft.y - exp.elemSpecs.eyes[currentAgent].left.center.y,
-  };
-
-  exp.elemSpecs.eyes[currentAgent].right.halfway = gazeCoordsHalfwayRight;
-  exp.elemSpecs.eyes[currentAgent].right.centerHalfway = {
-    x: gazeCoordsHalfwayRight.x - exp.elemSpecs.eyes[currentAgent].right.center.x,
-    y: gazeCoordsHalfwayRight.y - exp.elemSpecs.eyes[currentAgent].right.center.y,
-  };
   exp.elemSpecs.eyes[currentAgent].right.final = gazeCoordsRight;
-  exp.elemSpecs.eyes[currentAgent].right.centerFinal = {
-    x: gazeCoordsRight.x - exp.elemSpecs.eyes[currentAgent].right.center.x,
-    y: gazeCoordsRight.y - exp.elemSpecs.eyes[currentAgent].right.center.y,
-  };
+
+  // for fam trials
+  if (exp.trials.type[exp.trials.count] === 'fam') {
+    // with boxes, calculate eye position to balloon position above box
+    // (gets used only when there are boxes = in PC version)
+    const gazeCoordsAboveBoxesLeft = getGazeCoords(
+      exp.targets[exp.trials.count],
+      { x: exp.positions[exp.trials.count].x, y: exp.elemSpecs.targets.aboveBoxesY },
+      pupilLeft, eyelineLeft,
+    );
+    exp.elemSpecs.eyes[currentAgent].left.aboveBoxes = gazeCoordsAboveBoxesLeft;
+
+    const gazeCoordsAboveBoxesRight = getGazeCoords(
+      exp.targets[exp.trials.count],
+      { x: exp.positions[exp.trials.count].x, y: exp.elemSpecs.targets.aboveBoxesY },
+      pupilRight, eyelineRight,
+    );
+    exp.elemSpecs.eyes[currentAgent].right.aboveBoxes = gazeCoordsAboveBoxesRight;
+
+    // for animation, calculate distance
+    exp.elemSpecs.eyes[currentAgent].left.centerBox = {
+      x: gazeCoordsAboveBoxesLeft.x - exp.elemSpecs.eyes[currentAgent].left.center.x,
+      y: gazeCoordsAboveBoxesLeft.y - exp.elemSpecs.eyes[currentAgent].left.center.y,
+    };
+
+    exp.elemSpecs.eyes[currentAgent].left.centerFinal = {
+      x: gazeCoordsLeft.x - exp.elemSpecs.eyes[currentAgent].left.center.x,
+      y: gazeCoordsLeft.y - exp.elemSpecs.eyes[currentAgent].left.center.y,
+    };
+
+    // this always gets used (for PC and tablet version)
+    exp.elemSpecs.eyes[currentAgent].right.centerBox = {
+      x: gazeCoordsAboveBoxesRight.x - exp.elemSpecs.eyes[currentAgent].right.center.x,
+      y: gazeCoordsAboveBoxesRight.y - exp.elemSpecs.eyes[currentAgent].right.center.y,
+    };
+    exp.elemSpecs.eyes[currentAgent].right.centerFinal = {
+      x: gazeCoordsRight.x - exp.elemSpecs.eyes[currentAgent].right.center.x,
+      y: gazeCoordsRight.y - exp.elemSpecs.eyes[currentAgent].right.center.y,
+    };
+  }
+
+  // for test trials: first let eyes follow balloon to middle, until balloon is hidden
+  if (exp.trials.type[exp.trials.count] === 'test') {
+    const gazeCoordsHalfwayLeft = getGazeCoords(
+      exp.targets[exp.trials.count], exp.elemSpecs.targets.halfway,
+      pupilLeft, eyelineLeft,
+    );
+    exp.elemSpecs.eyes[currentAgent].left.halfway = gazeCoordsHalfwayLeft;
+
+    const gazeCoordsHalfwayRight = getGazeCoords(
+      exp.targets[exp.trials.count], exp.elemSpecs.targets.halfway,
+      pupilRight, eyelineRight,
+    );
+    exp.elemSpecs.eyes[currentAgent].right.halfway = gazeCoordsHalfwayRight;
+
+    // for animation, calculate distance
+    exp.elemSpecs.eyes[currentAgent].left.centerHalfway = {
+      x: gazeCoordsHalfwayLeft.x - exp.elemSpecs.eyes[currentAgent].left.center.x,
+      y: gazeCoordsHalfwayLeft.y - exp.elemSpecs.eyes[currentAgent].left.center.y,
+    };
+
+    exp.elemSpecs.eyes[currentAgent].left.centerFinal = {
+      x: gazeCoordsLeft.x - exp.elemSpecs.eyes[currentAgent].left.center.x,
+      y: gazeCoordsLeft.y - exp.elemSpecs.eyes[currentAgent].left.center.y,
+    };
+
+    exp.elemSpecs.eyes[currentAgent].right.centerHalfway = {
+      x: gazeCoordsHalfwayRight.x - exp.elemSpecs.eyes[currentAgent].right.center.x,
+      y: gazeCoordsHalfwayRight.y - exp.elemSpecs.eyes[currentAgent].right.center.y,
+    };
+    exp.elemSpecs.eyes[currentAgent].right.centerFinal = {
+      x: gazeCoordsRight.x - exp.elemSpecs.eyes[currentAgent].right.center.x,
+      y: gazeCoordsRight.y - exp.elemSpecs.eyes[currentAgent].right.center.y,
+    };
+  }
 
   // calculate distance between center and target position, for constant speed
   const distanceCenterFinal = distancePoints(
     exp.elemSpecs.targets.center,
     { x: exp.positions[exp.trials.count].x, y: exp.positions[exp.trials.count].y },
+  );
+
+  // for fam trials box version: balloon lands over box, then goes inside
+  const distanceCenterBox = distancePoints(
+    exp.elemSpecs.targets.center,
+    { x: exp.positions[exp.trials.count].x, y: exp.elemSpecs.targets.aboveBoxesY },
+  );
+
+  const distanceBoxFinal = distancePoints(
+    { x: exp.positions[exp.trials.count].x, y: exp.elemSpecs.targets.aboveBoxesY },
+    { x: exp.positions[exp.trials.count].x, y: exp.elemSpecs.targets.partlyInBoxesY },
   );
 
   // for all test trials, balloon hides first, then goes to final position
@@ -123,27 +190,11 @@ export default (exp) => {
     { x: exp.positions[exp.trials.count].x, y: exp.positions[exp.trials.count].y },
   );
 
-  // for box version: balloon lands over box, then goes inside
-  const distanceCenterBox = distancePoints(
-    exp.elemSpecs.targets.center,
-    { x: exp.positions[exp.trials.count].x, y: exp.positions[exp.trials.count].y - exp.targets[exp.trials.count].getBBox().height },
-  );
-
-  const distanceBoxFinal = distancePoints(
-    { x: exp.positions[exp.trials.count].x, y: exp.positions[exp.trials.count].y - exp.targets[exp.trials.count].getBBox().height },
-    { x: exp.positions[exp.trials.count].x, y: exp.elemSpecs.targets.centerFinal.y - exp.targets[exp.trials.count].getBBox().height / 3 },
-  );
-
-  // console.log('distanceCenterFinal', distanceCenterFinal);
-  // console.log('distanceCenterHalfway', distanceCenterHalfway);
-  // console.log('distanceHalfwayFinal', distanceHalfwayFinal);
-  // console.log('distanceCenterBox', distanceCenterBox);
-  // console.log('distanceBoxFinal', distanceBoxFinal);
-
   const perSecond = 400;
 
   exp.responseLog[exp.trials.count] = {};
   exp.responseLog[exp.trials.count].wrongClick = 0;
+
   // save animation speed in our exp object
   if (exp.trials.type[exp.trials.count] === 'fam') {
     if (exp.subjData.touchScreen) {

@@ -29,8 +29,8 @@ exp.subjData.subjID = 'testID';
 // TRIAL NUMBER
 // ---------------------------------------------------------------------------------------------------------------------
 exp.trials = {};
-exp.trials.famNr = 10;
-exp.trials.testNr = 2;
+exp.trials.famNr = 5;
+exp.trials.testNr = 5;
 exp.trials.totalNr = exp.trials.famNr + exp.trials.testNr;
 // this variable stores in which trial we currently are!
 exp.trials.count = 0;
@@ -62,8 +62,8 @@ const {
 } = experimentalInstructions(exp);
 
 // ---------------------------------------------------------------------------------------------------------------------
+// SAVE VIEWBOX VALUES
 // ---------------------------------------------------------------------------------------------------------------------
-
 // get viewBox size from whole SVG
 exp.elemSpecs = {
   outerSVG: {
@@ -174,7 +174,7 @@ exp.elemSpecs.targets = {
     x: balloonBlue.getBBox().x,
     y: balloonBlue.getBBox().y,
   },
-  // define from which point onwards the balloon is hidden behind hedge
+  // define coords from which point onwards the balloon is hidden behind hedge
   halfway: {
     // position mid, same as in center.x
     x: balloonBlue.getBBox().x,
@@ -183,8 +183,11 @@ exp.elemSpecs.targets = {
   },
   // right side of screen as upper boundary
   borderRight: exp.elemSpecs.outerSVG.origViewBoxWidth - balloonBlue.getBBox().width,
-  // calculate y coords for balloon (-30 for little distance from lower border)
+  // calculate y coords for balloon (-20 for little distance from lower border)
   groundY: exp.elemSpecs.outerSVG.origViewBoxHeight - balloonBlue.getBBox().height - 20,
+  // define y coord for target to be right above the boxes
+  aboveBoxesY: boxes8Front.getBBox().y - balloonBlue.getBBox().height,
+  partlyInBoxesY: boxes8Front.getBBox().y - balloonBlue.getBBox().height / 3,
 };
 
 // ---------------------------------------------------------------------------------------------------------------------
