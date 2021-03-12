@@ -58,11 +58,6 @@ export default (exp) => {
     y: exp.elemSpecs.targets.halfway.y - exp.elemSpecs.targets.center.y,
   };
 
-  exp.elemSpecs.targets.halfwayFinal = {
-    x: exp.positions[exp.trials.count].x - exp.elemSpecs.targets.halfway.x,
-    y: exp.positions[exp.trials.count].y - exp.elemSpecs.targets.halfway.y,
-  };
-
   exp.elemSpecs.targets.centerFinal = {
     x: exp.positions[exp.trials.count].x - exp.elemSpecs.targets.center.x,
     y: exp.positions[exp.trials.count].y - exp.elemSpecs.targets.center.y,

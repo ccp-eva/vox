@@ -2,6 +2,8 @@ import { gsap } from 'gsap';
 
 // ---------------------------------------------------------------------------------------------------------------------
 // FUNCTION FOR ANIMATING BALLOON, EYES, HEDGE
+// NOTE: we only return the gsap timeline object.
+// that means that anything outside of that has no effect!!
 // ---------------------------------------------------------------------------------------------------------------------
 export default (exp) => {
   // get relevant elements
@@ -69,17 +71,17 @@ export default (exp) => {
         y: exp.elemSpecs.eyes[currentAgent].right.centerFinal.y,
       }, '<');
 
+      // hide balloon a bit in the box (eye movement takes as long!)
       timeline.to(exp.targets[exp.trials.count], {
-        delay: 0.5,
-        duration: 1,
+        duration: 0.5,
         ease: 'none',
         y: exp.elemSpecs.targets.centerFinal.y - exp.targets[exp.trials.count].getBBox().height / 3,
-      });
+      }, '-=0.5');
     }
 
   // for test trials, first hide balloon, then move to final position
-  } else {
-  // first: hide balloon
+  } else if (exp.trials.type[exp.trials.count] === 'test') {
+    // first: hide balloon
     timeline.to(exp.targets[exp.trials.count], {
       duration: exp.responseLog[exp.trials.count].durationAnimationCenterHalfway,
       ease: 'none',
@@ -107,8 +109,8 @@ export default (exp) => {
     timeline.to(exp.targets[exp.trials.count], {
       duration: exp.responseLog[exp.trials.count].durationAnimationHalfwayFinal,
       ease: 'none',
-      x: exp.elemSpecs.targets.halfwayFinal.x,
-      y: exp.elemSpecs.targets.halfwayFinal.y,
+      x: exp.elemSpecs.targets.centerFinal.x,
+      y: exp.elemSpecs.targets.centerFinal.y,
     });
 
     // and put eyes on final position
