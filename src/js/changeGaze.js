@@ -49,7 +49,7 @@ export default (exp) => {
     // let balloons fly to box, then into it
     } else if (!exp.subjData.touchScreen) {
       timeline.to(exp.targets[exp.trials.count], {
-        duration: exp.responseLog[exp.trials.count].durationAnimationTotal,
+        duration: exp.responseLog[exp.trials.count].durationAnimationCenterBox,
         ease: 'none',
         x: exp.elemSpecs.targets.centerFinal.x,
         y: exp.elemSpecs.targets.centerFinal.y - exp.targets[exp.trials.count].getBBox().height,
@@ -73,7 +73,7 @@ export default (exp) => {
 
       // hide balloon a bit in the box (eye movement takes as long!)
       timeline.to(exp.targets[exp.trials.count], {
-        duration: 0.5,
+        duration: exp.responseLog[exp.trials.count].durationAnimationBoxFinal,
         ease: 'none',
         y: exp.elemSpecs.targets.centerFinal.y - exp.targets[exp.trials.count].getBBox().height / 3,
       }, '-=0.5');

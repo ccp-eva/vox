@@ -112,6 +112,8 @@ export default (exp) => {
     exp.elemSpecs.targets.center,
     { x: exp.positions[exp.trials.count].x, y: exp.positions[exp.trials.count].y },
   );
+
+  // for all test trials, balloon hides first, then goes to final position
   const distanceCenterHalfway = distancePoints(
     exp.elemSpecs.targets.center,
     exp.elemSpecs.targets.halfway,
@@ -120,13 +122,37 @@ export default (exp) => {
     exp.elemSpecs.targets.halfway,
     { x: exp.positions[exp.trials.count].x, y: exp.positions[exp.trials.count].y },
   );
+
+  // for box version: balloon lands over box, then goes inside
+  const distanceCenterBox = distancePoints(
+    exp.elemSpecs.targets.center,
+    { x: exp.positions[exp.trials.count].x, y: exp.positions[exp.trials.count].y - exp.targets[exp.trials.count].getBBox().height },
+  );
+
+  const distanceBoxFinal = distancePoints(
+    { x: exp.positions[exp.trials.count].x, y: exp.positions[exp.trials.count].y - exp.targets[exp.trials.count].getBBox().height },
+    { x: exp.positions[exp.trials.count].x, y: exp.elemSpecs.targets.centerFinal.y - exp.targets[exp.trials.count].getBBox().height / 3 },
+  );
+
+  // console.log('distanceCenterFinal', distanceCenterFinal);
+  // console.log('distanceCenterHalfway', distanceCenterHalfway);
+  // console.log('distanceHalfwayFinal', distanceHalfwayFinal);
+  // console.log('distanceCenterBox', distanceCenterBox);
+  // console.log('distanceBoxFinal', distanceBoxFinal);
+
   const perSecond = 400;
 
   exp.responseLog[exp.trials.count] = {};
   exp.responseLog[exp.trials.count].wrongClick = 0;
   // save animation speed in our exp object
   if (exp.trials.type[exp.trials.count] === 'fam') {
-    exp.responseLog[exp.trials.count].durationAnimationTotal = distanceCenterFinal / perSecond;
+    if (exp.subjData.touchScreen) {
+      exp.responseLog[exp.trials.count].durationAnimationTotal = distanceCenterFinal / perSecond;
+    } else if (!exp.subjData.touchScreen) {
+      exp.responseLog[exp.trials.count].durationAnimationCenterBox = distanceCenterBox / perSecond;
+      exp.responseLog[exp.trials.count].durationAnimationBoxFinal = distanceBoxFinal / perSecond;
+      exp.responseLog[exp.trials.count].durationAnimationTotal = (distanceCenterBox / perSecond) + (distanceBoxFinal / perSecond);
+    }
   } else if (exp.trials.type[exp.trials.count] === 'test') {
     exp.responseLog[exp.trials.count].durationAnimationCenterHalfway = distanceCenterHalfway / perSecond;
     exp.responseLog[exp.trials.count].durationAnimationHalfwayFinal = distanceHalfwayFinal / perSecond;

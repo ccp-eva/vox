@@ -26,10 +26,20 @@ exp.subjData = {};
 exp.subjData.subjID = 'testID';
 
 // ---------------------------------------------------------------------------------------------------------------------
+// TRIAL NUMBER
+// ---------------------------------------------------------------------------------------------------------------------
+exp.trials = {};
+exp.trials.famNr = 10;
+exp.trials.testNr = 2;
+exp.trials.totalNr = exp.trials.famNr + exp.trials.testNr;
+// this variable stores in which trial we currently are!
+exp.trials.count = 0;
+
+// ---------------------------------------------------------------------------------------------------------------------
 // TOUCHSCREEN & SCREEN SIZE
 // if (clientWidth < 600 || clientHeight < 200) alert('Please view on bigger screen!');
 // ---------------------------------------------------------------------------------------------------------------------
-exp.subjData.touchScreen = !checkForTouchscreen();
+exp.subjData.touchScreen = checkForTouchscreen();
 exp.subjData.offsetWidth = document.body.offsetWidth;
 exp.subjData.offsetHeight = document.body.offsetHeight;
 
@@ -178,19 +188,14 @@ exp.elemSpecs.targets = {
 };
 
 // ---------------------------------------------------------------------------------------------------------------------
-// TRIAL NUMBER & RANDOMIZATION OF AGENTS, TARGETS AND TARGET POSITIONS
+// RANDOMIZATION OF AGENTS, TARGETS AND TARGET POSITIONS
 // ---------------------------------------------------------------------------------------------------------------------
-exp.trials = {};
-exp.trials.famNr = 2;
-exp.trials.testNr = 2;
-exp.trials.totalNr = exp.trials.famNr + exp.trials.testNr;
-// this variable stores in which trial we currently are!
-exp.trials.count = 0;
-let timeline = null;
-
 // create arrays with agents, targets, positions etc. for all the trials
 randomizeTrials(exp, agentsSingle, targetsSingle);
 console.log('exp object', exp);
+
+// gsap timeline that will save our animation specifications
+let timeline = null;
 
 // ---------------------------------------------------------------------------------------------------------------------
 // DEFINE EVENTLISTENER FUNCTIONS
