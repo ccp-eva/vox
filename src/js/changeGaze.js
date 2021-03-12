@@ -55,32 +55,9 @@ export default (exp) => {
         y: exp.elemSpecs.targets.centerBox.y,
       });
 
-      // let eyes follow balloon already
-      timeline.to([pupilLeft, irisLeft], {
-        duration: exp.responseLog[exp.trials.count].durationAnimationCenterBox,
-        ease: 'none',
-        x: exp.elemSpecs.eyes[currentAgent].left.centerBox.x,
-        y: exp.elemSpecs.eyes[currentAgent].left.centerBox.y,
-      }, '<');
-
-      // same for right eye
-      timeline.to([pupilRight, irisRight], {
-        duration: exp.responseLog[exp.trials.count].durationAnimationCenterBox,
-        ease: 'none',
-        x: exp.elemSpecs.eyes[currentAgent].right.centerBox.x,
-        y: exp.elemSpecs.eyes[currentAgent].right.centerBox.y,
-      }, '<');
-
-      // hide balloon a bit in the box (eye movement takes as long!)
-      timeline.to(exp.targets[exp.trials.count], {
-        duration: exp.responseLog[exp.trials.count].durationAnimationBoxFinal,
-        ease: 'none',
-        y: exp.elemSpecs.targets.BoxFinal.y,
-      });
-
       // let eyes follow balloon to final position
       timeline.to([pupilLeft, irisLeft], {
-        duration: exp.responseLog[exp.trials.count].durationAnimationBoxFinal,
+        duration: exp.responseLog[exp.trials.count].durationAnimationTotal,
         ease: 'none',
         x: exp.elemSpecs.eyes[currentAgent].left.centerFinal.x,
         y: exp.elemSpecs.eyes[currentAgent].left.centerFinal.y,
@@ -88,11 +65,18 @@ export default (exp) => {
 
       // same for right eye
       timeline.to([pupilRight, irisRight], {
-        duration: exp.responseLog[exp.trials.count].durationAnimationBoxFinal,
+        duration: exp.responseLog[exp.trials.count].durationAnimationTotal,
         ease: 'none',
         x: exp.elemSpecs.eyes[currentAgent].right.centerFinal.x,
         y: exp.elemSpecs.eyes[currentAgent].right.centerFinal.y,
       }, '<');
+
+      // hide balloon a bit in the box (eye movement takes as long!)
+      timeline.to(exp.targets[exp.trials.count], {
+        duration: exp.responseLog[exp.trials.count].durationAnimationBoxFinal,
+        ease: 'none',
+        y: exp.elemSpecs.targets.BoxFinal.y,
+      }, `-=${exp.responseLog[exp.trials.count].durationAnimationBoxFinal}`);
     }
 
   // for test trials, first hide balloon, then move to final position
