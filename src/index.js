@@ -12,6 +12,8 @@ import closeFullscreen from './js/closeFullscreen';
 import convertToForeignObject from './js/convertToForeignObject';
 import experimentalInstructions from './js/experimentalInstructions';
 
+// TODO hedge!!
+
 // ---------------------------------------------------------------------------------------------------------------------
 // EXP OBJECT
 // in this object, we save all of our variables, easier to pass on to functions
@@ -29,8 +31,8 @@ exp.subjData.subjID = 'testID';
 // TRIAL NUMBER
 // ---------------------------------------------------------------------------------------------------------------------
 exp.trials = {};
-exp.trials.famNr = 5;
-exp.trials.testNr = 5;
+exp.trials.famNr = 1;
+exp.trials.testNr = 1;
 exp.trials.totalNr = exp.trials.famNr + exp.trials.testNr;
 // this variable stores in which trial we currently are!
 exp.trials.count = 0;
@@ -39,7 +41,7 @@ exp.trials.count = 0;
 // TOUCHSCREEN & SCREEN SIZE
 // if (clientWidth < 600 || clientHeight < 200) alert('Please view on bigger screen!');
 // ---------------------------------------------------------------------------------------------------------------------
-exp.subjData.touchScreen = checkForTouchscreen();
+exp.subjData.touchScreen = !checkForTouchscreen();
 exp.subjData.offsetWidth = document.body.offsetWidth;
 exp.subjData.offsetHeight = document.body.offsetHeight;
 
@@ -55,10 +57,13 @@ foreignObjects.forEach((elem) => {
 const {
   instructionsHeading,
   instructionsParagraph,
+  instructionsImage,
   transitionHeading,
   transitionParagraph,
+  transitionImage,
   goodbyeHeading,
   goodbyeParagraph,
+  goodbyeImage,
 } = experimentalInstructions(exp);
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -81,12 +86,6 @@ exp.elemSpecs = {
 // ---------------------------------------------------------------------------------------------------------------------
 const textSlide = document.getElementById('text-slide');
 const experimentSlide = document.getElementById('experiment-slide');
-
-const instructionsImgPC = document.getElementById('instructions-img-PC');
-const instructionsImgTablet = document.getElementById('instructions-img-tablet');
-const transitionImgPC = document.getElementById('transition-img-PC');
-const transitionImgTablet = document.getElementById('transition-img-tablet');
-const goodbyeImg = document.getElementById('goodbye-img');
 
 const instructionsButton = document.getElementById('instructions-button');
 const transitionButton = document.getElementById('transition-button');
@@ -213,8 +212,7 @@ const handleInstructionsClick = (event) => {
 
   // showSlide: first array gets shown, second array gets hidden
   showSlide([experimentSlide],
-    [textSlide, clickBubble, clickableArea,
-      instructionsButton, instructionsImgTablet, instructionsImgPC]);
+    [textSlide, clickBubble, clickableArea, instructionsButton]);
 
   // shows only relevant elements etc.
   prepareTrial(exp);
@@ -229,8 +227,7 @@ const handleTransitionClick = (event) => {
   event.preventDefault();
 
   showSlide([experimentSlide],
-    [textSlide, clickBubble,
-      transitionButton, transitionImgTablet, transitionImgPC]);
+    [textSlide, clickBubble, transitionButton]);
 
   prepareTrial(exp);
   timeline = gsap.timeline({ paused: true });
@@ -279,16 +276,13 @@ const handleTargetClick = async function tmp(event) {
   } else if (exp.trials.count === exp.trials.famNr) {
     document.getElementById('foreign-object-heading').replaceChild(transitionHeading, instructionsHeading);
     document.getElementById('foreign-object-center-left').replaceChild(transitionParagraph, instructionsParagraph);
+    document.getElementById('foreign-object-center-right').replaceChild(transitionImage, instructionsImage);
+
     showSlide([textSlide],
-      [experimentSlide, instructionsImgPC, instructionsImgTablet,
+      [experimentSlide,
         hedge, boxes8Front, boxes8Back,
         pig, monkey, sheep,
         balloonBlue, balloonRed, balloonYellow, balloonGreen]);
-    if (exp.subjData.touchScreen) {
-      transitionImgTablet.setAttribute('visibility', 'visible');
-    } else if (!exp.subjData.touchScreen) {
-      transitionImgPC.setAttribute('visibility', 'visible');
-    }
 
   // if test trial, prepare trial
   } else if (exp.trials.count < exp.trials.totalNr) {
@@ -301,7 +295,9 @@ const handleTargetClick = async function tmp(event) {
     // closeFullscreen();
     document.getElementById('foreign-object-heading').replaceChild(goodbyeHeading, transitionHeading);
     document.getElementById('foreign-object-center-left').replaceChild(goodbyeParagraph, transitionParagraph);
-    showSlide([textSlide, goodbyeImg],
+    document.getElementById('foreign-object-center-right').replaceChild(goodbyeImage, transitionImage);
+
+    showSlide([textSlide],
       [experimentSlide,
         hedge, boxes8Front, boxes8Back,
         pig, monkey, sheep,
@@ -361,16 +357,6 @@ const handleLosgehtsClick = async function tmp(event) {
     exp.targets[exp.trials.count].addEventListener('click', handleTargetClick, { capture: false, once: true });
     boxes8Front.addEventListener('click', handleTargetClick, { capture: false, once: true });
     boxes8Back.addEventListener('click', handleTargetClick, { capture: false, once: true });
-
-    // if (exp.trials.type[exp.trials.count] === 'fam') {
-    //   clickableArea.setAttribute('pointer-events', 'all');
-    //   clickableArea.addEventListener('click', handleTargetClick, { capture: false, once: true });
-    // } else if (exp.trials.type[exp.trials.count] === 'test') {
-    //   clickableArea.setAttribute('pointer-events', 'none');
-    //   hedge.setAttribute('pointer-events', 'none');
-    //   boxes8Front.addEventListener('click', handleTargetClick, { capture: false, once: true });
-    //   boxes8Back.addEventListener('click', handleTargetClick, { capture: false, once: true });
-    // }
   }
   exp.elemSpecs.outerSVG.ID.addEventListener('click', handleWrongClick, false);
 };
@@ -380,13 +366,9 @@ const handleLosgehtsClick = async function tmp(event) {
 // INSTRUCTIONS: show slide
 document.getElementById('foreign-object-heading').appendChild(instructionsHeading);
 document.getElementById('foreign-object-center-left').appendChild(instructionsParagraph);
+document.getElementById('foreign-object-center-right').appendChild(instructionsImage);
 showSlide([textSlide],
-  [experimentSlide, instructionsImgTablet, instructionsImgPC, transitionImgTablet, transitionImgPC, goodbyeImg]);
-if (exp.subjData.touchScreen) {
-  instructionsImgTablet.setAttribute('visibility', 'visible');
-} else if (!exp.subjData.touchScreen) {
-  instructionsImgPC.setAttribute('visibility', 'visible');
-}
+  [experimentSlide]);
 
 // add event listeners
 instructionsButton.addEventListener('click', handleInstructionsClick, { capture: false, once: true });
