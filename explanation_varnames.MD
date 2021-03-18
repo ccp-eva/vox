@@ -1,5 +1,9 @@
 # List of all the variables that we save in our response log
 
+* IF NOT STATED OTHERWISE, VALUES ARE IN THE SVG COORDINATE SYSTEM (NOT ACTUAL PIXEL)!
+* offsetWidth, offsetHeight, clikX and clickY are in pixels and the user coordinate system.
+* screenScalingWidth and screenScalingHeight are needed to transform the values from one coordinate system into the other.
+
 | variable name              | description                                                                        |
 |----------------------------|------------------------------------------------------------------------------------|
 | agent                      | which animal character is shown in current trial                                   |
@@ -16,7 +20,7 @@
 | eyeCenterLeftY             | Y coordinate of the current agent's left eye center                                |
 | eyeCenterRightX            | X coordinate of the current agent's right eye center                               |
 | eyeCenterRightY            | Y coordinate of the current agent's right eye center                               |
-| eyeRadius                  | radius of the current agent's eye (in SVG coords)                                  |
+| eyeRadius                  | radius of the current agent's eye                                                  |
 | hitBBTargetX               | boolean: true if clickScaledX is within the target's bounding box                  |
 | hitBBTargetY               | boolean: true if clickScaledY is within the target's bounding box                  |
 | offsetHeight               | client screen size height (px)                                                     |
@@ -40,3 +44,10 @@
 | touchScreen                | boolean: true if user uses tablet, false if PC                                     |
 | trialNr                    | number of the current trial                                                        |
 | trialType                  | fam for familiarization trials, test for test trials                               |
+
+### Calculation of the box positions
+* space between the boxes is calculated as follows (in the SVG coordinate system): 
+    * spaceOverall = origViewBoxWidth - boxesNr * boxesWidth
+    * spaceSingle = spaceOverall / (boxesNr + 1)
+* here, spaceOverall means how many "SVG pixels" are not filled by all of the boxes
+* thhe spaceOverall is then divided by the number of boxes + 1 (so that the space to the very left and very right side of the screen is also equal) 
