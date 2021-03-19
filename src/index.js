@@ -41,7 +41,9 @@ exp.trials.count = 0;
 // TOUCHSCREEN & SCREEN SIZE
 // if (clientWidth < 600 || clientHeight < 200) alert('Please view on bigger screen!');
 // ---------------------------------------------------------------------------------------------------------------------
-exp.subjData.touchScreen = checkForTouchscreen();
+// just for developing: turn off fullscreen mode
+const fullscreen = false;
+exp.subjData.touchScreen = !checkForTouchscreen();
 exp.subjData.offsetWidth = document.body.offsetWidth;
 exp.subjData.offsetHeight = document.body.offsetHeight;
 
@@ -209,7 +211,7 @@ let timeline = null;
 // save in const variables in order to pass on event to function
 const handleInstructionsClick = (event) => {
   event.preventDefault();
-  // openFullscreen();
+  if (fullscreen) openFullscreen();
 
   // showSlide: first array gets shown, second array gets hidden
   showSlide([experimentSlide],
@@ -293,7 +295,7 @@ const handleTargetClick = async function tmp(event) {
 
   // if all trials done, show goodbye slide
   } else if (exp.trials.count === exp.trials.totalNr) {
-    // closeFullscreen();
+    if (fullscreen) closeFullscreen();
     document.getElementById('foreign-object-heading').replaceChild(goodbyeHeading, transitionHeading);
     document.getElementById('foreign-object-center-left').replaceChild(goodbyeParagraph, transitionParagraph);
     document.getElementById('foreign-object-center-right').replaceChild(goodbyeImage, transitionImage);

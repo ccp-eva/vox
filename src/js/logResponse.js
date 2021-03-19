@@ -3,14 +3,14 @@ import { gsap } from 'gsap';
 // FUNCTION FOR LOGGING ALL RELEVANT TRIAL INFOS
 // ---------------------------------------------------------------------------------------------------------------------
 export default (event, exp) => {
-  // TODO get user screen size
-  // in our context, offset and client same values
-  exp.responseLog[exp.trials.count].offsetWidth = document.body.offsetWidth;
-  exp.responseLog[exp.trials.count].offsetHeight = document.body.offsetHeight;
+  // get user screen size
+  // offset and client properties don't work, they include padding/borders etc. when we style our svg in the CSS
+  exp.responseLog[exp.trials.count].clientWidth = document.getElementById('experiment-slide').getBoundingClientRect().width;
+  exp.responseLog[exp.trials.count].clientHeight = document.getElementById('experiment-slide').getBoundingClientRect().height;
 
   // how much smaller/bigger is the SVG coordinate system wrt the screen size?
-  exp.responseLog[exp.trials.count].screenScalingWidth = exp.elemSpecs.outerSVG.origViewBoxWidth / exp.responseLog[exp.trials.count].offsetWidth;
-  exp.responseLog[exp.trials.count].screenScalingHeight = exp.elemSpecs.outerSVG.origViewBoxHeight / exp.responseLog[exp.trials.count].offsetHeight;
+  // we could do the same with origViewBoxWidth / clientWidth, will result in the same value
+  exp.responseLog[exp.trials.count].screenScaling = exp.responseLog[exp.trials.count].clientHeight / exp.elemSpecs.outerSVG.origViewBoxHeight;
 
   // user feedback where they clicked (with sound)
   // create point (needed for transformation function later) and pass event coordinates
