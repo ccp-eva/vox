@@ -20,7 +20,6 @@ p{
     padding: 2%;
 }
 
-/* This is fixing the scaling, yet it causes it messes with the svg coord system... :( */
 svg {
     position:fixed;
     height:100%;
