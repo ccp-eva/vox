@@ -2,6 +2,8 @@ import { gsap } from 'gsap';
 
 // ---------------------------------------------------------------------------------------------------------------------
 // FUNCTION FOR ANIMATING BALLOON, EYES, HEDGE
+// NOTE: we only return the gsap timeline object.
+// that means that anything outside of that has no effect!!
 // ---------------------------------------------------------------------------------------------------------------------
 export default (exp) => {
   // get relevant elements
@@ -10,47 +12,81 @@ export default (exp) => {
   const pupilRight = document.getElementById(`${currentAgent}-pupil-right`);
   const irisLeft = document.getElementById(`${currentAgent}-iris-left`);
   const irisRight = document.getElementById(`${currentAgent}-iris-right`);
-
   const hedge = document.getElementById('hedge');
-  const fiveBoxes = document.getElementById('five-boxes');
 
   // we use gsap3 for animation
   const timeline = gsap.timeline({ paused: true });
 
   // animate target
-  // for fam trials, just show full path. everything at the same time
-
+  // for fam trials
   if (exp.trials.type[exp.trials.count] === 'fam') {
-    timeline.to(exp.targets[exp.trials.count], {
-      duration: exp.responseLog[exp.trials.count].durationAnimationTotal,
-      ease: 'none',
-      x: exp.positions[exp.trials.count].x,
-      y: exp.positions[exp.trials.count].y,
-    });
-    // let eyes follow balloon already
-    timeline.to([pupilLeft, irisLeft], {
-      duration: exp.responseLog[exp.trials.count].durationAnimationTotal,
-      ease: 'none',
-      x: exp.elemSpecs.eyes[currentAgent].left.centerFinal.x,
-      y: exp.elemSpecs.eyes[currentAgent].left.centerFinal.y,
-    }, '<');
+    // for tablet hedge version: just show full path. everything at the same time
+    if (exp.subjData.touchScreen) {
+      timeline.to(exp.targets[exp.trials.count], {
+        duration: exp.responseLog[exp.trials.count].durationAnimationTotal,
+        ease: 'none',
+        x: exp.elemSpecs.targets.centerFinal.x,
+        y: exp.elemSpecs.targets.centerFinal.y,
+      });
 
-    // same for right eye
-    timeline.to([pupilRight, irisRight], {
-      duration: exp.responseLog[exp.trials.count].durationAnimationTotal,
-      ease: 'none',
-      x: exp.elemSpecs.eyes[currentAgent].right.centerFinal.x,
-      y: exp.elemSpecs.eyes[currentAgent].right.centerFinal.y,
-    }, '<');
+      // let eyes follow balloon already
+      timeline.to([pupilLeft, irisLeft], {
+        duration: exp.responseLog[exp.trials.count].durationAnimationTotal,
+        ease: 'none',
+        x: exp.elemSpecs.eyes[currentAgent].left.centerFinal.x,
+        y: exp.elemSpecs.eyes[currentAgent].left.centerFinal.y,
+      }, '<');
+
+      // same for right eye
+      timeline.to([pupilRight, irisRight], {
+        duration: exp.responseLog[exp.trials.count].durationAnimationTotal,
+        ease: 'none',
+        x: exp.elemSpecs.eyes[currentAgent].right.centerFinal.x,
+        y: exp.elemSpecs.eyes[currentAgent].right.centerFinal.y,
+      }, '<');
+
+    // fam for PC box version
+    // let balloons fly above box, then into it
+    } else if (!exp.subjData.touchScreen) {
+      timeline.to(exp.targets[exp.trials.count], {
+        duration: exp.responseLog[exp.trials.count].durationAnimationCenterBox,
+        ease: 'none',
+        x: exp.elemSpecs.targets.centerBox.x,
+        y: exp.elemSpecs.targets.centerBox.y,
+      });
+
+      // let eyes follow balloon to final position
+      timeline.to([pupilLeft, irisLeft], {
+        duration: exp.responseLog[exp.trials.count].durationAnimationTotal,
+        ease: 'none',
+        x: exp.elemSpecs.eyes[currentAgent].left.centerFinal.x,
+        y: exp.elemSpecs.eyes[currentAgent].left.centerFinal.y,
+      }, '<');
+
+      // same for right eye
+      timeline.to([pupilRight, irisRight], {
+        duration: exp.responseLog[exp.trials.count].durationAnimationTotal,
+        ease: 'none',
+        x: exp.elemSpecs.eyes[currentAgent].right.centerFinal.x,
+        y: exp.elemSpecs.eyes[currentAgent].right.centerFinal.y,
+      }, '<');
+
+      // hide balloon a bit in the box (eye movement takes as long!)
+      timeline.to(exp.targets[exp.trials.count], {
+        duration: exp.responseLog[exp.trials.count].durationAnimationBoxFinal,
+        ease: 'none',
+        y: exp.elemSpecs.targets.BoxFinal.y,
+      }, `-=${exp.responseLog[exp.trials.count].durationAnimationBoxFinal}`);
+    }
 
   // for test trials, first hide balloon, then move to final position
-  } else {
-  // first: hide balloon
+  } else if (exp.trials.type[exp.trials.count] === 'test') {
+    // first: hide balloon
     timeline.to(exp.targets[exp.trials.count], {
       duration: exp.responseLog[exp.trials.count].durationAnimationCenterHalfway,
       ease: 'none',
-      x: exp.elemSpecs.targets.halfway.x,
-      y: exp.elemSpecs.targets.halfway.y,
+      x: exp.elemSpecs.targets.centerHalfway.x,
+      y: exp.elemSpecs.targets.centerHalfway.y,
     });
 
     // let eyes follow balloon already
@@ -73,8 +109,8 @@ export default (exp) => {
     timeline.to(exp.targets[exp.trials.count], {
       duration: exp.responseLog[exp.trials.count].durationAnimationHalfwayFinal,
       ease: 'none',
-      x: exp.positions[exp.trials.count].x,
-      y: exp.positions[exp.trials.count].y,
+      x: exp.elemSpecs.targets.centerFinal.x,
+      y: exp.elemSpecs.targets.centerFinal.y,
     });
 
     // and put eyes on final position

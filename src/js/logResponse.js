@@ -91,26 +91,38 @@ export default (event, exp) => {
     );
   }
 
-  // for PC version of experiment, check which box was clicked
+  // for tablet version, just save which area was clicked (either clickable-area or hedge)
   if (exp.subjData.touchScreen) {
-    if (exp.trials.type[exp.trials.count] === 'fam') exp.responseLog[exp.trials.count].clickedArea = 'clickable-area';
-    if (exp.trials.type[exp.trials.count] === 'test') exp.responseLog[exp.trials.count].clickedArea = 'hedge';
-  }
-  if (!exp.subjData.touchScreen) {
-    // get all boxes (by taking all child elements)
-    const boxes = document.getElementById('five-boxes').children;
-    const boxIDs = [];
-    // get all box IDs
-    for (let i = 0; i < boxes.length; i++) {
-      boxIDs.push(boxes[i].id);
-    }
-    // for each box, see whether it was clicked or not
-    // save the id of the one box that owas clicked
-    boxIDs.forEach((box) => {
-      if (event.target.closest(`#${box}`) !== null) {
-        exp.responseLog[exp.trials.count].clickedArea = box;
+    exp.responseLog[exp.trials.count].clickedArea = event.currentTarget.id;
+
+    // for PC version of experiment, check which box was clicked
+  } else if (!exp.subjData.touchScreen) {
+    console.log('currentTarget', event.currentTarget.id);
+
+    // if participants clicked on the part of the balooon that is still visible,
+    // simply save in which box the balloon is in
+    if (event.currentTarget.id.includes('balloon')) {
+      exp.responseLog[exp.trials.count].clickedArea = `box${exp.positions[exp.trials.count].bin}`;
+    // if participants clicked on a box, save on which one
+    } else {
+      // get all boxes (by taking all child elements)
+      const boxesFront = document.getElementById('boxes8-front').children;
+      const boxesBack = document.getElementById('boxes8-back').children;
+      const boxIDs = [];
+      // get all box IDs
+      for (let i = 0; i < boxesFront.length; i++) {
+        boxIDs.push(boxesFront[i].id);
+        boxIDs.push(boxesBack[i].id);
       }
-    });
+      // for each box, see whether it was clicked or not
+      boxIDs.forEach((box) => {
+        if (event.target.closest(`#${box}`) !== null) {
+          // save the id of the one box that was clicked (without the "boxes8-front/back-" prefix)
+          const clickedBox = box.replace('boxes8-', '').replace('front-', '').replace('back-', '');
+          exp.responseLog[exp.trials.count].clickedArea = clickedBox;
+        }
+      });
+    }
   }
 
   // log all important trial infos
