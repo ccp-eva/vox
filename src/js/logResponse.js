@@ -123,10 +123,11 @@ export default (event, exp) => {
         boxIDs.push(boxesBack[i].id);
       }
       // for each box, see whether it was clicked or not
+      let clickedBox = null;
       boxIDs.forEach((box, i) => {
         if (event.target.closest(`#${box}`) !== null) {
           // save the id of the one box that was clicked (without the "boxes8-front/back-" prefix)
-          const clickedBox = box.replace('boxes8-', '').replace('front-', '').replace('back-', '');
+          clickedBox = box.replace('boxes8-', '').replace('front-', '').replace('back-', '');
           exp.responseLog[exp.trials.count].clickedArea = clickedBox;
         }
       });
@@ -143,6 +144,9 @@ export default (event, exp) => {
         exp.responseLog[exp.trials.count][`box${i + 1}CenterX`] = box.getBBox().x + box.getBBox().width / 2;
         exp.responseLog[exp.trials.count][`box${i + 1}CenterY`] = box.getBBox().y + box.getBBox().height / 2;
       });
+
+      // save the center X coord of the box that was clicked
+      exp.responseLog[exp.trials.count].clickedBoxCenterX = exp.responseLog[exp.trials.count][`${clickedBox}CenterX`];
     }
   }
 
@@ -153,7 +157,13 @@ export default (event, exp) => {
   exp.responseLog[exp.trials.count].agent = `${exp.agents[exp.trials.count].getAttribute('id')}`;
   exp.responseLog[exp.trials.count].target = `${exp.targets[exp.trials.count].getAttribute('id')}`;
   exp.responseLog[exp.trials.count].trialType = exp.trials.type[exp.trials.count];
-  exp.responseLog[exp.trials.count].positionBin = exp.positions[exp.trials.count].bin;
+
+  if (exp.subjData.touchScreen) {
+    exp.responseLog[exp.trials.count].targetPosition = exp.positions[exp.trials.count].bin;
+  } else if (!exp.subjData.touchScreen) {
+    exp.responseLog[exp.trials.count].targetPosition = `box${exp.positions[exp.trials.count].bin}`;
+  }
+
   exp.responseLog[exp.trials.count].responseTime = exp.responseLog[exp.trials.count].responseTime.t1 - exp.responseLog[exp.trials.count].responseTime.t0;
 
   exp.responseLog[exp.trials.count].eyeRadius = parseFloat(

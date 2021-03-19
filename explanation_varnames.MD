@@ -7,15 +7,21 @@
 | variable name              | description                                                                        |
 |----------------------------|------------------------------------------------------------------------------------|
 | agent                      | which animal character is shown in current trial                                   |
+| box*CenterX                | X coordinate of the center of the respective box                                   |
+| box*CenterY                | Y coordinate of the center of the respective box                                   |
 | clickDistFromTargetBBoxX   | distance between clickScaledX and the target's bounding box                        |
 | clickDistFromTargetBBoxY   | distance between clickScaledY and the target's bounding box                        |
 | clickDistFromTargetCenterX | difference between clickScaledX and targetCenterX                                  |
 | clickDistFromTargetCenterY | difference between clickScaledY and targetCenterY                                  |
-| clickedArea                | in which SVG area the click is (clickable-area for fam, hedge or box 1-5 for test) |
+| clickedArea                | in which SVG area the click is (clickable-area for fam, hedge or box1-8 for test)  |
+| clickedBoxCenterX          | X coordinate of the center of the box that was clicked                             |
 | clickScaledX               | X coordinate of click event in SVG coordinate system                               |
 | clickScaledY               | Y coordinate of click event in SVG coordinate system                               |
-| clickX                     | X coordinate of click event in client screen coordinate system                     |
-| clickY                     | Y coordinate of click event in client screen coordinate system                     |
+| clickOriginalX             | X coordinate of click event in client screen coordinate system                     |
+| clickOriginalY             | Y coordinate of click event in client screen coordinate system                     |
+| clientScreenHeight         | client screen size height (px)                                                     |
+| clientScreenWidth          | client screen size width (px)                                                      |
+| clientScreenScaling        | how much smaller/bigger client screen size is compared to SVG coordinates          |
 | eyeCenterLeftX             | X coordinate of the current agent's left eye center                                |
 | eyeCenterLeftY             | Y coordinate of the current agent's left eye center                                |
 | eyeCenterRightX            | X coordinate of the current agent's right eye center                               |
@@ -23,21 +29,18 @@
 | eyeRadius                  | radius of the current agent's eye                                                  |
 | hitBBTargetX               | boolean: true if clickScaledX is within the target's bounding box                  |
 | hitBBTargetY               | boolean: true if clickScaledY is within the target's bounding box                  |
-| offsetHeight               | client screen size height (px)                                                     |
-| offsetWidth                | client screen size width (px)                                                      |
-| positionBin                | in which area the target landed (1-10 for hedge version, 1-5 for box version)      |
 | pupilFinalLeftX            | X coordinate of the current agent's left pupil center after following target       |
 | pupilFinalLeftY            | Y coordinate of the current agent's left pupil center after following target       |
 | pupilFinalRightX           | X coordinate of the current agent's right pupil center after following target      |
 | pupilFinalRightY           | Y coordinate of the current agent's right pupil center after following target      |
 | responseTime               | msec between end of the animation and user click                                   |
-| screenScalingHeight        | how much taller/shorter client screen size is compared to SVG coordinates          |
-| screenScalingWidth         | how much wider/narrower client screen size is compared to SVG coordinates          |
+| spaceBetweenBoxes          | space between two boxes (and also space to the border of the SVG)                  |
 | subjID                     | unique participant identifier                                                      |
 | target                     | which target (color) is shown in current trial                                     |
 | targetCenterX              | X coordinate of target center (= targetX + targetWidth/2)                          |
 | targetCenterY              | Y coordinate of target center (= targetY + targetHeight/2)                         |
 | targetHeight               | height of the target's bounding box                                                |
+| targetPosition             | in which area the target landed (1-10 for hedge version, box1-8 for box version)   |
 | targetWidth                | width of the target's bounding box                                                 |
 | targetX                    | X coordinate of upper left corner of target                                        |
 | targetY                    | Y coordinate of upper left corner of target                                        |
@@ -48,6 +51,6 @@
 ### Calculation of the box positions
 * space between the boxes is calculated as follows (in the SVG coordinate system): 
     * spaceOverall = origViewBoxWidth - boxesNr * boxesWidth
-    * spaceSingle = spaceOverall / (boxesNr + 1)
+    * spaceBetweenBoxes = spaceOverall / (boxesNr + 1)
 * here, spaceOverall means how many "SVG pixels" are not filled by all of the boxes
 * thhe spaceOverall is then divided by the number of boxes + 1 (so that the space to the very left and very right side of the screen is also equal) 
