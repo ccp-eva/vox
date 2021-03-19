@@ -29,7 +29,7 @@ export default (exp) => {
   if (exp.subjData.touchScreen) {
     // instruction for hedge version
     instructionsParagraph.innerHTML = `<p>
-    In diesem Spiel kannst du ein paar Tiere und Luftballoons sehen. <br> <br>
+    In diesem Spiel kannst du ein paar Tiere und Luftballons sehen. <br> <br>
     Deine Aufgabe ist es, den Ballon zu finden. <br>
     Der Ballon fliegt immer auf den Boden. <br>
     Das Tier hilft dir und schaut den Ballon an. <br> <br>
