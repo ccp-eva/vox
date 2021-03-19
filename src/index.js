@@ -9,7 +9,6 @@ import checkForTouchscreen from './js/checkForTouchscreen';
 import showSlide from './js/showSlide';
 import openFullscreen from './js/openFullscreen';
 import closeFullscreen from './js/closeFullscreen';
-import convertToForeignObject from './js/convertToForeignObject';
 import experimentalInstructions from './js/experimentalInstructions';
 
 // TODO hedge!!
@@ -53,7 +52,12 @@ exp.subjData.offsetHeight = document.body.offsetHeight;
 // add text via rect => foreignObject => innerHTML
 const foreignObjects = Array.from(document.querySelectorAll('[id^="foreign-object"]'));
 foreignObjects.forEach((elem) => {
-  convertToForeignObject(elem);
+  const obj = document.createElementNS(
+    'http://www.w3.org/2000/svg',
+    'foreignObject',
+  );
+  [...elem.attributes].map(({ name, value }) => obj.setAttribute(name, value));
+  elem.replaceWith(obj);
 });
 
 const {
