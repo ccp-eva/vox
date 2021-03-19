@@ -9,8 +9,8 @@ export default (event, exp) => {
   exp.responseLog[exp.trials.count].clientScreenHeight = document.getElementById('experiment-slide').getBoundingClientRect().height;
 
   // how much smaller/bigger is the SVG coordinate system wrt the screen size?
-  // we could do the same with origViewBoxWidth / clientWidth, will result in the same value
-  exp.responseLog[exp.trials.count].clientScreenScaling = exp.responseLog[exp.trials.count].clientHeight / exp.elemSpecs.outerSVG.origViewBoxHeight;
+  // we could do the same with origViewBoxWidth / clientScreenWidth, will result in the same value
+  exp.responseLog[exp.trials.count].clientScreenScaling = exp.responseLog[exp.trials.count].clientScreenHeight / exp.elemSpecs.outerSVG.origViewBoxHeight;
 
   // user feedback where they clicked (with sound)
   // create point (needed for transformation function later) and pass event coordinates
