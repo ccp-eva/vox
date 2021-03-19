@@ -31,8 +31,8 @@ exp.subjData.subjID = 'testID';
 // TRIAL NUMBER
 // ---------------------------------------------------------------------------------------------------------------------
 exp.trials = {};
-exp.trials.famNr = 2;
-exp.trials.testNr = 2;
+exp.trials.famNr = 5;
+exp.trials.testNr = 15;
 exp.trials.totalNr = exp.trials.famNr + exp.trials.testNr;
 // this variable stores in which trial we currently are!
 exp.trials.count = 0;
@@ -43,7 +43,7 @@ exp.trials.count = 0;
 // ---------------------------------------------------------------------------------------------------------------------
 // just for developing: turn off fullscreen mode
 const fullscreen = false;
-exp.subjData.touchScreen = !checkForTouchscreen();
+exp.subjData.touchScreen = checkForTouchscreen();
 exp.subjData.offsetWidth = document.body.offsetWidth;
 exp.subjData.offsetHeight = document.body.offsetHeight;
 
@@ -75,7 +75,6 @@ const {
 exp.elemSpecs = {
   outerSVG: {
     ID: document.getElementById('outer-svg'),
-    nameSpace: document.getElementById('outer-svg').getAttribute('xmlns'),
     origViewBox: document.getElementById('outer-svg').getAttribute('viewBox'),
     origViewBoxX: parseFloat(document.getElementById('outer-svg').getAttribute('viewBox').split(' ')[0]),
     origViewBoxY: parseFloat(document.getElementById('outer-svg').getAttribute('viewBox').split(' ')[1]),
@@ -126,6 +125,11 @@ const boxes7Back = document.getElementById('boxes7-back');
 const boxes8Front = document.getElementById('boxes8-front');
 const boxes8Back = document.getElementById('boxes8-back');
 
+exp.elemSpecs.boxes = {
+  currentNr: 8,
+  width: boxes1Front.getBBox().width,
+  height: boxes1Front.getBBox().height,
+};
 // boxes8Front.setEnabled
 
 // if you change animal agents or targets, then change ID here...

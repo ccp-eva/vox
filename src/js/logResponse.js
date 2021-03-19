@@ -107,8 +107,6 @@ export default (event, exp) => {
 
     // for PC version of experiment, check which box was clicked
   } else if (!exp.subjData.touchScreen) {
-    console.log('currentTarget', event.currentTarget.id);
-
     // if participants clicked on the part of the balooon that is still visible,
     // simply save in which box the balloon is in
     if (event.currentTarget.id.includes('balloon')) {
@@ -116,8 +114,8 @@ export default (event, exp) => {
     // if participants clicked on a box, save on which one
     } else {
       // get all boxes (by taking all child elements)
-      const boxesFront = document.getElementById('boxes8-front').children;
-      const boxesBack = document.getElementById('boxes8-back').children;
+      const boxesFront = Array.from(document.getElementById('boxes8-front').children);
+      const boxesBack = Array.from(document.getElementById('boxes8-back').children);
       const boxIDs = [];
       // get all box IDs
       for (let i = 0; i < boxesFront.length; i++) {
@@ -125,12 +123,25 @@ export default (event, exp) => {
         boxIDs.push(boxesBack[i].id);
       }
       // for each box, see whether it was clicked or not
-      boxIDs.forEach((box) => {
+      boxIDs.forEach((box, i) => {
         if (event.target.closest(`#${box}`) !== null) {
           // save the id of the one box that was clicked (without the "boxes8-front/back-" prefix)
           const clickedBox = box.replace('boxes8-', '').replace('front-', '').replace('back-', '');
           exp.responseLog[exp.trials.count].clickedArea = clickedBox;
         }
+      });
+
+      // log positions of boxes
+      // * spaceOverall = origViewBoxWidth - boxesNr * boxesWidth
+      // * spaceSingle = spaceOverall / (boxesNr + 1)
+      exp.responseLog[exp.trials.count].spaceBetweenBoxes = (
+        (exp.elemSpecs.outerSVG.origViewBoxWidth - exp.elemSpecs.boxes.currentNr * exp.elemSpecs.boxes.width)
+        / (exp.elemSpecs.boxes.currentNr + 1));
+
+      // for each box, calculate CenterX and CenterY positions
+      boxesFront.forEach((box, i) => {
+        exp.responseLog[exp.trials.count][`box${i + 1}CenterX`] = box.getBBox().x + box.getBBox().width / 2;
+        exp.responseLog[exp.trials.count][`box${i + 1}CenterY`] = box.getBBox().y + box.getBBox().height / 2;
       });
     }
   }
