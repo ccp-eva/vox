@@ -10,9 +10,20 @@ body, body * {
     overflow: hidden;
 }
 
+h1{
+    font-size:60px;
+    text-align: center;
+}
+
+p{
+    font-size: 40px;
+    padding: 2%;
+}
+
 /* This is fixing the scaling, yet it causes it messes with the svg coord system... :( */
-/* svg {
+svg {
     position:fixed;
     height:100%;
     width:100%
-} */
+}
+

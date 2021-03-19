@@ -31,8 +31,8 @@ exp.subjData.subjID = 'testID';
 // TRIAL NUMBER
 // ---------------------------------------------------------------------------------------------------------------------
 exp.trials = {};
-exp.trials.famNr = 4;
-exp.trials.testNr = 4;
+exp.trials.famNr = 2;
+exp.trials.testNr = 2;
 exp.trials.totalNr = exp.trials.famNr + exp.trials.testNr;
 // this variable stores in which trial we currently are!
 exp.trials.count = 0;
@@ -73,6 +73,7 @@ const {
 exp.elemSpecs = {
   outerSVG: {
     ID: document.getElementById('outer-svg'),
+    nameSpace: document.getElementById('outer-svg').getAttribute('xmlns'),
     origViewBox: document.getElementById('outer-svg').getAttribute('viewBox'),
     origViewBoxX: parseFloat(document.getElementById('outer-svg').getAttribute('viewBox').split(' ')[0]),
     origViewBoxY: parseFloat(document.getElementById('outer-svg').getAttribute('viewBox').split(' ')[1]),
@@ -208,7 +209,7 @@ let timeline = null;
 // save in const variables in order to pass on event to function
 const handleInstructionsClick = (event) => {
   event.preventDefault();
-  openFullscreen();
+  // openFullscreen();
 
   // showSlide: first array gets shown, second array gets hidden
   showSlide([experimentSlide],
@@ -292,7 +293,7 @@ const handleTargetClick = async function tmp(event) {
 
   // if all trials done, show goodbye slide
   } else if (exp.trials.count === exp.trials.totalNr) {
-    closeFullscreen();
+    // closeFullscreen();
     document.getElementById('foreign-object-heading').replaceChild(goodbyeHeading, transitionHeading);
     document.getElementById('foreign-object-center-left').replaceChild(goodbyeParagraph, transitionParagraph);
     document.getElementById('foreign-object-center-right').replaceChild(goodbyeImage, transitionImage);

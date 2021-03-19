@@ -3,7 +3,7 @@ import { gsap } from 'gsap';
 // FUNCTION FOR LOGGING ALL RELEVANT TRIAL INFOS
 // ---------------------------------------------------------------------------------------------------------------------
 export default (event, exp) => {
-  // get user screen size
+  // TODO get user screen size
   // in our context, offset and client same values
   exp.responseLog[exp.trials.count].offsetWidth = document.body.offsetWidth;
   exp.responseLog[exp.trials.count].offsetHeight = document.body.offsetHeight;
@@ -12,18 +12,27 @@ export default (event, exp) => {
   exp.responseLog[exp.trials.count].screenScalingWidth = exp.elemSpecs.outerSVG.origViewBoxWidth / exp.responseLog[exp.trials.count].offsetWidth;
   exp.responseLog[exp.trials.count].screenScalingHeight = exp.elemSpecs.outerSVG.origViewBoxHeight / exp.responseLog[exp.trials.count].offsetHeight;
 
-  // originally, we used offset. Didn't work in Firefox.
-  exp.responseLog[exp.trials.count].clickX = event.clientX - exp.elemSpecs.outerSVG.ID.getBoundingClientRect().left;
-  exp.responseLog[exp.trials.count].clickY = event.clientY - exp.elemSpecs.outerSVG.ID.getBoundingClientRect().top;
-
-  // translate orig click coords into our SVG coordinate system
-  exp.responseLog[exp.trials.count].clickScaledX = exp.responseLog[exp.trials.count].screenScalingWidth * exp.responseLog[exp.trials.count].clickX;
-  exp.responseLog[exp.trials.count].clickScaledY = exp.responseLog[exp.trials.count].screenScalingHeight * exp.responseLog[exp.trials.count].clickY;
-
   // user feedback where they clicked (with sound)
+  // create point (needed for transformation function later) and pass event coordinates
+  const clickOriginal = exp.elemSpecs.outerSVG.ID.createSVGPoint();
+  clickOriginal.x = event.clientX;
+  clickOriginal.y = event.clientY;
+
+  // transform client user coordinate system to SVG coordinates
+  // see: https://www.sitepoint.com/how-to-translate-from-dom-to-svg-coordinates-and-back-again/
+  const clickScaled = clickOriginal.matrixTransform(exp.elemSpecs.outerSVG.ID.getScreenCTM().inverse());
+
+  // save original and transformed click coords in our response log
+  exp.responseLog[exp.trials.count].clickOriginalX = clickOriginal.x;
+  exp.responseLog[exp.trials.count].clickOriginalY = clickOriginal.y;
+  exp.responseLog[exp.trials.count].clickScaledX = clickScaled.x;
+  exp.responseLog[exp.trials.count].clickScaledY = clickScaled.y;
+
+  // get the circle that we set on the click coordinates
   const clickBubble = document.getElementById('click-bubble');
-  clickBubble.setAttribute('cx', `${exp.responseLog[exp.trials.count].clickScaledX}`);
-  clickBubble.setAttribute('cy', `${exp.responseLog[exp.trials.count].clickScaledY}`);
+  clickBubble.setAttribute('cx', exp.responseLog[exp.trials.count].clickScaledX);
+  clickBubble.setAttribute('cy', exp.responseLog[exp.trials.count].clickScaledY);
+
   // let clickBubble be visible only for 0.5 sec
   gsap.to(clickBubble, {
     duration: 0.5,
@@ -32,6 +41,7 @@ export default (event, exp) => {
       clickBubble.setAttribute('visibility', 'hidden');
     },
   });
+
   // play positive user feedback
   document.getElementById('positive-sound').play();
 
