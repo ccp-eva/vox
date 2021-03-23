@@ -113,6 +113,7 @@ export default (event, exp) => {
       exp.responseLog[exp.trials.count].clickedArea = `box${exp.positions[exp.trials.count].bin}`;
     // if participants clicked on a box, save on which one
     } else {
+      // for 8 boxes version: gett all boxes, to see which exact element has been clicked
       // get all boxes (by taking all child elements)
       const boxesFront = Array.from(document.getElementById('boxes8-front').children);
       const boxesBack = Array.from(document.getElementById('boxes8-back').children);
@@ -124,7 +125,7 @@ export default (event, exp) => {
       }
       // for each box, see whether it was clicked or not
       let clickedBox = null;
-      boxIDs.forEach((box, i) => {
+      boxIDs.forEach((box) => {
         if (event.target.closest(`#${box}`) !== null) {
           // save the id of the one box that was clicked (without the "boxes8-front/back-" prefix)
           clickedBox = box.replace('boxes8-', '').replace('front-', '').replace('back-', '');
@@ -132,21 +133,38 @@ export default (event, exp) => {
         }
       });
 
-      // log positions of boxes
+      // log positions of all boxes
+
+      // TODO: needed? space between boxes?
       // * spaceOverall = origViewBoxWidth - boxesNr * boxesWidth
       // * spaceSingle = spaceOverall / (boxesNr + 1)
-      exp.responseLog[exp.trials.count].spaceBetweenBoxes = (
-        (exp.elemSpecs.outerSVG.origViewBoxWidth - exp.elemSpecs.boxes.currentNr * exp.elemSpecs.boxes.width)
-        / (exp.elemSpecs.boxes.currentNr + 1));
+      // exp.responseLog[exp.trials.count].spaceBetweenBoxes = (
+      //   (exp.elemSpecs.outerSVG.origViewBoxWidth - exp.elemSpecs.boxes.currentVersion * exp.elemSpecs.boxes.width)
+      //   / (exp.elemSpecs.boxes.currentVersion + 1));
+
+      // create array for dynamic variable creation
+      const b = [];
+      // special case for one-box-version
+      b.boxes1 = [document.getElementById('boxes1-front')];
+
+      // get all svg elements
+      for (let i = 2; i <= 8; i++) {
+        b[`boxes${i}`] = Array.from(document.getElementById(`boxes${i}-front`).children);
+      }
 
       // for each box, calculate CenterX and CenterY positions
-      boxesFront.forEach((box, i) => {
-        exp.responseLog[exp.trials.count][`box${i + 1}CenterX`] = box.getBBox().x + box.getBBox().width / 2;
-        exp.responseLog[exp.trials.count][`box${i + 1}CenterY`] = box.getBBox().y + box.getBBox().height / 2;
-      });
+      const boxCoords = [];
+      for (let i = 1; i <= 8; i++) {
+        for (let j = 0; j < i; j++) {
+          const currentBox = b[`boxes${i}`][j];
+          exp.responseLog[exp.trials.count][`boxes${i}box${j + 1}CenterX`] = currentBox.getBBox().x + currentBox.getBBox().width / 2;
+          exp.responseLog[exp.trials.count][`boxes${i}box${j + 1}CenterY`] = currentBox.getBBox().y + currentBox.getBBox().height / 2;
+        }
+      }
 
       // save the center X coord of the box that was clicked
-      exp.responseLog[exp.trials.count].clickedBoxCenterX = exp.responseLog[exp.trials.count][`${clickedBox}CenterX`];
+      exp.responseLog[exp.trials.count].clickedBoxCenterX = exp.responseLog[exp.trials.count][`boxes8${clickedBox}CenterX`];
+      exp.responseLog[exp.trials.count].boxVersion = exp.elemSpecs.boxes.currentVersion;
     }
   }
 
