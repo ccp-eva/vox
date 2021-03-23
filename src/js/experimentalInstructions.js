@@ -1,7 +1,7 @@
-import instructionsImageTabletSrc from 'url:../images/instructions-img-tablet.png';
-import instructionsImagePCSrc from 'url:../images/instructions-img-PC.png';
-import transitionImageTabletSrc from 'url:../images/transition-img-tablet.png';
-import transitionImagePCSrc from 'url:../images/transition-img-PC.png';
+import instructionsImageTabletSrc from 'url:../images/instructions-tablet-half-sheep.png';
+import instructionsImagePCSrc from 'url:../images/instructions-PC-sheep.png';
+import transitionImageTabletSrc from 'url:../images/transition-tablet-monkey.png';
+import transitionImagePCSrc from 'url:../images/transition-PC-monkey.png';
 import goodbyeImageSrc from 'url:../images/goodbye-img.png';
 
 export default (exp) => {
@@ -31,7 +31,7 @@ export default (exp) => {
     instructionsParagraph.innerHTML = `<p>
     In diesem Spiel kannst du ein paar Tiere und Luftballons sehen. <br> <br>
     Deine Aufgabe ist es, den Ballon zu finden. <br>
-    Der Ballon fliegt immer auf den Boden. <br>
+    Der Ballon fällt immer auf den Boden. <br>
     Das Tier hilft dir und schaut den Ballon an. <br> <br>
     Klicke auf den Ballon - <br>
     die Tiere schauen immer den Ballon an. <br> <br>
@@ -46,10 +46,10 @@ export default (exp) => {
     transitionParagraph.innerHTML = `<p> 
     Die Tiere spielen nun in einem neuen Haus. <br> 
     Hier fällt der Ballon immer hinter eine Hecke. <br> <br> 
-    Du musst herausfinden, auf welche Stelle der Ballon geflogen ist. <br>
+    Du musst herausfinden, auf welche Stelle der Ballon gefallen ist. <br>
     Das Tier hilft Dir und schaut immer auf die Stelle mit dem Ballon. <br> <br> 
     Klicke auf die Stelle der Hecke, <br> 
-    hinter der sich der Ballon versteckt - <br> 
+    hinter der der Ballon versteckt ist - <br> 
     die Tiere schauen immer den Ballon an. <br> <br> 
     Klicke "los geht's!", um das Spiel zu starten.
     </p>`;
@@ -62,7 +62,7 @@ export default (exp) => {
     instructionsParagraph.innerHTML = `<p> 
     In diesem Spiel kannst du ein paar Tiere und Luftballoons sehen. <br> <br> 
     Deine Aufgabe ist es, den Ballon zu finden. <br> 
-    Der Ballon fliegt immer in eine Kiste. <br> 
+    Der Ballon fällt immer in eine Kiste. <br> 
     Das Tier hilft dir und schaut den Ballon an. <br> <br> 
     Klicke auf die Kiste mit dem Ballon - <br> 
     die Tiere schauen immer den Ballon an. <br> <br> 
@@ -78,10 +78,10 @@ export default (exp) => {
     Die Tiere spielen nun in einem neuen Haus. <br> 
     Hier fällt der Ballon immer hinter eine Hecke. <br> 
     Hinter der Hecke stehen Kisten. <br> <br> 
-    Du musst herausfinden, in welche Kiste der Ballon geflogen ist. <br>
+    Du musst herausfinden, in welche Kiste der Ballon gefallen ist. <br>
     Das Tier hilft Dir und schaut immer auf die Kiste mit dem Ballon. <br> <br> 
     Klicke auf die Kiste, <br> 
-    in der sich der Ballon versteckt - <br> 
+    in der der Ballon versteckt ist - <br> 
     die Tiere schauen immer den Ballon an. <br> <br> 
     Klicke "los geht's!", um das Spiel zu starten.
     </p>`;
