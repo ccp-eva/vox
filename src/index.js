@@ -10,6 +10,7 @@ import showSlide from './js/showSlide';
 import openFullscreen from './js/openFullscreen';
 import closeFullscreen from './js/closeFullscreen';
 import experimentalInstructions from './js/experimentalInstructions';
+import calculateBoxPositions from './js/calculateBoxPositions';
 
 // TODO hedge!!
 
@@ -30,8 +31,8 @@ exp.subjData.subjID = 'testID';
 // TRIAL NUMBER
 // ---------------------------------------------------------------------------------------------------------------------
 exp.trials = {};
-exp.trials.famNr = 5;
-exp.trials.testNr = 15;
+exp.trials.famNr = 2;
+exp.trials.testNr = 2;
 exp.trials.totalNr = exp.trials.famNr + exp.trials.testNr;
 // this variable stores in which trial we currently are!
 exp.trials.count = 0;
@@ -42,7 +43,7 @@ exp.trials.count = 0;
 // ---------------------------------------------------------------------------------------------------------------------
 // just for developing: turn off fullscreen mode
 const fullscreen = false;
-exp.subjData.touchScreen = checkForTouchscreen();
+exp.subjData.touchScreen = !checkForTouchscreen();
 exp.subjData.offsetWidth = document.body.offsetWidth;
 exp.subjData.offsetHeight = document.body.offsetHeight;
 
@@ -98,7 +99,6 @@ const transitionButton = document.getElementById('transition-button');
 const goodbyeButton = document.getElementById('goodbye-button');
 const losgehtsButton = document.getElementById('experiment-button');
 const clickBubble = document.getElementById('click-bubble');
-const clickableArea = document.getElementById('clickable-area');
 const hedge = document.getElementById('hedge');
 
 const boxes1Front = document.getElementById('boxes1-front');
@@ -130,11 +130,10 @@ const boxes8Front = document.getElementById('boxes8-front');
 const boxes8Back = document.getElementById('boxes8-back');
 
 exp.elemSpecs.boxes = {
-  currentNr: 8,
+  currentVersion: 8,
   width: boxes1Front.getBBox().width,
   height: boxes1Front.getBBox().height,
 };
-// boxes8Front.setEnabled
 
 // if you change animal agents or targets, then change ID here...
 const pig = document.getElementById('pig');
@@ -197,7 +196,7 @@ exp.elemSpecs.targets = {
   groundY: exp.elemSpecs.outerSVG.origViewBoxHeight - balloonBlue.getBBox().height - 20,
   // define y coord for target to be right above the boxes
   aboveBoxesY: boxes8Front.getBBox().y - balloonBlue.getBBox().height,
-  partlyInBoxesY: boxes8Front.getBBox().y - balloonBlue.getBBox().height / 3,
+  // partlyInBoxesY: boxes8Front.getBBox().y - balloonBlue.getBBox().height / 3,
 };
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -223,12 +222,13 @@ const handleInstructionsClick = (event) => {
 
   // showSlide: first array gets shown, second array gets hidden
   showSlide([experimentSlide],
-    [textSlide, clickBubble, clickableArea, instructionsButton]);
+    [textSlide, clickBubble, instructionsButton]);
 
   // shows only relevant elements etc.
   prepareTrial(exp);
   timeline = gsap.timeline({ paused: true });
   timeline.add(changeGaze(exp));
+  exp.responseLog[exp.trials.count].durationAnimationComplete = timeline.duration();
 };
 // ---------------------------------------------------------------------------------------------------------------------
 // RUNS WHEN TRANSITION BUTTON IS CLICKED (between fam and test trials)
@@ -243,6 +243,7 @@ const handleTransitionClick = (event) => {
   prepareTrial(exp);
   timeline = gsap.timeline({ paused: true });
   timeline.add(changeGaze(exp));
+  exp.responseLog[exp.trials.count].durationAnimationComplete = timeline.duration();
 };
 // ---------------------------------------------------------------------------------------------------------------------
 // RUNS WHEN GOODBYE BUTTON IS CLICKED
@@ -282,6 +283,7 @@ const handleTargetClick = async function tmp(event) {
     prepareTrial(exp);
     timeline = gsap.timeline({ paused: true });
     timeline.add(changeGaze(exp));
+    exp.responseLog[exp.trials.count].durationAnimationComplete = timeline.duration();
 
   // if transition between fam and test trials, show that transition slide
   } else if (exp.trials.count === exp.trials.famNr) {
@@ -300,6 +302,7 @@ const handleTargetClick = async function tmp(event) {
     prepareTrial(exp);
     timeline = gsap.timeline({ paused: true });
     timeline.add(changeGaze(exp));
+    exp.responseLog[exp.trials.count].durationAnimationComplete = timeline.duration();
 
   // if all trials done, show goodbye slide
   } else if (exp.trials.count === exp.trials.totalNr) {
@@ -325,10 +328,11 @@ const handleWrongClick = (event) => {
   const clickY = event.clientY - exp.elemSpecs.outerSVG.ID.getBoundingClientRect().top;
   const clickScaledY = screenScalingHeight * clickY;
   // if participant clicked above hedge, play negative feedback sound
-  if (clickScaledY < clickableArea.getBBox().y) {
+  if (clickScaledY < hedge.getBBox().y) {
     // count how often a participant clicked in the wrong area
     exp.responseLog[exp.trials.count].wrongClick++;
-    document.getElementById('negative-sound').play();
+    // IF WANTED: NEGATIVE FEEDBACK FOR NOT CLICKING IN THE HEDGE/BOX AREA
+    // document.getElementById('negative-sound').play();
   }
 };
 // ---------------------------------------------------------------------------------------------------------------------
@@ -354,18 +358,8 @@ const handleLosgehtsClick = async function tmp(event) {
 
   // depending on experiment version, participants click on hedge or boxes
   if (exp.subjData.touchScreen) {
-    if (exp.trials.type[exp.trials.count] === 'fam') {
-      clickableArea.setAttribute('pointer-events', 'all');
-      clickableArea.addEventListener('click', handleTargetClick, { capture: false, once: true });
-    } else if (exp.trials.type[exp.trials.count] === 'test') {
-      clickableArea.setAttribute('pointer-events', 'none');
-      hedge.setAttribute('pointer-events', 'all');
-      hedge.addEventListener('click', handleTargetClick, { capture: false, once: true });
-    }
+    hedge.addEventListener('click', handleTargetClick, { capture: false, once: true });
   } else if (!exp.subjData.touchScreen) {
-    clickableArea.setAttribute('pointer-events', 'none');
-    hedge.setAttribute('pointer-events', 'none');
-    exp.targets[exp.trials.count].addEventListener('click', handleTargetClick, { capture: false, once: true });
     boxes8Front.addEventListener('click', handleTargetClick, { capture: false, once: true });
     boxes8Back.addEventListener('click', handleTargetClick, { capture: false, once: true });
   }
