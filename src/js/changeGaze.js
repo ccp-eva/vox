@@ -17,133 +17,125 @@ export default (exp) => {
   // we use gsap3 for animation
   const timeline = gsap.timeline({ paused: true });
 
-  // animate target
-  // for fam trials
-  if (exp.trials.type[exp.trials.count] === 'fam') {
-    // for tablet hedge version: just show full path. everything at the same time
-    if (exp.subjData.touchScreen) {
-      timeline.to(exp.targets[exp.trials.count], {
-        duration: exp.responseLog[exp.trials.count].durationAnimationTotal,
-        ease: 'none',
-        x: exp.elemSpecs.targets.centerFinal.x,
-        y: exp.elemSpecs.targets.centerFinal.y,
-      });
-
-      // let eyes follow balloon already
-      timeline.to([pupilLeft, irisLeft], {
-        duration: exp.responseLog[exp.trials.count].durationAnimationTotal,
-        ease: 'none',
-        x: exp.elemSpecs.eyes[currentAgent].left.centerFinal.x,
-        y: exp.elemSpecs.eyes[currentAgent].left.centerFinal.y,
-      }, '<');
-
-      // same for right eye
-      timeline.to([pupilRight, irisRight], {
-        duration: exp.responseLog[exp.trials.count].durationAnimationTotal,
-        ease: 'none',
-        x: exp.elemSpecs.eyes[currentAgent].right.centerFinal.x,
-        y: exp.elemSpecs.eyes[currentAgent].right.centerFinal.y,
-      }, '<');
-
-    // fam for PC box version
-    // let balloons fly above box, then into it
-    } else if (!exp.subjData.touchScreen) {
-      timeline.to(exp.targets[exp.trials.count], {
-        duration: exp.responseLog[exp.trials.count].durationAnimationCenterBox,
-        ease: 'none',
-        x: exp.elemSpecs.targets.centerBox.x,
-        y: exp.elemSpecs.targets.centerBox.y,
-      });
-
-      // let eyes follow balloon to final position
-      timeline.to([pupilLeft, irisLeft], {
-        duration: exp.responseLog[exp.trials.count].durationAnimationTotal,
-        ease: 'none',
-        x: exp.elemSpecs.eyes[currentAgent].left.centerFinal.x,
-        y: exp.elemSpecs.eyes[currentAgent].left.centerFinal.y,
-      }, '<');
-
-      // same for right eye
-      timeline.to([pupilRight, irisRight], {
-        duration: exp.responseLog[exp.trials.count].durationAnimationTotal,
-        ease: 'none',
-        x: exp.elemSpecs.eyes[currentAgent].right.centerFinal.x,
-        y: exp.elemSpecs.eyes[currentAgent].right.centerFinal.y,
-      }, '<');
-
-      // hide balloon a bit in the box (eye movement takes as long!)
-      timeline.to(exp.targets[exp.trials.count], {
-        duration: exp.responseLog[exp.trials.count].durationAnimationBoxFinal,
-        ease: 'none',
-        y: exp.elemSpecs.targets.BoxFinal.y,
-      }, `-=${exp.responseLog[exp.trials.count].durationAnimationBoxFinal}`);
+  // -------------------------------------------------------------------------------------------------------------------
+  // TABLET VERSION WITH HEDGE
+  // -------------------------------------------------------------------------------------------------------------------
+  if (exp.subjData.touchScreen) {
+    // for test trials, let hedge move up to cover balloon falling down
+    if (exp.trials.type[exp.trials.count] === 'test') {
+      const hedgeTestUp = gsap.fromTo(hedge,
+        { y: hedge.getBBox().height }, {
+          y: 0,
+          delay: 1,
+          duration: 2,
+          ease: 'none',
+        });
+      timeline.add(hedgeTestUp);
     }
 
-  // for test trials, first hide balloon, then move to final position
-  } else if (exp.trials.type[exp.trials.count] === 'test') {
-    // first: hide balloon
+    // for fam + test trial: let balloon fall down
     timeline.to(exp.targets[exp.trials.count], {
-      duration: exp.responseLog[exp.trials.count].durationAnimationCenterHalfway,
-      ease: 'none',
-      x: exp.elemSpecs.targets.centerHalfway.x,
-      y: exp.elemSpecs.targets.centerHalfway.y,
-    });
-
-    // let eyes follow balloon already
-    timeline.to([pupilLeft, irisLeft], {
-      duration: exp.responseLog[exp.trials.count].durationAnimationCenterHalfway,
-      ease: 'none',
-      x: exp.elemSpecs.eyes[currentAgent].left.centerHalfway.x,
-      y: exp.elemSpecs.eyes[currentAgent].left.centerHalfway.y,
-    }, '<');
-
-    // same for right eye
-    timeline.to([pupilRight, irisRight], {
-      duration: exp.responseLog[exp.trials.count].durationAnimationCenterHalfway,
-      ease: 'none',
-      x: exp.elemSpecs.eyes[currentAgent].right.centerHalfway.x,
-      y: exp.elemSpecs.eyes[currentAgent].right.centerHalfway.y,
-    }, '<');
-
-    // then move balloon to final position
-    timeline.to(exp.targets[exp.trials.count], {
-      duration: exp.responseLog[exp.trials.count].durationAnimationHalfwayFinal,
+      delay: 1,
+      duration: exp.responseLog[exp.trials.count].durationAnimationBalloonTotal,
       ease: 'none',
       x: exp.elemSpecs.targets.centerFinal.x,
       y: exp.elemSpecs.targets.centerFinal.y,
     });
 
-    // and put eyes on final position
+    // let eyes follow balloon
     timeline.to([pupilLeft, irisLeft], {
-      duration: exp.responseLog[exp.trials.count].durationAnimationHalfwayFinal,
+      duration: exp.responseLog[exp.trials.count].durationAnimationBalloonTotal,
       ease: 'none',
       x: exp.elemSpecs.eyes[currentAgent].left.centerFinal.x,
       y: exp.elemSpecs.eyes[currentAgent].left.centerFinal.y,
     }, '<');
 
+    // same for right eye
     timeline.to([pupilRight, irisRight], {
-      duration: exp.responseLog[exp.trials.count].durationAnimationHalfwayFinal,
+      duration: exp.responseLog[exp.trials.count].durationAnimationBalloonTotal,
       ease: 'none',
       x: exp.elemSpecs.eyes[currentAgent].right.centerFinal.x,
       y: exp.elemSpecs.eyes[currentAgent].right.centerFinal.y,
     }, '<');
 
-    // until here, same for touchscreen and PC version.
-    // now, for touchscreen version, move hedge a bit down
-    if (exp.subjData.touchScreen === true) {
-      timeline.to(hedge, {
-        duration: 0.8,
-        ease: 'none',
-        // -75 because balloon doesn't land directly at border of screen
+    // for fam trials, move hedge up in the end
+    if (exp.trials.type[exp.trials.count] === 'fam') {
+      const hedgeFamTween = gsap.fromTo(hedge,
+        { y: hedge.getBBox().height }, {
+          // -75 because balloon doesn't land directly at border of screen
+          y: hedge.getBBox().height - exp.targets[exp.trials.count].getBBox().height - 75,
+          delay: 0.5,
+          duration: 1,
+          ease: 'none',
+        });
+      timeline.add(hedgeFamTween);
+    }
+    if (exp.trials.type[exp.trials.count] === 'test') {
+      const hedgeTestDown = gsap.to(hedge, {
         y: hedge.getBBox().height - exp.targets[exp.trials.count].getBBox().height - 75,
-      }, '+=0.1');
-    // for PC version, let hedge move completely down to reveal boxes
-    } else if (exp.subjData.touchScreen === false) {
-      timeline.to(hedge, {
-        duration: 1,
+        delay: 0.5,
+        duration: 1.5,
         ease: 'none',
-        y: exp.elemSpecs.outerSVG.origViewBoxHeight,
-      }, '+=0.1');
+      }, '>');
+      timeline.add(hedgeTestDown);
+    }
+
+  // -------------------------------------------------------------------------------------------------------------------
+  // PC VERSION WITH BOXES
+  // -------------------------------------------------------------------------------------------------------------------
+  } else if (!exp.subjData.touchScreen) {
+    // for test trials, let hedge move up to cover balloon falling down
+    if (exp.trials.type[exp.trials.count] === 'test') {
+      const hedgeTestUp = gsap.fromTo(hedge,
+        { y: hedge.getBBox().height }, {
+          y: 0,
+          delay: 1,
+          duration: 2,
+          ease: 'none',
+        });
+      timeline.add(hedgeTestUp);
+    }
+
+    // balloon flies above box
+    timeline.to(exp.targets[exp.trials.count], {
+      delay: 1,
+      duration: exp.responseLog[exp.trials.count].durationAnimationBalloonCenterBox,
+      ease: 'none',
+      x: exp.elemSpecs.targets.centerBox.x,
+      y: exp.elemSpecs.targets.centerBox.y,
+    });
+
+    // let eyes follow balloon to final position
+    timeline.to([pupilLeft, irisLeft], {
+      duration: exp.responseLog[exp.trials.count].durationAnimationBalloonTotal,
+      ease: 'none',
+      x: exp.elemSpecs.eyes[currentAgent].left.centerFinal.x,
+      y: exp.elemSpecs.eyes[currentAgent].left.centerFinal.y,
+    }, '<');
+
+    // same for right eye
+    timeline.to([pupilRight, irisRight], {
+      duration: exp.responseLog[exp.trials.count].durationAnimationBalloonTotal,
+      ease: 'none',
+      x: exp.elemSpecs.eyes[currentAgent].right.centerFinal.x,
+      y: exp.elemSpecs.eyes[currentAgent].right.centerFinal.y,
+    }, '<');
+
+    // hide balloon in the box (eye movement takes as long!)
+    timeline.to(exp.targets[exp.trials.count], {
+      duration: exp.responseLog[exp.trials.count].durationAnimationBalloonBoxFinal,
+      ease: 'none',
+      y: exp.elemSpecs.targets.centerFinal.y,
+    }, `-=${exp.responseLog[exp.trials.count].durationAnimationBalloonBoxFinal}`);
+
+    if (exp.trials.type[exp.trials.count] === 'test') {
+      const hedgeTestDown = gsap.to(hedge, {
+        y: hedge.getBBox().height,
+        delay: 0.5,
+        duration: 2,
+        ease: 'none',
+      }, '>');
+      timeline.add(hedgeTestDown);
     }
   }
 
