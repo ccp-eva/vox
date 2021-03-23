@@ -208,6 +208,7 @@ console.log('exp object', exp);
 
 // gsap timeline that will save our animation specifications
 let timeline = null;
+let targetClickTimer = null;
 
 // ---------------------------------------------------------------------------------------------------------------------
 // DEFINE EVENTLISTENER FUNCTIONS
@@ -257,12 +258,49 @@ const handleGoodbyeClick = (event) => {
   downloadData(exp.responseLog, exp.subjData.subjID);
 };
 // ---------------------------------------------------------------------------------------------------------------------
-// RUNS WHEN TARGET IS CLICKED
+// RUNS WHEN "los geht's" BUTTON IS CLICKED
+// ---------------------------------------------------------------------------------------------------------------------
+const handleLosgehtsClick = async function tmp(event) {
+  event.preventDefault();
+  console.log('');
+  console.log('trial: ', exp.trials.count);
+
+  // hide blurr canvas and button
+  document.getElementById('experiment-button').setAttribute('visibility', 'hidden');
+  document.getElementById('cover-blurr').setAttribute('visibility', 'hidden');
+
+  // animate balloon & eye movement to randomized positions
+  await timeline.play();
+
+  // save current time to calculate response time later
+  exp.responseLog[exp.trials.count].responseTime = {
+    t0: new Date().getTime(),
+    t1: 0,
+  };
+
+  targetClickTimer = window.setTimeout(noTargetClickYet, 5000);
+
+  // depending on experiment version, participants click on hedge or boxes
+  if (exp.subjData.touchScreen) {
+    hedge.addEventListener('click', handleTargetClick, { capture: false, once: true });
+  } else if (!exp.subjData.touchScreen) {
+    boxes8Front.addEventListener('click', handleTargetClick, { capture: false, once: true });
+    boxes8Back.addEventListener('click', handleTargetClick, { capture: false, once: true });
+  }
+  exp.elemSpecs.outerSVG.ID.addEventListener('click', handleWrongClick, false);
+};
+// ---------------------------------------------------------------------------------------------------------------------
+// RUNS WHEN TARGET (HEDGE OR BOX) IS CLICKED
 // ---------------------------------------------------------------------------------------------------------------------
 // async so we can await animation!
 const handleTargetClick = async function tmp(event) {
   // we save current time, so that we can calculate response time
   exp.responseLog[exp.trials.count].responseTime.t1 = new Date().getTime();
+
+  // clear timer that awaits participant's click
+  // otherwise, it will run even after target click
+  clearTimeout(targetClickTimer);
+
   // remove eventListener that was responsible for "wrong input" sound
   exp.elemSpecs.outerSVG.ID.removeEventListener('click', handleWrongClick, false);
   event.preventDefault();
@@ -336,35 +374,11 @@ const handleWrongClick = (event) => {
   }
 };
 // ---------------------------------------------------------------------------------------------------------------------
-// RUNS WHEN "los geht's" BUTTON IS CLICKED
+// RUNS WHEN PARTICIPANT HASN'T CLICKED WITHIN CERTAIN AMOUNT OF TIME
 // ---------------------------------------------------------------------------------------------------------------------
-const handleLosgehtsClick = async function tmp(event) {
-  event.preventDefault();
-  console.log('');
-  console.log('trial: ', exp.trials.count);
-
-  // hide blurr canvas and button
-  document.getElementById('experiment-button').setAttribute('visibility', 'hidden');
-  document.getElementById('cover-blurr').setAttribute('visibility', 'hidden');
-
-  // animate balloon & eye movement to randomized positions
-  await timeline.play();
-
-  // save current time to calculate response time later
-  exp.responseLog[exp.trials.count].responseTime = {
-    t0: new Date().getTime(),
-    t1: 0,
-  };
-
-  // depending on experiment version, participants click on hedge or boxes
-  if (exp.subjData.touchScreen) {
-    hedge.addEventListener('click', handleTargetClick, { capture: false, once: true });
-  } else if (!exp.subjData.touchScreen) {
-    boxes8Front.addEventListener('click', handleTargetClick, { capture: false, once: true });
-    boxes8Back.addEventListener('click', handleTargetClick, { capture: false, once: true });
-  }
-  exp.elemSpecs.outerSVG.ID.addEventListener('click', handleWrongClick, false);
-};
+function noTargetClickYet() {
+  document.getElementById('noTargetClickYet').play();
+}
 // ---------------------------------------------------------------------------------------------------------------------
 // ACTUALLY RUNNING:
 // ---------------------------------------------------------------------------------------------------------------------
