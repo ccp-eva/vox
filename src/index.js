@@ -43,7 +43,7 @@ exp.trials.count = 0;
 // ---------------------------------------------------------------------------------------------------------------------
 // just for developing: turn off fullscreen mode
 const fullscreen = false;
-exp.subjData.touchScreen = !checkForTouchscreen();
+exp.subjData.touchScreen = checkForTouchscreen();
 exp.subjData.offsetWidth = document.body.offsetWidth;
 exp.subjData.offsetHeight = document.body.offsetHeight;
 
@@ -208,7 +208,8 @@ console.log('exp object', exp);
 
 // gsap timeline that will save our animation specifications
 let timeline = null;
-let targetClickTimer = null;
+let targetClickTimer5sec = null;
+let targetClickTimer15sec = null;
 
 // ---------------------------------------------------------------------------------------------------------------------
 // DEFINE EVENTLISTENER FUNCTIONS
@@ -278,7 +279,8 @@ const handleLosgehtsClick = async function tmp(event) {
     t1: 0,
   };
 
-  targetClickTimer = window.setTimeout(noTargetClickYet, 5000);
+  targetClickTimer5sec = window.setTimeout(noTargetClickWithin5sec, 5000);
+  targetClickTimer15sec = window.setTimeout(noTargetClickWithin15sec, 15000);
 
   // depending on experiment version, participants click on hedge or boxes
   if (exp.subjData.touchScreen) {
@@ -299,7 +301,8 @@ const handleTargetClick = async function tmp(event) {
 
   // clear timer that awaits participant's click
   // otherwise, it will run even after target click
-  clearTimeout(targetClickTimer);
+  clearTimeout(targetClickTimer5sec);
+  clearTimeout(targetClickTimer15sec);
 
   // remove eventListener that was responsible for "wrong input" sound
   exp.elemSpecs.outerSVG.ID.removeEventListener('click', handleWrongClick, false);
@@ -376,8 +379,16 @@ const handleWrongClick = (event) => {
 // ---------------------------------------------------------------------------------------------------------------------
 // RUNS WHEN PARTICIPANT HASN'T CLICKED WITHIN CERTAIN AMOUNT OF TIME
 // ---------------------------------------------------------------------------------------------------------------------
-function noTargetClickYet() {
-  document.getElementById('noTargetClickYet').play();
+function noTargetClickWithin5sec() {
+  document.getElementById('wo-ist-ballon').play();
+}
+
+function noTargetClickWithin15sec() {
+  if (exp.subjData.touchScreen) {
+    document.getElementById('ballon-hinter-hecke').play();
+  } else if (!exp.subjData.touchScreen) {
+    document.getElementById('ballon-in-kiste').play();
+  }
 }
 // ---------------------------------------------------------------------------------------------------------------------
 // ACTUALLY RUNNING:

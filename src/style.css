@@ -2,27 +2,41 @@
 * {
     margin: 0;
     padding: 0;
-}
-
-
-body, body * {
     font-family: "PT Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol" !important;
-    overflow: hidden;
 }
 
-h1{
+h1 {
     font-size:60px;
     text-align: center;
 }
 
-p{
+p {
     font-size: 40px;
     padding: 2%;
 }
 
-svg {
+html, body {
+    background-color: #fff;
+    width: 100%;
+    height: 100%;
+    margin: 0;
+    border: 0;
+    outline: 0;
+  }
+
+/* use flex box to center svg (while keeping its size/ratio specifications */
+/* #svg-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    width: 100vw;
+    overflow: hidden;
+} */
+
+/* 
+#svg-inner-container {
     position:fixed;
     height:100%;
-    width:100%
-}
-
+    width:100%;
+} */
