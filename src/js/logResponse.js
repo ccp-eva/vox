@@ -43,7 +43,7 @@ export default (event, exp) => {
   });
 
   // play positive user feedback
-  document.getElementById('positive-sound').play();
+  document.getElementById('audio-positive-feedback').play();
 
   // get upper left corner of target
   exp.responseLog[exp.trials.count].targetX = exp.positions[exp.trials.count].x;

@@ -10,7 +10,8 @@ import showSlide from './js/showSlide';
 import openFullscreen from './js/openFullscreen';
 import closeFullscreen from './js/closeFullscreen';
 import experimentalInstructions from './js/experimentalInstructions';
-import calculateBoxPositions from './js/calculateBoxPositions';
+import playFullAudio from './js/playFullAudio';
+// import calculateBoxPositions from './js/calculateBoxPositions';
 
 // TODO hedge!!
 
@@ -31,8 +32,8 @@ exp.subjData.subjID = 'testID';
 // TRIAL NUMBER
 // ---------------------------------------------------------------------------------------------------------------------
 exp.trials = {};
-exp.trials.famNr = 2;
-exp.trials.testNr = 2;
+exp.trials.famNr = 1;
+exp.trials.testNr = 3;
 exp.trials.totalNr = exp.trials.famNr + exp.trials.testNr;
 // this variable stores in which trial we currently are!
 exp.trials.count = 0;
@@ -43,7 +44,7 @@ exp.trials.count = 0;
 // ---------------------------------------------------------------------------------------------------------------------
 // just for developing: turn off fullscreen mode
 const fullscreen = false;
-exp.subjData.touchScreen = checkForTouchscreen();
+exp.subjData.touchScreen = !checkForTouchscreen();
 exp.subjData.offsetWidth = document.body.offsetWidth;
 exp.subjData.offsetHeight = document.body.offsetHeight;
 
@@ -99,8 +100,18 @@ const transitionButton = document.getElementById('transition-button');
 const goodbyeButton = document.getElementById('goodbye-button');
 const losgehtsButton = document.getElementById('experiment-button');
 const clickBubble = document.getElementById('click-bubble');
-const hedge = document.getElementById('hedge');
 
+const speaker = document.getElementById('speaker');
+const audioInstructionsTablet = document.getElementById('audio-instructions-tablet');
+const audioInstructionsPC = document.getElementById('audio-instructions-PC');
+const audioTransitionTablet = document.getElementById('audio-transition-tablet');
+const audioTransitionPC = document.getElementById('audio-transition-PC');
+const audioGoodbye = document.getElementById('audio-goodbye');
+const audioPrompt = document.getElementById('audio-prompt');
+const audioReminderTablet = document.getElementById('audio-reminder-tablet');
+const audioReminderPC = document.getElementById('audio-reminder-PC');
+
+const hedge = document.getElementById('hedge');
 const boxes1Front = document.getElementById('boxes1-front');
 const boxes1Back = document.getElementById('boxes1-back');
 const boxes2Front = document.getElementById('boxes2-front');
@@ -209,7 +220,7 @@ console.log('exp object', exp);
 // gsap timeline that will save our animation specifications
 let timeline = null;
 let targetClickTimer5sec = null;
-let targetClickTimer15sec = null;
+const targetClickTimer10sec = null;
 
 // ---------------------------------------------------------------------------------------------------------------------
 // DEFINE EVENTLISTENER FUNCTIONS
@@ -267,11 +278,12 @@ const handleLosgehtsClick = async function tmp(event) {
   console.log('trial: ', exp.trials.count);
 
   // hide blurr canvas and button
-  document.getElementById('experiment-button').setAttribute('visibility', 'hidden');
-  document.getElementById('cover-blurr').setAttribute('visibility', 'hidden');
+  showSlide([], [document.getElementById('experiment-button'), document.getElementById('cover-blurr')]);
 
   // animate balloon & eye movement to randomized positions
   await timeline.play();
+  await pause(200);
+  audioPrompt.play();
 
   // save current time to calculate response time later
   exp.responseLog[exp.trials.count].responseTime = {
@@ -280,7 +292,6 @@ const handleLosgehtsClick = async function tmp(event) {
   };
 
   targetClickTimer5sec = window.setTimeout(noTargetClickWithin5sec, 5000);
-  targetClickTimer15sec = window.setTimeout(noTargetClickWithin15sec, 15000);
 
   // depending on experiment version, participants click on hedge or boxes
   if (exp.subjData.touchScreen) {
@@ -296,13 +307,21 @@ const handleLosgehtsClick = async function tmp(event) {
 // ---------------------------------------------------------------------------------------------------------------------
 // async so we can await animation!
 const handleTargetClick = async function tmp(event) {
+  // stop audio that is potentially playing
+  audioPrompt.pause();
+  audioPrompt.currentTime = 0;
+  audioReminderTablet.pause();
+  audioReminderTablet.currentTime = 0;
+  audioReminderPC.pause();
+  audioReminderPC.currentTime = 0;
+
   // we save current time, so that we can calculate response time
   exp.responseLog[exp.trials.count].responseTime.t1 = new Date().getTime();
 
   // clear timer that awaits participant's click
   // otherwise, it will run even after target click
   clearTimeout(targetClickTimer5sec);
-  clearTimeout(targetClickTimer15sec);
+  clearTimeout(targetClickTimer10sec);
 
   // remove eventListener that was responsible for "wrong input" sound
   exp.elemSpecs.outerSVG.ID.removeEventListener('click', handleWrongClick, false);
@@ -368,28 +387,49 @@ const handleWrongClick = (event) => {
   const screenScalingHeight = exp.elemSpecs.outerSVG.origViewBoxHeight / exp.subjData.offsetHeight;
   const clickY = event.clientY - exp.elemSpecs.outerSVG.ID.getBoundingClientRect().top;
   const clickScaledY = screenScalingHeight * clickY;
-  // if participant clicked above hedge, play negative feedback sound
   if (clickScaledY < hedge.getBBox().y) {
     // count how often a participant clicked in the wrong area
     exp.responseLog[exp.trials.count].wrongClick++;
     // IF WANTED: NEGATIVE FEEDBACK FOR NOT CLICKING IN THE HEDGE/BOX AREA
-    // document.getElementById('negative-sound').play();
+    // audioNegativeFeedback.play();
   }
 };
 // ---------------------------------------------------------------------------------------------------------------------
+// RUNS WHEN SPEAKER IN INSTRUCTIONS HAS BEEN CLICKED
+// ---------------------------------------------------------------------------------------------------------------------
+const handleSpeakerClick = async function tmp(event) {
+  event.preventDefault();
+  if (exp.trials.count === 0) {
+    if (exp.subjData.touchScreen) {
+      await playFullAudio(audioInstructionsTablet, instructionsButton);
+      showSlide([instructionsButton], []);
+    } else if (!exp.subjData.touchScreen) {
+      await playFullAudio(audioInstructionsPC, instructionsButton);
+      showSlide([instructionsButton], []);
+    }
+  } else if (exp.trials.count === exp.trials.famNr) {
+    if (exp.subjData.touchScreen) {
+      await playFullAudio(audioTransitionTablet, transitionButton);
+      showSlide([transitionButton], []);
+    } else if (!exp.subjData.touchScreen) {
+      await playFullAudio(audioTransitionPC, transitionButton);
+      showSlide([transitionButton], []);
+    }
+  } else if (exp.trials.count === exp.trials.totalNr) {
+    audioGoodbye.play();
+  }
+};
+
+// ---------------------------------------------------------------------------------------------------------------------
 // RUNS WHEN PARTICIPANT HASN'T CLICKED WITHIN CERTAIN AMOUNT OF TIME
 // ---------------------------------------------------------------------------------------------------------------------
-function noTargetClickWithin5sec() {
-  document.getElementById('wo-ist-ballon').play();
-}
-
-function noTargetClickWithin15sec() {
+const noTargetClickWithin5sec = () => {
   if (exp.subjData.touchScreen) {
-    document.getElementById('ballon-hinter-hecke').play();
+    audioReminderTablet.play();
   } else if (!exp.subjData.touchScreen) {
-    document.getElementById('ballon-in-kiste').play();
+    audioReminderPC.play();
   }
-}
+};
 // ---------------------------------------------------------------------------------------------------------------------
 // ACTUALLY RUNNING:
 // ---------------------------------------------------------------------------------------------------------------------
@@ -398,10 +438,13 @@ document.getElementById('foreign-object-heading').appendChild(instructionsHeadin
 document.getElementById('foreign-object-center-left').appendChild(instructionsParagraph);
 document.getElementById('foreign-object-center-right').appendChild(instructionsImage);
 showSlide([textSlide],
-  [experimentSlide]);
+  // first hide buttons, participants can only start once they listened to the instructions
+  // instructionsButton, transitionButton, goodbyeButton
+  [experimentSlide, instructionsButton, transitionButton, goodbyeButton]);
 
 // add event listeners
 instructionsButton.addEventListener('click', handleInstructionsClick, { capture: false, once: true });
 losgehtsButton.addEventListener('click', handleLosgehtsClick, { capture: false });
 transitionButton.addEventListener('click', handleTransitionClick, { capture: false, once: true });
 goodbyeButton.addEventListener('click', handleGoodbyeClick, { capture: false, once: true });
+speaker.addEventListener('click', handleSpeakerClick, { capture: false, once: false });

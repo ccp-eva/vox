@@ -27,7 +27,7 @@ export default (exp) => {
         { y: hedge.getBBox().height }, {
           y: 0,
           delay: 1,
-          duration: 2,
+          duration: 1.5,
           ease: 'none',
         });
       timeline.add(hedgeTestUp);
@@ -65,7 +65,7 @@ export default (exp) => {
           // -75 because balloon doesn't land directly at border of screen
           y: hedge.getBBox().height - exp.targets[exp.trials.count].getBBox().height - 75,
           delay: 0.5,
-          duration: 1,
+          duration: 0.5,
           ease: 'none',
         });
       timeline.add(hedgeFamTween);
@@ -74,7 +74,7 @@ export default (exp) => {
       const hedgeTestDown = gsap.to(hedge, {
         y: hedge.getBBox().height - exp.targets[exp.trials.count].getBBox().height - 75,
         delay: 0.5,
-        duration: 1.5,
+        duration: 1,
         ease: 'none',
       }, '>');
       timeline.add(hedgeTestDown);
@@ -90,7 +90,7 @@ export default (exp) => {
         { y: hedge.getBBox().height }, {
           y: 0,
           delay: 1,
-          duration: 2,
+          duration: 1.5,
           ease: 'none',
         });
       timeline.add(hedgeTestUp);
@@ -132,7 +132,7 @@ export default (exp) => {
       const hedgeTestDown = gsap.to(hedge, {
         y: hedge.getBBox().height,
         delay: 0.5,
-        duration: 2,
+        duration: 1.5,
         ease: 'none',
       }, '>');
       timeline.add(hedgeTestDown);

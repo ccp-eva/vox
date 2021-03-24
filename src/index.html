@@ -10,24 +10,28 @@
   <link href="https://fonts.googleapis.com/css2?family=PT+Sans:ital,wght@0,400;0,700;1,400;1,700&display=swap" rel="stylesheet">
   <!-- ICON STUFF based on https://evilmartians.com/chronicles/how-to-favicon-in-2021-six-files-that-fit-most-needs -->
   <!-- <link rel="icon" href="/favicon.ico">
-  <link rel="apple-touch-icon" href="/apple-touch-icon.png">
-  <link rel="manifest" href="/manifest.webmanifest"> -->
-</head>
-<body>
-  <?xml version="1.0" encoding="utf-8"?>
-  <!-- add sounds for user feedback -->
-  <audio id="positive-sound" autobuffer preload="auto" src = "./sounds/positive1.mp3"></audio>
-  <audio id="negative-sound" autobuffer preload="auto" src = "./sounds/negative1.mp3"></audio>   
-  <audio id="wo-ist-ballon" autobuffer preload="auto" src = "./sounds/WoIstBallon.mp3"></audio> 
-  <audio id="ballon-hinter-hecke" autobuffer preload="auto" src = "./sounds/BallonHinterHecke.mp3"></audio>   
-  <audio id="ballon-in-kiste" autobuffer preload="auto" src = "./sounds/BallonInKiste.mp3"></audio>   
-
-  
-  <!-- IMPORTANT:
-    - add id="outer-svg" viewBox="0 0 1920 1080" to outermost svg tag
-    - next line, add: <style> svg { cursor: pointer;} </style>
-    - for images: <image id="instructions-img-tablet" width="966" height="1042" transform="translate(1088.22 189.12) scale(0.68)" xlink:href="./images/instructions-img-tablet.png"/>
-    - <image id="hedge" x="0" y="549" width="1920" height="531" xlink:href="./images/hedge.png"/>
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+    <link rel="manifest" href="/manifest.webmanifest"> -->
+  </head>
+  <body>
+    <?xml version="1.0" encoding="utf-8"?>
+    <!-- add sounds for instructions and feedback -->
+    <audio id="audio-positive-feedback" autobuffer preload="auto" src = "./sounds/positive1.mp3"></audio>
+    <audio id="audio-negative-feedback" autobuffer preload="auto" src = "./sounds/negative1.mp3"></audio>   
+    <audio id="audio-prompt" autobuffer preload="auto" src = "./sounds/WoIstBallon.mp3"></audio> 
+    <audio id="audio-reminder-tablet" autobuffer preload="auto" src = "./sounds/BallonHinterHeckeWoIstBallon.mp3"></audio>   
+    <audio id="audio-reminder-PC" autobuffer preload="auto" src = "./sounds/BallonInKisteWoIstBallon.mp3"></audio>
+    <audio id="audio-instructions-tablet" autobuffer preload="auto" src = "./sounds/InstructionsTablet.mp3"></audio>
+    <audio id="audio-instructions-PC" autobuffer preload="auto" src = "./sounds/InstructionsPC.mp3"></audio>
+    <audio id="audio-transition-tablet" autobuffer preload="auto" src = "./sounds/TransitionTablet.mp3"></audio>
+    <audio id="audio-transition-PC" autobuffer preload="auto" src = "./sounds/TransitionPC.mp3"></audio>
+    <audio id="audio-goodbye" autobuffer preload="auto" src = "./sounds/Goodbye.mp3"></audio>
+    
+    <!-- IMPORTANT:
+      - add id="outer-svg" viewBox="0 0 1920 1080" to outermost svg tag
+      - next line, add: <style> svg { cursor: pointer;} </style>
+      - for images: <image id="instructions-img-tablet" width="966" height="1042" transform="translate(1088.22 189.12) scale(0.68)" xlink:href="./images/instructions-img-tablet.png"/>
+      - <image id="hedge" x="0" y="549" width="1920" height="531" xlink:href="./images/hedge.png"/>
     --> 
     <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" id="outer-svg" viewBox="0 0 1920 1080">
       <style> svg { cursor: pointer;} </style>
@@ -688,10 +692,10 @@
             </g>
             <image id="hedge" x="0" y="374" width="1920" height="706" xlink:href="./images/hedge.png"/>
             <rect id="cover-blurr" width="1920" height="1080" fill="#f4fdff" opacity="0.9"/>
-            <circle id="click-bubble" cx="960.39" cy="504" r="35" fill="#fbb03b"/>
+            <circle id="click-bubble" cx="960" cy="540" r="35" fill="#fbb03b"/>
             <g id="experiment-button">
-              <rect id="experiment-button-shape" x="759.55" y="435.1" width="400.9" height="125.28" rx="12" fill="#00becc"/>
-              <text id="experiment-button-text" transform="translate(788.93 518.43)" font-size="72" fill="#fff" font-family="OpenSans-Semibold, Open Sans" font-weight="600" style="isolation: isolate">los geht’s!</text>
+              <rect id="experiment-button-shape" x="800" y="490" width="320" height="100" rx="12" fill="#00becc"/>
+              <text id="experiment-button-text" x="960" y="540">los geht’s!</text>
             </g>
           </g>
           <g id="text-slide">
@@ -700,27 +704,33 @@
             <rect id="foreign-object-center-big" x="100" y="170" width="1720" height="740" fill="#fff"/>
             <rect id="foreign-object-heading" x="100" y="40" width="1720" height="100" fill="#fff"/>
             <!-- <image id="transition-img-PC" width="960" height="1038" transform="translate(1090.25 190.48) scale(0.68)" xlink:href="../../../vox/src/images/transition-img-PC.png"/>
-            <image id="transition-img-tablet" width="964" height="1040" transform="translate(1088.9 189.8) scale(0.68)" xlink:href="../../../vox/src/images/transition-img-tablet.png"/>
-            <image id="instructions-img-tablet" width="966" height="1042" transform="translate(1088.22 189.12) scale(0.68)" xlink:href="../../../vox/src/images/instructions-img-tablet.png"/>
-            <image id="instructions-img-PC" width="964" height="1040" transform="translate(1088.9 189.8) scale(0.68)" xlink:href="../../../vox/src/images/instructions-img-PC.png"/> -->
-            <g id="goodbye-button">
-              <rect id="goodbye-button-shape" x="800" y="940" width="320" height="100" rx="12" fill="#00becc"/>
-              <text id="goodbye-button-text" transform="translate(848.1 1010.55)" font-size="57.47" fill="#fff" font-family="OpenSans-Semibold, Open Sans" font-weight="600" style="isolation: isolate">tschüss!</text>
-            </g>
-            <g id="transition-button">
-              <rect id="instructions-button-shape" x="800" y="940" width="320" height="100" rx="12" fill="#00becc"/>
-              <text id="instructions-button-text" transform="translate(823.45 1008.56)" font-size="57.47" fill="#fff" font-family="OpenSans-Semibold, Open Sans" font-weight="600" style="isolation: isolate">los geht’s!</text>
-            </g>
-            <g id="instructions-button">
-              <rect id="instructions-button-shape-2" data-name="instructions-button-shape" x="800" y="940" width="320" height="100" rx="12" fill="#00becc"/>
-              <text id="instructions-button-text-2" data-name="instructions-button-text" transform="translate(823.45 1008.59)" font-size="57.47" fill="#fff" font-family="OpenSans-Semibold, Open Sans" font-weight="600" style="isolation: isolate">los geht’s!</text>
+              <image id="transition-img-tablet" width="964" height="1040" transform="translate(1088.9 189.8) scale(0.68)" xlink:href="../../../vox/src/images/transition-img-tablet.png"/>
+              <image id="instructions-img-tablet" width="966" height="1042" transform="translate(1088.22 189.12) scale(0.68)" xlink:href="../../../vox/src/images/instructions-img-tablet.png"/>
+              <image id="instructions-img-PC" width="964" height="1040" transform="translate(1088.9 189.8) scale(0.68)" xlink:href="../../../vox/src/images/instructions-img-PC.png"/> -->
+              <g id="goodbye-button">
+                <rect id="goodbye-button-shape" x="800" y="940" width="320" height="100" rx="12" fill="#00becc"/>
+                <text id="goodbye-button-text" x="960" y="990">tschüss!</text>
+              </g>
+              <g id="transition-button">
+                <rect id="transition-button-shape" x="800" y="940" width="320" height="100" rx="12" fill="#00becc"/>
+                <text id="transition-button-text" x="960" y="990">los geht’s!</text>
+              </g>
+              <g id="instructions-button">
+                <rect id="instructions-button-shape" x="800" y="940" width="320" height="100" rx="12" fill="#00becc"/>
+                <text id="instructions-button-text" x="960" y="990">los geht’s!</text>
+              </g>
+              <g id="speaker">
+                <circle id="speaker-circle" cx="505" cy="821.65" r="88.35" fill="#fbb03b"/>
+                <g id="speaker-sign">
+                  <path d="M504.88,780.87a3.5,3.5,0,0,0-3.59.14L469.7,801.53H458a3.51,3.51,0,0,0-3.51,3.51v30.79a3.52,3.52,0,0,0,3.51,3.52H469.7l31.59,20.51a3.49,3.49,0,0,0,3.59.14,3.51,3.51,0,0,0,1.84-3.08V784A3.54,3.54,0,0,0,504.88,780.87Z" fill="#fff"/>
+                  <path d="M516.5,845.29a2.38,2.38,0,0,0,.89-.17c8.05-3.12,13.45-12.78,13.45-24,0-10-4.38-18.94-11.16-22.92a2.46,2.46,0,1,0-2.49,4.25c5.3,3.11,8.73,10.44,8.73,18.67,0,9.08-4.24,17.07-10.32,19.43a2.46,2.46,0,0,0,.9,4.76Z" fill="#fff"/>
+                  <path d="M522.93,855.57a2.51,2.51,0,0,0,.89-.17c11.3-4.39,19.2-18.59,19.2-34.53,0-14.34-6.27-27.28-16-33a2.46,2.46,0,1,0-2.49,4.25c8.23,4.82,13.54,16.09,13.54,28.71,0,14-6.6,26.27-16.05,29.94a2.46,2.46,0,0,0,.89,4.76Z" fill="#fff"/>
+                  <path d="M529.55,865.36a2.49,2.49,0,0,1-.9-4.81c12.87-5,21.86-21.39,21.86-39.85,0-16.65-7.17-31.61-18.28-38.12a2.49,2.49,0,1,1,2.52-4.29c12.6,7.38,20.74,24,20.74,42.41,0,20.47-10.29,38.77-25,44.49A2.36,2.36,0,0,1,529.55,865.36Z" fill="#fff"/>
+                </g>
+              </g>
             </g>
           </g>
-        </g>
-      </g>
-    </svg>
-    
-    
-
-  </body>
-</html>
+        </svg>
+        
+      </body>
+      </html>

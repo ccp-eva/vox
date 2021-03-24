@@ -2,6 +2,7 @@ import { gsap } from 'gsap';
 import showElement from './showElement';
 import getGazeCoords from './getGazeCoords';
 import distancePoints from './distancePoints';
+import showSlide from './showSlide';
 
 // ---------------------------------------------------------------------------------------------------------------------
 // FUNCTION THAT PREPARES EACH TRIAL
@@ -9,8 +10,7 @@ import distancePoints from './distancePoints';
 // ---------------------------------------------------------------------------------------------------------------------
 export default (exp) => {
   // show blurred canvas and button
-  document.getElementById('experiment-button').setAttribute('visibility', 'visible');
-  document.getElementById('cover-blurr').setAttribute('visibility', 'visible');
+  showSlide([document.getElementById('experiment-button'), document.getElementById('cover-blurr')], []);
 
   // show agent and target of the current trial only, hide the other ones
   showElement(exp.agents, exp.trials.count);
@@ -45,11 +45,9 @@ export default (exp) => {
 
   // for PC version show boxes, for touchscreen hide them
   if (exp.subjData.touchScreen) {
-    boxes8Front.setAttribute('visibility', 'hidden');
-    boxes8Back.setAttribute('visibility', 'hidden');
+    showSlide([], [boxes8Front, boxes8Back]);
   } else if (!exp.subjData.touchScreen) {
-    boxes8Front.setAttribute('visibility', 'visible');
-    boxes8Back.setAttribute('visibility', 'visible');
+    showSlide([boxes8Front, boxes8Back], []);
   }
 
   // calculate how far the balloon will fly
