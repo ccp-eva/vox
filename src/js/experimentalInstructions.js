@@ -22,78 +22,55 @@ export default (exp) => {
 
   // headings
   instructionsHeading.innerHTML = '<h1> Herzlich Willkommen! </h1>';
-  transitionHeading.innerHTML = '<h1> Super! Das war klasse! </h1>';
-  goodbyeHeading.innerHTML = '<h1> Geschafft! Das hast du klasse gemacht! </h1>';
+  transitionHeading.innerHTML = '<h1> Super! Den ersten Teil habt ihr geschafft! </h1>';
+  goodbyeHeading.innerHTML = '<h1> Fertig! </h1>';
 
+  // text for the parents (children get audio instructions)
+  instructionsParagraph.innerHTML = `<p> 
+  Vielen Dank, dass Sie mit Ihrem Kind an unserer Studie teilnehmen. <br> <br>
+  Ihr Kind hat gleich die Aufgabe, einen Ballon zu finden. <br>
+  Dafür klickt Ihr Kind einfach auf den Bildschirm - dorthin, wo der Ballon ist. <br>
+  Die Aufgabe erklären wir Ihrem Kind in einer Sprachaufnahme. <br>
+  Um diese abzuspielen, schalten Sie Ihren Ton ein und klicken auf das Lautsprecher-Symbol.
+  Sie können sich die Sprachaufnahme mehrmals anhören. 
+  Sobald Sie mit Ihrem Kind das Spiel starten möchten, klicken Sie auf den "los geht's!" Knopf. <br> <br>
+  Bitte geben Sie Ihrem Kind keinerlei Hinweise - alles, was Ihr Kind macht, ist prima! 
+  </p>`;
+
+  transitionParagraph.innerHTML = `<p> 
+  <br> <br>
+  Ihr könnt gleich weiterspielen. <br> <br>
+  Die Aufgabe bleibt die Gleiche - Ihr Kind soll wieder den Ballon finden. <br> <br>
+  Bitte hören Sie sich wieder die Sprachaufnahme an, in dem Sie auf das Lautsprecher-Symbol klicken. <br>
+  Auch diese können Sie sich mehrmals anhören. <br> <br>
+  Sobald Sie weiterspielen möchten, klicken Sie wieder "los geht's!". <br>
+  </p>`;
+
+  // goodbye text
+  goodbyeParagraph.innerHTML = `<p> 
+   <br> <br>
+   Wunderbar!
+   Das hat Ihr Kind klasse gemacht! <br> <br>
+   Wenn Sie auf das Lautsprecher-Symbol klicken, 
+   kann Ihr Kind ein kleines Dankeschön und eine Verabschiedung hören. <br> <br>
+   Vielen herzlichen Dank, dass Sie mit Ihrem Kind an unserer Studie teilgenommen haben. <br> <br>
+   Beste Grüße, <br> 
+   Ihr Forschungsteam vom Max-Planck-Institut
+   </p>`;
+
+  // add instruction pictures
   // for tablet version
+  goodbyeImage.src = goodbyeImageSrc;
+
   if (exp.subjData.touchScreen) {
-    // instruction for hedge version
-    instructionsParagraph.innerHTML = `<p>
-    Willkommen zu unserem Ballon-Spiel! <br>
-    Siehst du den Ballon auf dem Bild? <br> <br>
-    Deine Aufgabe ist es, den Ballon zu finden. <br>
-    Der Ballon fällt nach unten und landet immer hinter einer Hecke. 
-    Die Tiere helfen Dir und schauen den Ballon an. <br> <br> 
-    Klicke auf die Hecke, wo der Ballon ist. <br> 
-    Denk dran - die Tiere helfen dir. Sie schauen immer dorthin, wo der Ballon ist. <br> <br> 
-    </p>`;
-
     instructionsImage.src = instructionsImageTabletSrc;
-
-    // transition for hedge version
-    transitionParagraph.innerHTML = `<p> 
-    Das hast du super gemacht! Jetzt spielen wir weiter. <br> <br>
-    Der Ballon fällt wieder nach unten auf den Boden. <br>
-    Diesmal kannst du das nicht sehen, weil die Hecke schon da ist.
-    Aber die Tiere sehen es! <br> <br>
-    Du musst wieder herausfinden, wo der Ballon ist. <br>
-    Denk dran - die Tiere helfen dir. Sie schauen immer den Ballon an. <br> <br>
-    Klicke auf die Hecke, wo der Ballon ist. <br> 
-    Die Tiere helfen dir und schauen immer dorthin, wo der Ballon ist.
-    </p>`;
-
     transitionImage.src = transitionImageTabletSrc;
 
   // for PC version
   } else if (!exp.subjData.touchScreen) {
-    // instruction for box version
-    instructionsParagraph.innerHTML = `<p> 
-    Willkommen zu unserem Ballon-Spiel! <br>
-    Siehst du den Ballon auf dem Bild? <br> <br>
-    Deine Aufgabe ist es, den Ballon zu finden. <br>
-    Der Ballon fällt nach unten und landet immer in einer Kiste. 
-    Die Tiere helfen Dir und schauen den Ballon an. <br> <br> 
-    Klicke auf die Kiste mit dem Ballon. <br> 
-    Denk dran - die Tiere helfen dir. Sie schauen immer dorthin, wo der Ballon ist. <br> <br> 
-    </p>`;
-
     instructionsImage.src = instructionsImagePCSrc;
-
-    // transition for box version
-    transitionParagraph.innerHTML = `<p> 
-    Das hast du super gemacht! Jetzt spielen wir weiter. <br> <br>
-    Der Ballon fällt wieder nach unten in eine Kiste. <br>
-    Diesmal kannst du das nicht sehen, weil da eine Hecke ist. 
-    Aber die Tiere sehen es! <br> <br>
-    Du musst wieder herausfinden, wo der Ballon ist. <br>
-    Denk dran - die Tiere helfen dir. Sie schauen immer den Ballon an. <br> <br>
-    Klicke auf die Kiste mit dem Ballon. <br> 
-    Die Tiere helfen dir und schauen immer dorthin, wo der Ballon ist.
-    </p>`;
-
     transitionImage.src = transitionImagePCSrc;
   }
-
-  // goodbye text
-  goodbyeParagraph.innerHTML = `<p> 
-  <br> <br> <br>
-  Die Tiere sind schon ganz müde und glücklich vom Spielen! <br> <br>
-  Vielen Dank für deine Hilfe! <br> <br>
-  Bis zum nächsten Mal und liebe Grüße <br> <br>
-  vom Schwein, Affen und Schaf
-  </p>`;
-
-  goodbyeImage.src = goodbyeImageSrc;
 
   return ({
     instructionsHeading,
