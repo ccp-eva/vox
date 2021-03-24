@@ -8,6 +8,17 @@
     "Segoe UI Symbol" !important;
 }
 
+body {
+  height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+svg {
+  max-height: 100vh;
+}
+
 h1 {
   font-size: 60px;
   text-align: center;
