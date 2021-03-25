@@ -32,7 +32,7 @@ p {
 #instructions-button-text, #transition-button-text, #goodbye-button-text, #experiment-button-text {
     font-weight: 600;
     font-size: 60px;
-    alignment-baseline: central;
+    dominant-baseline: central;
     text-anchor: middle;
     fill: white;
 }
