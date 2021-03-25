@@ -16,6 +16,9 @@ export default (exp) => {
 
   // we use gsap3 for animation
   const timeline = gsap.timeline({ paused: true });
+  const hedgeDuration = 0.2;
+  const hedgeDelay = 1;
+  const targetDelay = 1;
 
   // -------------------------------------------------------------------------------------------------------------------
   // TABLET VERSION WITH HEDGE
@@ -26,8 +29,8 @@ export default (exp) => {
       const hedgeTestUp = gsap.fromTo(hedge,
         { y: hedge.getBBox().height }, {
           y: 0,
-          delay: 1,
-          duration: 1.5,
+          delay: hedgeDelay,
+          duration: hedgeDuration,
           ease: 'none',
         });
       timeline.add(hedgeTestUp);
@@ -35,7 +38,7 @@ export default (exp) => {
 
     // for fam + test trial: let balloon fall down
     timeline.to(exp.targets[exp.trials.count], {
-      delay: 1,
+      delay: targetDelay,
       duration: exp.responseLog[exp.trials.count].durationAnimationBalloonTotal,
       ease: 'none',
       x: exp.elemSpecs.targets.centerFinal.x,
@@ -64,8 +67,8 @@ export default (exp) => {
         { y: hedge.getBBox().height }, {
           // -75 because balloon doesn't land directly at border of screen
           y: hedge.getBBox().height - exp.targets[exp.trials.count].getBBox().height - 75,
-          delay: 0.5,
-          duration: 0.5,
+          delay: hedgeDelay,
+          duration: hedgeDuration / 3,
           ease: 'none',
         });
       timeline.add(hedgeFamTween);
@@ -73,8 +76,8 @@ export default (exp) => {
     if (exp.trials.type[exp.trials.count] === 'test') {
       const hedgeTestDown = gsap.to(hedge, {
         y: hedge.getBBox().height - exp.targets[exp.trials.count].getBBox().height - 75,
-        delay: 0.5,
-        duration: 1,
+        delay: hedgeDelay,
+        duration: hedgeDuration,
         ease: 'none',
       }, '>');
       timeline.add(hedgeTestDown);
@@ -89,8 +92,8 @@ export default (exp) => {
       const hedgeTestUp = gsap.fromTo(hedge,
         { y: hedge.getBBox().height }, {
           y: 0,
-          delay: 1,
-          duration: 1.5,
+          delay: hedgeDelay,
+          duration: hedgeDuration,
           ease: 'none',
         });
       timeline.add(hedgeTestUp);
@@ -98,7 +101,7 @@ export default (exp) => {
 
     // balloon flies above box
     timeline.to(exp.targets[exp.trials.count], {
-      delay: 1,
+      delay: targetDelay,
       duration: exp.responseLog[exp.trials.count].durationAnimationBalloonCenterBox,
       ease: 'none',
       x: exp.elemSpecs.targets.centerBox.x,
@@ -131,8 +134,8 @@ export default (exp) => {
     if (exp.trials.type[exp.trials.count] === 'test') {
       const hedgeTestDown = gsap.to(hedge, {
         y: hedge.getBBox().height,
-        delay: 0.5,
-        duration: 1.5,
+        delay: hedgeDelay,
+        duration: hedgeDuration,
         ease: 'none',
       }, '>');
       timeline.add(hedgeTestDown);

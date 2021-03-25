@@ -32,8 +32,8 @@ exp.subjData.subjID = 'testID';
 // TRIAL NUMBER
 // ---------------------------------------------------------------------------------------------------------------------
 exp.trials = {};
-exp.trials.famNr = 1;
-exp.trials.testNr = 3;
+exp.trials.famNr = 2;
+exp.trials.testNr = 2;
 exp.trials.totalNr = exp.trials.famNr + exp.trials.testNr;
 // this variable stores in which trial we currently are!
 exp.trials.count = 0;
@@ -282,7 +282,6 @@ const handleLosgehtsClick = async function tmp(event) {
 
   // animate balloon & eye movement to randomized positions
   await timeline.play();
-  await pause(200);
   audioPrompt.play();
 
   // save current time to calculate response time later
@@ -417,6 +416,7 @@ const handleSpeakerClick = async function tmp(event) {
     }
   } else if (exp.trials.count === exp.trials.totalNr) {
     audioGoodbye.play();
+    showSlide([goodbyeButton], []);
   }
 };
 
@@ -439,8 +439,9 @@ document.getElementById('foreign-object-center-left').appendChild(instructionsPa
 document.getElementById('foreign-object-center-right').appendChild(instructionsImage);
 showSlide([textSlide],
   // first hide buttons, participants can only start once they listened to the instructions
-  // instructionsButton, transitionButton, goodbyeButton
   [experimentSlide, instructionsButton, transitionButton, goodbyeButton]);
+// dev mode: show buttons to jump ahead audio instructions
+// [experimentSlide]);
 
 // add event listeners
 instructionsButton.addEventListener('click', handleInstructionsClick, { capture: false, once: true });

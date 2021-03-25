@@ -103,7 +103,7 @@ export default (exp) => {
     { x: exp.positions[exp.trials.count].x, y: exp.positions[exp.trials.count].y },
   );
 
-  const perSecond = 300;
+  const perSecond = 700;
 
   exp.responseLog[exp.trials.count] = {};
   exp.responseLog[exp.trials.count].wrongClick = 0;
