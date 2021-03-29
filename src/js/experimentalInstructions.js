@@ -2,13 +2,13 @@ import instructionsFamImageTabletSrc from 'url:../images/instructions-tablet-hal
 import instructionsFamImagePCSrc from 'url:../images/instructions-PC-sheep.png';
 import instructionsTestImageTabletSrc from 'url:../images/transition-tablet-monkey.png';
 import instructionsTestImagePCSrc from 'url:../images/transition-PC-monkey.png';
-import goodbyeImageSrc from 'url:../images/goodbye-img.png';
+import goodbyeImageSrc from 'url:../images/familypic.png';
 
 export default (exp) => {
   const instructionsTrainHeading = document.createElement('div');
   const instructionsTrainParagraph = document.createElement('div');
   const instructionsTrainImage = document.createElement('img');
-  instructionsTrainImage.style = 'height: inherit';
+  instructionsTrainImage.style = 'width: inherit';
 
   const instructionsFamHeading = document.createElement('div');
   const instructionsFamParagraph = document.createElement('div');
@@ -75,7 +75,7 @@ export default (exp) => {
 
   // add instruction pictures
   // for tablet version
-  instructionsTrainImage.src = instructionsFamImageTabletSrc;
+  instructionsTrainImage.src = goodbyeImageSrc;
   goodbyeImage.src = goodbyeImageSrc;
 
   if (exp.subjData.touchScreen) {

@@ -29,19 +29,20 @@ exp.subjData = {};
 exp.subjData.subjID = 'testID';
 // just for developing: turn off fullscreen mode
 const fullscreen = false;
-exp.subjData.touchScreen = checkForTouchscreen();
+exp.subjData.touchScreen = !checkForTouchscreen();
 
 // ---------------------------------------------------------------------------------------------------------------------
 // TRIAL SPECIFICATIONS
 // ---------------------------------------------------------------------------------------------------------------------
 exp.trials = {};
-exp.trials.trainNr = 1;
-exp.trials.famNr = 1;
+exp.trials.trainNr = 2;
+exp.trials.famNr = 2;
 exp.trials.testNr = 2;
 exp.trials.totalNr = exp.trials.trainNr + exp.trials.famNr + exp.trials.testNr;
 // this variable stores in which trial we currently are!
 exp.trials.count = 0;
-exp.trials.instructions = true;
+// NOTE: make sure, that the number of voice over fits to the nr of training, fam and test trials!!
+exp.trials.voiceoverNr = 1;
 
 // ---------------------------------------------------------------------------------------------------------------------
 // SCREEN SIZE
@@ -112,12 +113,16 @@ const clickBubble = document.getElementById('click-bubble');
 const clickableArea = document.getElementById('clickable-area');
 
 const speaker = document.getElementById('speaker');
+const audioWelcome = document.getElementById('audio-welcome');
+
 const audioInstructionsTablet = document.getElementById('audio-instructions-tablet');
 const audioInstructionsPC = document.getElementById('audio-instructions-PC');
 const audioTransitionTablet = document.getElementById('audio-transition-tablet');
 const audioTransitionPC = document.getElementById('audio-transition-PC');
 const audioGoodbye = document.getElementById('audio-goodbye');
-const audioPrompt = document.getElementById('audio-prompt');
+const audioGeneralPrompt = document.getElementById('audio-general-prompt');
+const audioTrainingPrompt = document.getElementById('audio-train-prompt');
+
 const audioReminderTablet = document.getElementById('audio-reminder-tablet');
 const audioReminderPC = document.getElementById('audio-reminder-PC');
 
@@ -228,7 +233,7 @@ console.log('exp object', exp);
 
 // gsap timeline that will save our animation specifications
 let timeline = null;
-const targetClickTimer5sec = null;
+let targetClickTimer5sec = null;
 // const targetClickTimer10sec = null;
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -292,7 +297,7 @@ const handleLosgehtsClick = async function tmp(event) {
   // animate balloon & eye movement to randomized positions
   await timeline.play();
   await pause(200);
-  // audioPrompt.play();
+  audioTrainingPrompt.play();
 
   // save current time to calculate response time later
   exp.responseLog[exp.trials.count].responseTime = {
@@ -300,7 +305,7 @@ const handleLosgehtsClick = async function tmp(event) {
     t1: 0,
   };
 
-  // targetClickTimer5sec = window.setTimeout(noTargetClickWithin5sec, 5000);
+  targetClickTimer5sec = window.setTimeout(noTargetClickWithin5sec, 5000);
 
   switch (true) {
     case exp.trials.type[exp.trials.count] === 'train':
@@ -327,8 +332,8 @@ const handleLosgehtsClick = async function tmp(event) {
 // async so we can await animation!
 const handleTargetClick = async function tmp(event) {
   // stop audio that is potentially playing
-  audioPrompt.pause();
-  audioPrompt.currentTime = 0;
+  audioTrainingPrompt.pause();
+  audioTrainingPrompt.currentTime = 0;
   audioReminderTablet.pause();
   audioReminderTablet.currentTime = 0;
   audioReminderPC.pause();
@@ -454,7 +459,7 @@ const handleSpeakerClick = async function tmp(event) {
   switch (true) {
     // for training trials
     case exp.trials.count === 0:
-      await playFullAudio(audioInstructionsTablet, instructionsTrainButton);
+      await playFullAudio(audioWelcome, instructionsTrainButton);
       showSlide([instructionsTrainButton], []);
       break;
 
@@ -490,11 +495,12 @@ const handleSpeakerClick = async function tmp(event) {
 // ---------------------------------------------------------------------------------------------------------------------
 // RUNS WHEN PARTICIPANT HASN'T CLICKED WITHIN CERTAIN AMOUNT OF TIME
 // ---------------------------------------------------------------------------------------------------------------------
-const noTargetClickWithin5sec = () => {
+// TODO one audio for hedge, one for boxes
+let noTargetClickWithin5sec = () => {
   if (exp.trials.boxesNr[exp.trials.count] === 0) {
-    audioReminderTablet.play();
+    audioGeneralPrompt.play();
   } else if (exp.trials.boxesNr[exp.trials.count] > 0) {
-    audioReminderPC.play();
+    audioGeneralPrompt.play();
   }
 };
 // ---------------------------------------------------------------------------------------------------------------------

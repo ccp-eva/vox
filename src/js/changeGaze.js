@@ -13,12 +13,15 @@ export default (exp) => {
   const irisLeft = document.getElementById(`${currentAgent}-iris-left`);
   const irisRight = document.getElementById(`${currentAgent}-iris-right`);
   const hedge = document.getElementById('hedge');
-  const audioTest = document.getElementById('audio-positive-feedback');
+  const audioTrainIntro = document.getElementById('audio-train-intro');
+  // TODO
+  // const audioFamIntro = document.getElementById('audio-fam-intro');
+  // const audioTestIntro = document.getElementById('audio-test-intro');
 
   // we use gsap3 for animation
   const timeline = gsap.timeline({ paused: true });
-  // general delay at beginning, for 1 sec
-  timeline.delay(0.5);
+  // general delay
+  const delay = 0.5;
   const hedgeDuration = 0.2;
 
   // -------------------------------------------------------------------------------------------------------------------
@@ -81,19 +84,19 @@ export default (exp) => {
   const ballonToGround = gsap.timeline({ paused: true });
   ballonToGround
     .to(exp.targets[exp.trials.count], {
-      duration: audioTest.duration,
+      duration: exp.responseLog[exp.trials.count].durationAnimationBalloonTotal,
       ease: 'none',
       x: exp.elemSpecs.targets.centerFinal.x,
       y: exp.elemSpecs.targets.centerFinal.y,
     })
     .to([pupilLeft, irisLeft], {
-      duration: audioTest.duration,
+      duration: exp.responseLog[exp.trials.count].durationAnimationBalloonTotal,
       ease: 'none',
       x: exp.elemSpecs.eyes[currentAgent].left.centerFinal.x,
       y: exp.elemSpecs.eyes[currentAgent].left.centerFinal.y,
     }, '<')
     .to([pupilRight, irisRight], {
-      duration: audioTest.duration,
+      duration: exp.responseLog[exp.trials.count].durationAnimationBalloonTotal,
       ease: 'none',
       x: exp.elemSpecs.eyes[currentAgent].right.centerFinal.x,
       y: exp.elemSpecs.eyes[currentAgent].right.centerFinal.y,
@@ -126,16 +129,29 @@ export default (exp) => {
     }, `-=${exp.responseLog[exp.trials.count].durationAnimationBalloonBoxFinal}`);
 
   // -------------------------------------------------------------------------------------------------------------------
+  // ADD VOICE INSTRUCTIONS
+  // -------------------------------------------------------------------------------------------------------------------
+  const playTrain = () => { audioTrainIntro.play(); };
+  // TODO
+  const playFam = () => { audioFamIntro.play(); };
+  const playTest = () => { audioTestIntro.play(); };
+
+  // -------------------------------------------------------------------------------------------------------------------
   // define animation depending on trial type
   // -------------------------------------------------------------------------------------------------------------------
   switch (true) {
     // for training trials
     case exp.trials.type[exp.trials.count] === 'train':
+      // for instructions voice over
+      if (exp.trials.voiceover[exp.trials.count]) {
+        timeline.eventCallback('onStart', playTrain);
+        attentionGetter.delay(audioTrainIntro.duration);
+      }
       attentionGetter.play();
       ballonToGround.play();
       timeline
-        .add(attentionGetter)
-        .add(ballonToGround, '+=0.5');
+        .add(attentionGetter, `+=${delay}`)
+        .add(ballonToGround, `+=${delay}`);
       break;
 
     // for tablet hedge version fam trials
@@ -144,9 +160,9 @@ export default (exp) => {
       ballonToGround.play();
       hedgeHalfUp.play();
       timeline
-        .add(attentionGetter)
-        .add(ballonToGround, '+=0.5')
-        .add(hedgeHalfUp, '+=0.5');
+        .add(attentionGetter, `+=${delay}`)
+        .add(ballonToGround, `+=${delay}`)
+        .add(hedgeHalfUp, `+=${delay}`);
       break;
 
     // for tablet hedge version test trials
@@ -156,10 +172,10 @@ export default (exp) => {
       ballonToGround.play();
       hedgeHalfDown.play();
       timeline
-        .add(hedgeUp)
-        .add(attentionGetter, '+=0.5')
-        .add(ballonToGround, '+=0.5')
-        .add(hedgeHalfDown, '+=0.5');
+        .add(hedgeUp, `+=${delay}`)
+        .add(attentionGetter, `+=${delay}`)
+        .add(ballonToGround, `+=${delay}`)
+        .add(hedgeHalfDown, `+=${delay}`);
       break;
 
     // for PC box version fam trials
@@ -167,8 +183,8 @@ export default (exp) => {
       attentionGetter.play();
       ballonIntoBox.play();
       timeline
-        .add(attentionGetter)
-        .add(ballonIntoBox, '+=0.5');
+        .add(attentionGetter, `+=${delay}`)
+        .add(ballonIntoBox, `+=${delay}`);
       break;
 
     // for PC box version test trials
@@ -178,10 +194,10 @@ export default (exp) => {
       ballonIntoBox.play();
       hedgeDown.play();
       timeline
-        .add(hedgeUp)
-        .add(attentionGetter, '+=0.5')
-        .add(ballonIntoBox, '+=0.5')
-        .add(hedgeDown, '+=0.5');
+        .add(hedgeUp, `+=${delay}`)
+        .add(attentionGetter, `+=${delay}`)
+        .add(ballonIntoBox, `+=${delay}`)
+        .add(hedgeDown, `+=${delay}`);
       break;
 
     default:
