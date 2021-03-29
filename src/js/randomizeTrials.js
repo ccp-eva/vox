@@ -8,7 +8,19 @@ import randomNumber from './randomNumber';
 // ---------------------------------------------------------------------------------------------------------------------
 export default (exp, agentsSingle, targetsSingle) => {
   // create array with entry for each fam and test trial
-  exp.trials.type = [].concat(new Array(exp.trials.famNr).fill('fam'), new Array(exp.trials.testNr).fill('test'));
+  const trainTrials = new Array(exp.trials.trainNr).fill('train');
+  const famTrials = new Array(exp.trials.famNr).fill('fam');
+  const testTrials = new Array(exp.trials.testNr).fill('test');
+  exp.trials.type = trainTrials.concat(famTrials, testTrials);
+
+  if (exp.subjData.touchScreen) {
+    exp.trials.boxesNr = new Array(exp.trials.totalNr).fill(0);
+  } else if (!exp.subjData.touchScreen) {
+    exp.trials.boxesNr = [].concat(
+      new Array(exp.trials.trainNr).fill(0),
+      new Array(exp.trials.famNr + exp.trials.testNr).fill(8),
+    );
+  }
 
   // calculate how many times each agent should be repeated, based on trialNumber
   const agentsDiv = divideWithRemainder(exp.trials.type.length, agentsSingle.length);
@@ -64,6 +76,7 @@ export default (exp, agentsSingle, targetsSingle) => {
   }
 
   // for touchscreen with hedge, the target lands in random locations for all trials
+  // TODO if we want to show boxes/hedge indepedent of touchscreen, this has to change!
   if (exp.subjData.touchScreen) {
     // how many times can we repeat each section
     const positionsDiv = divideWithRemainder(exp.trials.type.length, positionsSingleContinuous.length);

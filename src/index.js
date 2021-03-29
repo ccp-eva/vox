@@ -23,28 +23,30 @@ import playFullAudio from './js/playFullAudio';
 const exp = {};
 
 // ---------------------------------------------------------------------------------------------------------------------
-// PARTICIPANT ID
+// PARTICIPANT ID & TOUCH
 // ---------------------------------------------------------------------------------------------------------------------
 exp.subjData = {};
 exp.subjData.subjID = 'testID';
-
-// ---------------------------------------------------------------------------------------------------------------------
-// TRIAL NUMBER
-// ---------------------------------------------------------------------------------------------------------------------
-exp.trials = {};
-exp.trials.famNr = 2;
-exp.trials.testNr = 2;
-exp.trials.totalNr = exp.trials.famNr + exp.trials.testNr;
-// this variable stores in which trial we currently are!
-exp.trials.count = 0;
-
-// ---------------------------------------------------------------------------------------------------------------------
-// TOUCHSCREEN & SCREEN SIZE
-// if (clientWidth < 600 || clientHeight < 200) alert('Please view on bigger screen!');
-// ---------------------------------------------------------------------------------------------------------------------
 // just for developing: turn off fullscreen mode
 const fullscreen = false;
-exp.subjData.touchScreen = !checkForTouchscreen();
+exp.subjData.touchScreen = checkForTouchscreen();
+
+// ---------------------------------------------------------------------------------------------------------------------
+// TRIAL SPECIFICATIONS
+// ---------------------------------------------------------------------------------------------------------------------
+exp.trials = {};
+exp.trials.trainNr = 1;
+exp.trials.famNr = 1;
+exp.trials.testNr = 2;
+exp.trials.totalNr = exp.trials.trainNr + exp.trials.famNr + exp.trials.testNr;
+// this variable stores in which trial we currently are!
+exp.trials.count = 0;
+exp.trials.instructions = true;
+
+// ---------------------------------------------------------------------------------------------------------------------
+// SCREEN SIZE
+// if (clientWidth < 600 || clientHeight < 200) alert('Please view on bigger screen!');
+// ---------------------------------------------------------------------------------------------------------------------
 exp.subjData.offsetWidth = document.body.offsetWidth;
 exp.subjData.offsetHeight = document.body.offsetHeight;
 
@@ -63,12 +65,18 @@ foreignObjects.forEach((elem) => {
 });
 
 const {
-  instructionsHeading,
-  instructionsParagraph,
-  instructionsImage,
-  transitionHeading,
-  transitionParagraph,
-  transitionImage,
+  instructionsTrainHeading,
+  instructionsTrainParagraph,
+  instructionsTrainImage,
+
+  instructionsFamHeading,
+  instructionsFamParagraph,
+  instructionsFamImage,
+
+  instructionsTestHeading,
+  instructionsTestParagraph,
+  instructionsTestImage,
+
   goodbyeHeading,
   goodbyeParagraph,
   goodbyeImage,
@@ -95,11 +103,13 @@ exp.elemSpecs = {
 const textSlide = document.getElementById('text-slide');
 const experimentSlide = document.getElementById('experiment-slide');
 
-const instructionsButton = document.getElementById('instructions-button');
-const transitionButton = document.getElementById('transition-button');
+const instructionsTrainButton = document.getElementById('instructions-train-button');
+const instructionsFamButton = document.getElementById('instructions-fam-button');
+const instructionsTestButton = document.getElementById('instructions-test-button');
 const goodbyeButton = document.getElementById('goodbye-button');
 const losgehtsButton = document.getElementById('experiment-button');
 const clickBubble = document.getElementById('click-bubble');
+const clickableArea = document.getElementById('clickable-area');
 
 const speaker = document.getElementById('speaker');
 const audioInstructionsTablet = document.getElementById('audio-instructions-tablet');
@@ -141,7 +151,6 @@ const boxes8Front = document.getElementById('boxes8-front');
 const boxes8Back = document.getElementById('boxes8-back');
 
 exp.elemSpecs.boxes = {
-  currentVersion: 8,
   width: boxes1Front.getBBox().width,
   height: boxes1Front.getBBox().height,
 };
@@ -220,7 +229,7 @@ console.log('exp object', exp);
 // gsap timeline that will save our animation specifications
 let timeline = null;
 let targetClickTimer5sec = null;
-const targetClickTimer10sec = null;
+// const targetClickTimer10sec = null;
 
 // ---------------------------------------------------------------------------------------------------------------------
 // DEFINE EVENTLISTENER FUNCTIONS
@@ -235,7 +244,7 @@ const handleInstructionsClick = (event) => {
 
   // showSlide: first array gets shown, second array gets hidden
   showSlide([experimentSlide],
-    [textSlide, clickBubble, instructionsButton]);
+    [textSlide, clickBubble, clickableArea]);
 
   // shows only relevant elements etc.
   prepareTrial(exp);
@@ -251,7 +260,7 @@ const handleTransitionClick = (event) => {
   event.preventDefault();
 
   showSlide([experimentSlide],
-    [textSlide, clickBubble, transitionButton]);
+    [textSlide, clickBubble]);
 
   prepareTrial(exp);
   timeline = gsap.timeline({ paused: true });
@@ -282,7 +291,8 @@ const handleLosgehtsClick = async function tmp(event) {
 
   // animate balloon & eye movement to randomized positions
   await timeline.play();
-  audioPrompt.play();
+  await pause(200);
+  // audioPrompt.play();
 
   // save current time to calculate response time later
   exp.responseLog[exp.trials.count].responseTime = {
@@ -292,12 +302,22 @@ const handleLosgehtsClick = async function tmp(event) {
 
   targetClickTimer5sec = window.setTimeout(noTargetClickWithin5sec, 5000);
 
-  // depending on experiment version, participants click on hedge or boxes
-  if (exp.subjData.touchScreen) {
-    hedge.addEventListener('click', handleTargetClick, { capture: false, once: true });
-  } else if (!exp.subjData.touchScreen) {
-    boxes8Front.addEventListener('click', handleTargetClick, { capture: false, once: true });
-    boxes8Back.addEventListener('click', handleTargetClick, { capture: false, once: true });
+  switch (true) {
+    case exp.trials.type[exp.trials.count] === 'train':
+      clickableArea.setAttribute('pointer-events', 'all');
+      clickableArea.addEventListener('click', handleTargetClick, { capture: false, once: true });
+      break;
+    case exp.trials.boxesNr[exp.trials.count] === 0:
+      clickableArea.setAttribute('pointer-events', 'none');
+      hedge.addEventListener('click', handleTargetClick, { capture: false, once: true });
+      break;
+    case exp.trials.boxesNr[exp.trials.count] > 0:
+      clickableArea.setAttribute('pointer-events', 'none');
+      boxes8Front.addEventListener('click', handleTargetClick, { capture: false, once: true });
+      boxes8Back.addEventListener('click', handleTargetClick, { capture: false, once: true });
+      break;
+    default:
+      console.error('Error in setting event listeners');
   }
   exp.elemSpecs.outerSVG.ID.addEventListener('click', handleWrongClick, false);
 };
@@ -320,7 +340,7 @@ const handleTargetClick = async function tmp(event) {
   // clear timer that awaits participant's click
   // otherwise, it will run even after target click
   clearTimeout(targetClickTimer5sec);
-  clearTimeout(targetClickTimer10sec);
+  // clearTimeout(targetClickTimer10sec);
 
   // remove eventListener that was responsible for "wrong input" sound
   exp.elemSpecs.outerSVG.ID.removeEventListener('click', handleWrongClick, false);
@@ -335,46 +355,78 @@ const handleTargetClick = async function tmp(event) {
 
   // prepare next trial
   exp.trials.count += 1;
+  console.log('trialnr', exp.trials.count);
 
   // then depending on trialcount, decide what happens next...
-  // if still in fam trials, prepare trial
-  if (exp.trials.count < exp.trials.famNr) {
-    prepareTrial(exp);
-    timeline = gsap.timeline({ paused: true });
-    timeline.add(changeGaze(exp));
-    exp.responseLog[exp.trials.count].durationAnimationComplete = timeline.duration();
+  switch (true) {
+    // for training trials
+    case exp.trials.count < exp.trials.trainNr:
+      prepareTrial(exp);
+      timeline = gsap.timeline({ paused: true });
+      timeline.add(changeGaze(exp));
+      exp.responseLog[exp.trials.count].durationAnimationComplete = timeline.duration();
+      break;
 
-  // if transition between fam and test trials, show that transition slide
-  } else if (exp.trials.count === exp.trials.famNr) {
-    document.getElementById('foreign-object-heading').replaceChild(transitionHeading, instructionsHeading);
-    document.getElementById('foreign-object-center-left').replaceChild(transitionParagraph, instructionsParagraph);
-    document.getElementById('foreign-object-center-right').replaceChild(transitionImage, instructionsImage);
+    // for transition from training into familiarization
+    case exp.trials.count === exp.trials.trainNr:
+      document.getElementById('foreign-object-heading').replaceChild(instructionsFamHeading, instructionsTrainHeading);
+      document.getElementById('foreign-object-center-left').replaceChild(instructionsFamParagraph, instructionsTrainParagraph);
+      document.getElementById('foreign-object-center-right').replaceChild(instructionsFamImage, instructionsTrainImage);
 
-    showSlide([textSlide],
-      [experimentSlide,
-        hedge, boxes8Front, boxes8Back,
-        pig, monkey, sheep,
-        balloonBlue, balloonRed, balloonYellow, balloonGreen]);
+      showSlide([textSlide],
+        [experimentSlide,
+          hedge, boxes8Front, boxes8Back,
+          pig, monkey, sheep,
+          balloonBlue, balloonRed, balloonYellow, balloonGreen, instructionsTrainButton]);
 
-  // if test trial, prepare trial
-  } else if (exp.trials.count < exp.trials.totalNr) {
-    prepareTrial(exp);
-    timeline = gsap.timeline({ paused: true });
-    timeline.add(changeGaze(exp));
-    exp.responseLog[exp.trials.count].durationAnimationComplete = timeline.duration();
+      break;
 
-  // if all trials done, show goodbye slide
-  } else if (exp.trials.count === exp.trials.totalNr) {
-    if (fullscreen) closeFullscreen();
-    document.getElementById('foreign-object-heading').replaceChild(goodbyeHeading, transitionHeading);
-    document.getElementById('foreign-object-center-left').replaceChild(goodbyeParagraph, transitionParagraph);
-    document.getElementById('foreign-object-center-right').replaceChild(goodbyeImage, transitionImage);
+    // for familiarization trials
+    case exp.trials.count < exp.trials.trainNr + exp.trials.famNr:
+      prepareTrial(exp);
+      timeline = gsap.timeline({ paused: true });
+      timeline.add(changeGaze(exp));
+      exp.responseLog[exp.trials.count].durationAnimationComplete = timeline.duration();
+      break;
 
-    showSlide([textSlide],
-      [experimentSlide,
-        hedge, boxes8Front, boxes8Back,
-        pig, monkey, sheep,
-        balloonBlue, balloonRed, balloonYellow, balloonGreen]);
+    // for transition from familiarization to test trials
+    case exp.trials.count === exp.trials.trainNr + exp.trials.famNr:
+      document.getElementById('foreign-object-heading').replaceChild(instructionsTestHeading, instructionsFamHeading);
+      document.getElementById('foreign-object-center-left').replaceChild(instructionsTestParagraph, instructionsFamParagraph);
+      document.getElementById('foreign-object-center-right').replaceChild(instructionsTestImage, instructionsFamImage);
+
+      showSlide([textSlide],
+        [experimentSlide,
+          hedge, boxes8Front, boxes8Back,
+          pig, monkey, sheep,
+          balloonBlue, balloonRed, balloonYellow, balloonGreen, instructionsFamButton]);
+      break;
+
+    // for test trials
+    case exp.trials.count < exp.trials.totalNr:
+      prepareTrial(exp);
+      timeline = gsap.timeline({ paused: true });
+      timeline.add(changeGaze(exp));
+      exp.responseLog[exp.trials.count].durationAnimationComplete = timeline.duration();
+      break;
+
+    // for goodbye after test trials
+    case exp.trials.count === exp.trials.totalNr:
+      if (fullscreen) closeFullscreen();
+      document.getElementById('foreign-object-heading').replaceChild(goodbyeHeading, instructionsTestHeading);
+      document.getElementById('foreign-object-center-left').replaceChild(goodbyeParagraph, instructionsTestParagraph);
+      document.getElementById('foreign-object-center-right').replaceChild(goodbyeImage, instructionsTestImage);
+
+      showSlide([textSlide],
+        [experimentSlide,
+          hedge, boxes8Front, boxes8Back,
+          pig, monkey, sheep,
+          balloonBlue, balloonRed, balloonYellow, balloonGreen, instructionsTestButton]);
+      break;
+
+    // error handling
+    default:
+      console.error('Error in specifying next trial');
   }
 };
 // ---------------------------------------------------------------------------------------------------------------------
@@ -396,26 +448,27 @@ const handleWrongClick = (event) => {
 // ---------------------------------------------------------------------------------------------------------------------
 // RUNS WHEN SPEAKER IN INSTRUCTIONS HAS BEEN CLICKED
 // ---------------------------------------------------------------------------------------------------------------------
+// TODO switch? audio for new transition!
 const handleSpeakerClick = async function tmp(event) {
   event.preventDefault();
   if (exp.trials.count === 0) {
-    if (exp.subjData.touchScreen) {
-      await playFullAudio(audioInstructionsTablet, instructionsButton);
-      showSlide([instructionsButton], []);
-    } else if (!exp.subjData.touchScreen) {
-      await playFullAudio(audioInstructionsPC, instructionsButton);
-      showSlide([instructionsButton], []);
+    if (exp.trials.boxesNr[exp.trials.count] === 0) {
+      await playFullAudio(audioInstructionsTablet, instructionsTrainButton);
+      showSlide([instructionsTrainButton], []);
+    } else if (exp.trials.boxesNr[exp.trials.count] > 0) {
+      await playFullAudio(audioInstructionsPC, instructionsTrainButton);
+      showSlide([instructionsTrainButton], []);
     }
   } else if (exp.trials.count === exp.trials.famNr) {
-    if (exp.subjData.touchScreen) {
-      await playFullAudio(audioTransitionTablet, transitionButton);
-      showSlide([transitionButton], []);
-    } else if (!exp.subjData.touchScreen) {
-      await playFullAudio(audioTransitionPC, transitionButton);
-      showSlide([transitionButton], []);
+    if (exp.trials.boxesNr[exp.trials.count] === 0) {
+      await playFullAudio(audioTransitionTablet, instructionsFamButton);
+      showSlide([instructionsFamButton], []);
+    } else if (exp.trials.boxesNr[exp.trials.count] > 0) {
+      await playFullAudio(audioTransitionPC, instructionsFamButton);
+      showSlide([instructionsFamButton], []);
     }
   } else if (exp.trials.count === exp.trials.totalNr) {
-    audioGoodbye.play();
+    await audioGoodbye.play();
     showSlide([goodbyeButton], []);
   }
 };
@@ -424,9 +477,9 @@ const handleSpeakerClick = async function tmp(event) {
 // RUNS WHEN PARTICIPANT HASN'T CLICKED WITHIN CERTAIN AMOUNT OF TIME
 // ---------------------------------------------------------------------------------------------------------------------
 const noTargetClickWithin5sec = () => {
-  if (exp.subjData.touchScreen) {
+  if (exp.trials.boxesNr[exp.trials.count] === 0) {
     audioReminderTablet.play();
-  } else if (!exp.subjData.touchScreen) {
+  } else if (exp.trials.boxesNr[exp.trials.count] > 0) {
     audioReminderPC.play();
   }
 };
@@ -434,18 +487,19 @@ const noTargetClickWithin5sec = () => {
 // ACTUALLY RUNNING:
 // ---------------------------------------------------------------------------------------------------------------------
 // INSTRUCTIONS: show slide
-document.getElementById('foreign-object-heading').appendChild(instructionsHeading);
-document.getElementById('foreign-object-center-left').appendChild(instructionsParagraph);
-document.getElementById('foreign-object-center-right').appendChild(instructionsImage);
+document.getElementById('foreign-object-heading').appendChild(instructionsTrainHeading);
+document.getElementById('foreign-object-center-left').appendChild(instructionsTrainParagraph);
+document.getElementById('foreign-object-center-right').appendChild(instructionsTrainImage);
 showSlide([textSlide],
   // first hide buttons, participants can only start once they listened to the instructions
-  [experimentSlide, instructionsButton, transitionButton, goodbyeButton]);
-// dev mode: show buttons to jump ahead audio instructions
-// [experimentSlide]);
+  // [experimentSlide, instructionsTrainButton, instructionsFamButton, instructionsTestButton, goodbyeButton]);
+  // dev mode: show buttons to jump ahead audio instructions
+  [experimentSlide]);
 
 // add event listeners
-instructionsButton.addEventListener('click', handleInstructionsClick, { capture: false, once: true });
-losgehtsButton.addEventListener('click', handleLosgehtsClick, { capture: false });
-transitionButton.addEventListener('click', handleTransitionClick, { capture: false, once: true });
+instructionsTrainButton.addEventListener('click', handleInstructionsClick, { capture: false, once: true });
+instructionsFamButton.addEventListener('click', handleTransitionClick, { capture: false, once: true });
+instructionsTestButton.addEventListener('click', handleTransitionClick, { capture: false, once: true });
 goodbyeButton.addEventListener('click', handleGoodbyeClick, { capture: false, once: true });
+losgehtsButton.addEventListener('click', handleLosgehtsClick, { capture: false });
 speaker.addEventListener('click', handleSpeakerClick, { capture: false, once: false });

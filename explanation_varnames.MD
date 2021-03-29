@@ -9,7 +9,7 @@
 | agent                             | which animal character is shown in current trial                                  |
 | box\*CenterX                      | X coordinate of the center of the respective box                                  |
 | box\*CenterY                      | Y coordinate of the center of the respective box                                  |
-| boxVersion                        | how many boxes are shown in current trial (for PC version)                        |
+| boxesNr                           | how many boxes are shown in current trial (for PC version)                        |
 | clickDistFromTargetBBoxX          | distance between clickScaledX and the target's bounding box                       |
 | clickDistFromTargetBBoxY          | distance between clickScaledY and the target's bounding box                       |
 | clickDistFromTargetCenterX        | difference between clickScaledX and targetCenterX                                 |

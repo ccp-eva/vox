@@ -102,11 +102,11 @@ export default (event, exp) => {
   }
 
   // for tablet version, just save which area was clicked (either clickable-area or hedge)
-  if (exp.subjData.touchScreen) {
+  if (exp.trials.boxesNr[exp.trials.count] === 0) {
     exp.responseLog[exp.trials.count].clickedArea = event.currentTarget.id;
 
     // for PC version of experiment, check which box was clicked
-  } else if (!exp.subjData.touchScreen) {
+  } else if (exp.trials.boxesNr[exp.trials.count] > 0) {
     // if participants clicked on the part of the balooon that is still visible,
     // simply save in which box the balloon is in
     if (event.currentTarget.id.includes('balloon')) {
@@ -164,7 +164,7 @@ export default (event, exp) => {
 
       // save the center X coord of the box that was clicked
       exp.responseLog[exp.trials.count].clickedBoxCenterX = exp.responseLog[exp.trials.count][`boxes8${clickedBox}CenterX`];
-      exp.responseLog[exp.trials.count].boxVersion = exp.elemSpecs.boxes.currentVersion;
+      exp.responseLog[exp.trials.count].boxesNr = exp.trials.boxesNr[exp.trials.count];
     }
   }
 
@@ -176,9 +176,9 @@ export default (event, exp) => {
   exp.responseLog[exp.trials.count].target = `${exp.targets[exp.trials.count].getAttribute('id')}`;
   exp.responseLog[exp.trials.count].trialType = exp.trials.type[exp.trials.count];
 
-  if (exp.subjData.touchScreen) {
+  if (exp.trials.boxesNr[exp.trials.count] === 0) {
     exp.responseLog[exp.trials.count].targetPosition = exp.positions[exp.trials.count].bin;
-  } else if (!exp.subjData.touchScreen) {
+  } else if (exp.trials.boxesNr[exp.trials.count] > 0) {
     exp.responseLog[exp.trials.count].targetPosition = `box${exp.positions[exp.trials.count].bin}`;
   }
 

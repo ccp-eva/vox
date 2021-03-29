@@ -36,18 +36,24 @@ export default (exp) => {
     y: 0,
   });
 
-  // depending on trial type, show or hide hedge
-  if (exp.subjData.touchScreen || exp.trials.type[exp.trials.count] === 'test') {
-    hedge.setAttribute('visibility', 'visible');
-  } else if (exp.trials.type[exp.trials.count] === 'fam') {
-    hedge.setAttribute('visibility', 'hidden');
-  }
-
-  // for PC version show boxes, for touchscreen hide them
-  if (exp.subjData.touchScreen) {
-    showSlide([], [boxes8Front, boxes8Back]);
-  } else if (!exp.subjData.touchScreen) {
-    showSlide([boxes8Front, boxes8Back], []);
+  // depending on trial type, show or hide hedge and boxes
+  switch (true) {
+    case exp.trials.type[exp.trials.count] === 'train':
+      showSlide([], [hedge, boxes8Front, boxes8Back]);
+      break;
+    // for tablet hedge version
+    case exp.trials.boxesNr[exp.trials.count] === 0:
+      showSlide([hedge], [boxes8Front, boxes8Back]);
+      break;
+    // for PC box version
+    case exp.trials.type[exp.trials.count] === 'fam' && exp.trials.boxesNr[exp.trials.count] > 0:
+      showSlide([boxes8Front, boxes8Back], [hedge]);
+      break;
+    case exp.trials.type[exp.trials.count] === 'test' && exp.trials.boxesNr[exp.trials.count] > 0:
+      showSlide([hedge, boxes8Front, boxes8Back], []);
+      break;
+    default:
+      console.error('Error in showing hedges/boxes');
   }
 
   // calculate how far the balloon will fly
@@ -109,9 +115,9 @@ export default (exp) => {
   exp.responseLog[exp.trials.count].wrongClick = 0;
 
   // save animation speed in our exp object
-  if (exp.subjData.touchScreen) {
+  if (exp.trials.boxesNr[exp.trials.count] === 0) {
     exp.responseLog[exp.trials.count].durationAnimationBalloonTotal = distanceCenterFinal / perSecond;
-  } else if (!exp.subjData.touchScreen) {
+  } else if (exp.trials.boxesNr[exp.trials.count] > 0) {
     exp.responseLog[exp.trials.count].durationAnimationBalloonCenterBox = distanceCenterBox / perSecond;
     exp.responseLog[exp.trials.count].durationAnimationBalloonBoxFinal = distanceBoxFinal / perSecond;
     exp.responseLog[exp.trials.count].durationAnimationBalloonTotal = (distanceCenterBox / perSecond) + (distanceBoxFinal / perSecond);

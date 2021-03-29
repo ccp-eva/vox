@@ -8,12 +8,12 @@
     "Segoe UI Symbol" !important;
 }
 
-body {
+/* body {
     height: 100vh;
     display: flex;
     align-items: center;
     justify-content: center;
-}
+} */
 
 svg {
     max-height: 100vh;
@@ -29,7 +29,7 @@ p {
     padding: 1%;
 }
 
-#instructions-button-text, #transition-button-text, #goodbye-button-text, #experiment-button-text {
+#instructions-train-button-text, #instructions-fam-button-text, #instructions-test-button-text, #goodbye-button-text, #experiment-button-text {
     font-weight: 600;
     font-size: 60px;
     dominant-baseline: central;

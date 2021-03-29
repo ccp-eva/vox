@@ -13,6 +13,7 @@ export default (exp) => {
   const irisLeft = document.getElementById(`${currentAgent}-iris-left`);
   const irisRight = document.getElementById(`${currentAgent}-iris-right`);
   const hedge = document.getElementById('hedge');
+  const audioTest = document.getElementById('audio-positive-feedback');
 
   // we use gsap3 for animation
   const timeline = gsap.timeline({ paused: true });
@@ -20,10 +21,66 @@ export default (exp) => {
   const hedgeDelay = 1;
   const targetDelay = 1;
 
+  // // depending on trial type, show or hide hedge and boxes
+  // switch (true) {
+  //   case exp.trials.type[exp.trials.count] === 'train':
+  //     showSlide([], [hedge, boxes8Front, boxes8Back]);
+  //     break;
+  //   case exp.trials.type[exp.trials.count] === 'fam' && exp.trials.boxesNr[exp.trials.count] === 0:
+  //     showSlide([hedge], [boxes8Front, boxes8Back]);
+  //     break;
+  //   case exp.trials.type[exp.trials.count] === 'fam' && exp.trials.boxesNr[exp.trials.count] > 0:
+  //     showSlide([hedge, boxes8Front, boxes8Back], []);
+  //     break;
+  //   case exp.trials.type[exp.trials.count] === 'test' && exp.trials.boxesNr[exp.trials.count] === 0:
+  //     showSlide([hedge], [boxes8Front, boxes8Back]);
+  //     break;
+  //   case exp.trials.type[exp.trials.count] === 'test' && exp.trials.boxesNr[exp.trials.count] > 0:
+  //     showSlide([hedge, boxes8Front, boxes8Back], []);
+  //     break;
+  //   default:
+  //     console.error('Error in showing hedges/boxes');
+  // }
+
+  // TODO switch cases?
+
+  // -------------------------------------------------------------------------------------------------------------------
+  // TOUCH TRAINING
+  // -------------------------------------------------------------------------------------------------------------------
+  if (exp.trials.type[exp.trials.count] === 'train') {
+    // for touch trial: let balloon fall down
+    timeline.to(exp.targets[exp.trials.count], {
+      delay: audioTest.duration,
+      duration: audioTest.duration,
+      ease: 'none',
+      x: exp.elemSpecs.targets.centerFinal.x,
+      y: exp.elemSpecs.targets.centerFinal.y,
+      // onStart() {
+      //   audioTest.play();
+      // },
+    });
+
+    // let eyes follow balloon
+    timeline.to([pupilLeft, irisLeft], {
+      duration: audioTest.duration,
+      ease: 'none',
+      x: exp.elemSpecs.eyes[currentAgent].left.centerFinal.x,
+      y: exp.elemSpecs.eyes[currentAgent].left.centerFinal.y,
+    }, '<');
+
+    // same for right eye
+    timeline.to([pupilRight, irisRight], {
+      duration: audioTest.duration,
+      ease: 'none',
+      x: exp.elemSpecs.eyes[currentAgent].right.centerFinal.x,
+      y: exp.elemSpecs.eyes[currentAgent].right.centerFinal.y,
+    }, '<');
+  }
+
   // -------------------------------------------------------------------------------------------------------------------
   // TABLET VERSION WITH HEDGE
   // -------------------------------------------------------------------------------------------------------------------
-  if (exp.subjData.touchScreen) {
+  if (exp.trials.boxesNr[exp.trials.count] === 0) {
     // for test trials, let hedge move up to cover balloon falling down
     if (exp.trials.type[exp.trials.count] === 'test') {
       const hedgeTestUp = gsap.fromTo(hedge,
@@ -86,7 +143,7 @@ export default (exp) => {
   // -------------------------------------------------------------------------------------------------------------------
   // PC VERSION WITH BOXES
   // -------------------------------------------------------------------------------------------------------------------
-  } else if (!exp.subjData.touchScreen) {
+  } else if (exp.trials.boxesNr[exp.trials.count] > 0) {
     // for test trials, let hedge move up to cover balloon falling down
     if (exp.trials.type[exp.trials.count] === 'test') {
       const hedgeTestUp = gsap.fromTo(hedge,
