@@ -22,6 +22,14 @@ export default (exp, agentsSingle, targetsSingle) => {
     );
   }
 
+  // create boolean that stores whether trial should have an instruction voice over
+  exp.trials.voiceover = Array(exp.trials.totalNr).fill(false);
+  for (let i = 1; i <= exp.trials.voiceoverNr; i++) {
+    exp.trials.voiceover[0 + i - 1] = true;
+    exp.trials.voiceover[exp.trials.trainNr + i - 1] = true;
+    exp.trials.voiceover[exp.trials.trainNr + exp.trials.famNr + i - 1] = true;
+  }
+
   // calculate how many times each agent should be repeated, based on trialNumber
   const agentsDiv = divideWithRemainder(exp.trials.type.length, agentsSingle.length);
 
