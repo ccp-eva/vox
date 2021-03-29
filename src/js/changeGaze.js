@@ -21,182 +21,146 @@ export default (exp) => {
   const hedgeDelay = 1;
   const targetDelay = 1;
 
-  // // depending on trial type, show or hide hedge and boxes
-  // switch (true) {
-  //   case exp.trials.type[exp.trials.count] === 'train':
-  //     showSlide([], [hedge, boxes8Front, boxes8Back]);
-  //     break;
-  //   case exp.trials.type[exp.trials.count] === 'fam' && exp.trials.boxesNr[exp.trials.count] === 0:
-  //     showSlide([hedge], [boxes8Front, boxes8Back]);
-  //     break;
-  //   case exp.trials.type[exp.trials.count] === 'fam' && exp.trials.boxesNr[exp.trials.count] > 0:
-  //     showSlide([hedge, boxes8Front, boxes8Back], []);
-  //     break;
-  //   case exp.trials.type[exp.trials.count] === 'test' && exp.trials.boxesNr[exp.trials.count] === 0:
-  //     showSlide([hedge], [boxes8Front, boxes8Back]);
-  //     break;
-  //   case exp.trials.type[exp.trials.count] === 'test' && exp.trials.boxesNr[exp.trials.count] > 0:
-  //     showSlide([hedge, boxes8Front, boxes8Back], []);
-  //     break;
-  //   default:
-  //     console.error('Error in showing hedges/boxes');
-  // }
-
-  // TODO switch cases?
-
   // -------------------------------------------------------------------------------------------------------------------
-  // TOUCH TRAINING
+  // define common movements/ animations
   // -------------------------------------------------------------------------------------------------------------------
-  if (exp.trials.type[exp.trials.count] === 'train') {
-    // for touch trial: let balloon fall down
-    timeline.to(exp.targets[exp.trials.count], {
+  const hedgeUp = gsap.timeline({ paused: true });
+  hedgeUp
+    .fromTo(hedge,
+      { y: hedge.getBBox().height }, {
+        y: 0,
+        delay: hedgeDelay,
+        duration: hedgeDuration,
+        ease: 'none',
+      });
+
+  const hedgeDown = gsap.timeline({ paused: true });
+  hedgeDown
+    .to(hedge, {
+      y: hedge.getBBox().height,
+      delay: hedgeDelay,
+      duration: hedgeDuration,
+      ease: 'none',
+    }, '>');
+
+  const hedgeHalfDown = gsap.timeline({ paused: true });
+  hedgeHalfDown
+    .to(hedge, {
+      y: hedge.getBBox().height - exp.targets[exp.trials.count].getBBox().height - 75,
+      delay: hedgeDelay,
+      duration: hedgeDuration,
+      ease: 'none',
+    }, '>');
+
+  const hedgeHalfUp = gsap.timeline({ paused: true });
+  hedgeHalfUp
+    .fromTo(hedge,
+      { y: hedge.getBBox().height }, {
+      // -75 because balloon doesn't land directly at border of screen
+        y: hedge.getBBox().height - exp.targets[exp.trials.count].getBBox().height - 75,
+        delay: hedgeDelay,
+        duration: hedgeDuration / 3,
+        ease: 'none',
+      });
+
+  const ballonToGround = gsap.timeline({ paused: true });
+  ballonToGround
+    .to(exp.targets[exp.trials.count], {
       delay: audioTest.duration,
       duration: audioTest.duration,
       ease: 'none',
       x: exp.elemSpecs.targets.centerFinal.x,
       y: exp.elemSpecs.targets.centerFinal.y,
-      // onStart() {
-      //   audioTest.play();
-      // },
-    });
-
-    // let eyes follow balloon
-    timeline.to([pupilLeft, irisLeft], {
+    })
+    .to([pupilLeft, irisLeft], {
       duration: audioTest.duration,
       ease: 'none',
       x: exp.elemSpecs.eyes[currentAgent].left.centerFinal.x,
       y: exp.elemSpecs.eyes[currentAgent].left.centerFinal.y,
-    }, '<');
-
-    // same for right eye
-    timeline.to([pupilRight, irisRight], {
+    }, '<')
+    .to([pupilRight, irisRight], {
       duration: audioTest.duration,
       ease: 'none',
       x: exp.elemSpecs.eyes[currentAgent].right.centerFinal.x,
       y: exp.elemSpecs.eyes[currentAgent].right.centerFinal.y,
     }, '<');
-  }
 
-  // -------------------------------------------------------------------------------------------------------------------
-  // TABLET VERSION WITH HEDGE
-  // -------------------------------------------------------------------------------------------------------------------
-  if (exp.trials.boxesNr[exp.trials.count] === 0) {
-    // for test trials, let hedge move up to cover balloon falling down
-    if (exp.trials.type[exp.trials.count] === 'test') {
-      const hedgeTestUp = gsap.fromTo(hedge,
-        { y: hedge.getBBox().height }, {
-          y: 0,
-          delay: hedgeDelay,
-          duration: hedgeDuration,
-          ease: 'none',
-        });
-      timeline.add(hedgeTestUp);
-    }
-
-    // for fam + test trial: let balloon fall down
-    timeline.to(exp.targets[exp.trials.count], {
-      delay: targetDelay,
-      duration: exp.responseLog[exp.trials.count].durationAnimationBalloonTotal,
-      ease: 'none',
-      x: exp.elemSpecs.targets.centerFinal.x,
-      y: exp.elemSpecs.targets.centerFinal.y,
-    });
-
-    // let eyes follow balloon
-    timeline.to([pupilLeft, irisLeft], {
-      duration: exp.responseLog[exp.trials.count].durationAnimationBalloonTotal,
-      ease: 'none',
-      x: exp.elemSpecs.eyes[currentAgent].left.centerFinal.x,
-      y: exp.elemSpecs.eyes[currentAgent].left.centerFinal.y,
-    }, '<');
-
-    // same for right eye
-    timeline.to([pupilRight, irisRight], {
-      duration: exp.responseLog[exp.trials.count].durationAnimationBalloonTotal,
-      ease: 'none',
-      x: exp.elemSpecs.eyes[currentAgent].right.centerFinal.x,
-      y: exp.elemSpecs.eyes[currentAgent].right.centerFinal.y,
-    }, '<');
-
-    // for fam trials, move hedge up in the end
-    if (exp.trials.type[exp.trials.count] === 'fam') {
-      const hedgeFamTween = gsap.fromTo(hedge,
-        { y: hedge.getBBox().height }, {
-          // -75 because balloon doesn't land directly at border of screen
-          y: hedge.getBBox().height - exp.targets[exp.trials.count].getBBox().height - 75,
-          delay: hedgeDelay,
-          duration: hedgeDuration / 3,
-          ease: 'none',
-        });
-      timeline.add(hedgeFamTween);
-    }
-    if (exp.trials.type[exp.trials.count] === 'test') {
-      const hedgeTestDown = gsap.to(hedge, {
-        y: hedge.getBBox().height - exp.targets[exp.trials.count].getBBox().height - 75,
-        delay: hedgeDelay,
-        duration: hedgeDuration,
-        ease: 'none',
-      }, '>');
-      timeline.add(hedgeTestDown);
-    }
-
-  // -------------------------------------------------------------------------------------------------------------------
-  // PC VERSION WITH BOXES
-  // -------------------------------------------------------------------------------------------------------------------
-  } else if (exp.trials.boxesNr[exp.trials.count] > 0) {
-    // for test trials, let hedge move up to cover balloon falling down
-    if (exp.trials.type[exp.trials.count] === 'test') {
-      const hedgeTestUp = gsap.fromTo(hedge,
-        { y: hedge.getBBox().height }, {
-          y: 0,
-          delay: hedgeDelay,
-          duration: hedgeDuration,
-          ease: 'none',
-        });
-      timeline.add(hedgeTestUp);
-    }
-
-    // balloon flies above box
-    timeline.to(exp.targets[exp.trials.count], {
+  const ballonIntoBox = gsap.timeline({ paused: true });
+  ballonIntoBox
+    .to(exp.targets[exp.trials.count], {
       delay: targetDelay,
       duration: exp.responseLog[exp.trials.count].durationAnimationBalloonCenterBox,
       ease: 'none',
       x: exp.elemSpecs.targets.centerBox.x,
       y: exp.elemSpecs.targets.centerBox.y,
-    });
-
-    // let eyes follow balloon to final position
-    timeline.to([pupilLeft, irisLeft], {
+    })
+    .to([pupilLeft, irisLeft], {
       duration: exp.responseLog[exp.trials.count].durationAnimationBalloonTotal,
       ease: 'none',
       x: exp.elemSpecs.eyes[currentAgent].left.centerFinal.x,
       y: exp.elemSpecs.eyes[currentAgent].left.centerFinal.y,
-    }, '<');
-
-    // same for right eye
-    timeline.to([pupilRight, irisRight], {
+    }, '<')
+    .to([pupilRight, irisRight], {
       duration: exp.responseLog[exp.trials.count].durationAnimationBalloonTotal,
       ease: 'none',
       x: exp.elemSpecs.eyes[currentAgent].right.centerFinal.x,
       y: exp.elemSpecs.eyes[currentAgent].right.centerFinal.y,
-    }, '<');
-
-    // hide balloon in the box (eye movement takes as long!)
-    timeline.to(exp.targets[exp.trials.count], {
+    }, '<')
+    .to(exp.targets[exp.trials.count], {
       duration: exp.responseLog[exp.trials.count].durationAnimationBalloonBoxFinal,
       ease: 'none',
       y: exp.elemSpecs.targets.centerFinal.y,
     }, `-=${exp.responseLog[exp.trials.count].durationAnimationBalloonBoxFinal}`);
 
-    if (exp.trials.type[exp.trials.count] === 'test') {
-      const hedgeTestDown = gsap.to(hedge, {
-        y: hedge.getBBox().height,
-        delay: hedgeDelay,
-        duration: hedgeDuration,
-        ease: 'none',
-      }, '>');
-      timeline.add(hedgeTestDown);
-    }
+  // -------------------------------------------------------------------------------------------------------------------
+  // define animation depending on trial type
+  // -------------------------------------------------------------------------------------------------------------------
+  switch (true) {
+    // for training trials
+    case exp.trials.type[exp.trials.count] === 'train':
+      ballonToGround.play();
+      timeline.add(ballonToGround);
+      break;
+
+    // for tablet hedge version fam trials
+    case exp.trials.boxesNr[exp.trials.count] === 0 && exp.trials.type[exp.trials.count] === 'fam':
+      ballonToGround.play();
+      hedgeHalfUp.play();
+      timeline
+        .add(ballonToGround)
+        .add(hedgeHalfUp);
+      break;
+
+    // for tablet hedge version test trials
+    case exp.trials.boxesNr[exp.trials.count] === 0 && exp.trials.type[exp.trials.count] === 'test':
+      hedgeUp.play();
+      ballonToGround.play();
+      hedgeHalfDown.play();
+      timeline
+        .add(hedgeUp)
+        .add(ballonToGround)
+        .add(hedgeHalfDown);
+      break;
+
+    // for PC box version fam trials
+    case exp.trials.boxesNr[exp.trials.count] > 0 && exp.trials.type[exp.trials.count] === 'fam':
+      ballonIntoBox.play();
+      timeline.add(ballonIntoBox);
+      break;
+
+    // for PC box version test trials
+    case exp.trials.boxesNr[exp.trials.count] > 0 && exp.trials.type[exp.trials.count] === 'test':
+      hedgeUp.play();
+      ballonIntoBox.play();
+      hedgeDown.play();
+      timeline
+        .add(hedgeUp)
+        .add(ballonIntoBox)
+        .add(hedgeDown);
+      break;
+
+    default:
+      console.error('Error in defining animation');
   }
 
   timeline.play();

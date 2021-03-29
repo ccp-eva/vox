@@ -46,10 +46,10 @@ export default (exp) => {
       showSlide([hedge], [boxes8Front, boxes8Back]);
       break;
     // for PC box version
-    case exp.trials.type[exp.trials.count] === 'fam' && exp.trials.boxesNr[exp.trials.count] > 0:
+    case exp.trials.boxesNr[exp.trials.count] > 0 && exp.trials.type[exp.trials.count] === 'fam':
       showSlide([boxes8Front, boxes8Back], [hedge]);
       break;
-    case exp.trials.type[exp.trials.count] === 'test' && exp.trials.boxesNr[exp.trials.count] > 0:
+    case exp.trials.boxesNr[exp.trials.count] > 0 && exp.trials.type[exp.trials.count] === 'test':
       showSlide([hedge, boxes8Front, boxes8Back], []);
       break;
     default:

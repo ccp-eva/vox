@@ -451,25 +451,39 @@ const handleWrongClick = (event) => {
 // TODO switch? audio for new transition!
 const handleSpeakerClick = async function tmp(event) {
   event.preventDefault();
-  if (exp.trials.count === 0) {
-    if (exp.trials.boxesNr[exp.trials.count] === 0) {
+  switch (true) {
+    // for training trials
+    case exp.trials.count === 0:
       await playFullAudio(audioInstructionsTablet, instructionsTrainButton);
       showSlide([instructionsTrainButton], []);
-    } else if (exp.trials.boxesNr[exp.trials.count] > 0) {
-      await playFullAudio(audioInstructionsPC, instructionsTrainButton);
-      showSlide([instructionsTrainButton], []);
-    }
-  } else if (exp.trials.count === exp.trials.famNr) {
-    if (exp.trials.boxesNr[exp.trials.count] === 0) {
-      await playFullAudio(audioTransitionTablet, instructionsFamButton);
+      break;
+
+    // for tablet hedge version fam trials
+    case exp.trials.boxesNr[exp.trials.count] === 0 && exp.trials.count === exp.trials.trainNr:
+      await playFullAudio(audioInstructionsTablet, instructionsFamButton);
       showSlide([instructionsFamButton], []);
-    } else if (exp.trials.boxesNr[exp.trials.count] > 0) {
-      await playFullAudio(audioTransitionPC, instructionsFamButton);
+      break;
+
+    // for tablet hedge version test trials
+    case exp.trials.boxesNr[exp.trials.count] === 0 && exp.trials.count === exp.trials.trainNr + exp.trials.famNr:
+      await playFullAudio(audioTransitionTablet, instructionsTestButton);
+      showSlide([instructionsTestButton], []);
+      break;
+
+    // for PC box version fam trials
+    case exp.trials.boxesNr[exp.trials.count] > 0 && exp.trials.count === exp.trials.trainNr:
+      await playFullAudio(audioInstructionsPC, instructionsFamButton);
       showSlide([instructionsFamButton], []);
-    }
-  } else if (exp.trials.count === exp.trials.totalNr) {
-    await audioGoodbye.play();
-    showSlide([goodbyeButton], []);
+      break;
+
+    // for PC box version test trials
+    case exp.trials.boxesNr[exp.trials.count] > 0 && exp.trials.count === exp.trials.trainNr + exp.trials.famNr:
+      await playFullAudio(audioTransitionPC, instructionsTestButton);
+      showSlide([instructionsTestButton], []);
+      break;
+
+    default:
+      console.error('Error in playing instructions');
   }
 };
 
