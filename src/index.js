@@ -228,7 +228,7 @@ console.log('exp object', exp);
 
 // gsap timeline that will save our animation specifications
 let timeline = null;
-let targetClickTimer5sec = null;
+const targetClickTimer5sec = null;
 // const targetClickTimer10sec = null;
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -300,7 +300,7 @@ const handleLosgehtsClick = async function tmp(event) {
     t1: 0,
   };
 
-  targetClickTimer5sec = window.setTimeout(noTargetClickWithin5sec, 5000);
+  // targetClickTimer5sec = window.setTimeout(noTargetClickWithin5sec, 5000);
 
   switch (true) {
     case exp.trials.type[exp.trials.count] === 'train':

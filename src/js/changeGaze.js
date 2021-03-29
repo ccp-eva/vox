@@ -17,19 +17,37 @@ export default (exp) => {
 
   // we use gsap3 for animation
   const timeline = gsap.timeline({ paused: true });
+  // general delay at beginning, for 1 sec
+  timeline.delay(0.5);
   const hedgeDuration = 0.2;
-  const hedgeDelay = 1;
-  const targetDelay = 1;
 
   // -------------------------------------------------------------------------------------------------------------------
   // define common movements/ animations
   // -------------------------------------------------------------------------------------------------------------------
+  const attentionGetter = gsap.timeline({ paused: true });
+  attentionGetter
+    .to([exp.agents[exp.trials.count]], {
+      scale: 1.05,
+      opacity: 0,
+      duration: 0.1,
+      transformOrigin: '50% 50%',
+    })
+    . to([pupilLeft, pupilRight, irisLeft, irisRight], {
+      scale: 1.1,
+      opacity: 0,
+      duration: 0.1,
+      transformOrigin: '50% 50%',
+    }, '<')
+    .set([exp.agents[exp.trials.count], pupilLeft, pupilRight, irisLeft, irisRight], {
+      scale: 1,
+      opacity: 1,
+    });
+
   const hedgeUp = gsap.timeline({ paused: true });
   hedgeUp
     .fromTo(hedge,
       { y: hedge.getBBox().height }, {
         y: 0,
-        delay: hedgeDelay,
         duration: hedgeDuration,
         ease: 'none',
       });
@@ -38,7 +56,6 @@ export default (exp) => {
   hedgeDown
     .to(hedge, {
       y: hedge.getBBox().height,
-      delay: hedgeDelay,
       duration: hedgeDuration,
       ease: 'none',
     }, '>');
@@ -47,7 +64,6 @@ export default (exp) => {
   hedgeHalfDown
     .to(hedge, {
       y: hedge.getBBox().height - exp.targets[exp.trials.count].getBBox().height - 75,
-      delay: hedgeDelay,
       duration: hedgeDuration,
       ease: 'none',
     }, '>');
@@ -58,7 +74,6 @@ export default (exp) => {
       { y: hedge.getBBox().height }, {
       // -75 because balloon doesn't land directly at border of screen
         y: hedge.getBBox().height - exp.targets[exp.trials.count].getBBox().height - 75,
-        delay: hedgeDelay,
         duration: hedgeDuration / 3,
         ease: 'none',
       });
@@ -66,7 +81,6 @@ export default (exp) => {
   const ballonToGround = gsap.timeline({ paused: true });
   ballonToGround
     .to(exp.targets[exp.trials.count], {
-      delay: audioTest.duration,
       duration: audioTest.duration,
       ease: 'none',
       x: exp.elemSpecs.targets.centerFinal.x,
@@ -88,7 +102,6 @@ export default (exp) => {
   const ballonIntoBox = gsap.timeline({ paused: true });
   ballonIntoBox
     .to(exp.targets[exp.trials.count], {
-      delay: targetDelay,
       duration: exp.responseLog[exp.trials.count].durationAnimationBalloonCenterBox,
       ease: 'none',
       x: exp.elemSpecs.targets.centerBox.x,
@@ -118,45 +131,57 @@ export default (exp) => {
   switch (true) {
     // for training trials
     case exp.trials.type[exp.trials.count] === 'train':
+      attentionGetter.play();
       ballonToGround.play();
-      timeline.add(ballonToGround);
+      timeline
+        .add(attentionGetter)
+        .add(ballonToGround, '+=0.5');
       break;
 
     // for tablet hedge version fam trials
     case exp.trials.boxesNr[exp.trials.count] === 0 && exp.trials.type[exp.trials.count] === 'fam':
+      attentionGetter.play();
       ballonToGround.play();
       hedgeHalfUp.play();
       timeline
-        .add(ballonToGround)
-        .add(hedgeHalfUp);
+        .add(attentionGetter)
+        .add(ballonToGround, '+=0.5')
+        .add(hedgeHalfUp, '+=0.5');
       break;
 
     // for tablet hedge version test trials
     case exp.trials.boxesNr[exp.trials.count] === 0 && exp.trials.type[exp.trials.count] === 'test':
       hedgeUp.play();
+      attentionGetter.play();
       ballonToGround.play();
       hedgeHalfDown.play();
       timeline
         .add(hedgeUp)
-        .add(ballonToGround)
-        .add(hedgeHalfDown);
+        .add(attentionGetter, '+=0.5')
+        .add(ballonToGround, '+=0.5')
+        .add(hedgeHalfDown, '+=0.5');
       break;
 
     // for PC box version fam trials
     case exp.trials.boxesNr[exp.trials.count] > 0 && exp.trials.type[exp.trials.count] === 'fam':
+      attentionGetter.play();
       ballonIntoBox.play();
-      timeline.add(ballonIntoBox);
+      timeline
+        .add(attentionGetter)
+        .add(ballonIntoBox, '+=0.5');
       break;
 
     // for PC box version test trials
     case exp.trials.boxesNr[exp.trials.count] > 0 && exp.trials.type[exp.trials.count] === 'test':
+      attentionGetter.play();
       hedgeUp.play();
       ballonIntoBox.play();
       hedgeDown.play();
       timeline
         .add(hedgeUp)
-        .add(ballonIntoBox)
-        .add(hedgeDown);
+        .add(attentionGetter, '+=0.5')
+        .add(ballonIntoBox, '+=0.5')
+        .add(hedgeDown, '+=0.5');
       break;
 
     default:
