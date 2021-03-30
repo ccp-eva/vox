@@ -31,7 +31,7 @@ export default (exp) => {
   instructionsTestHeading.innerHTML = '<h1> Super! Jetzt kommt der letzte Teil. </h1>';
   goodbyeHeading.innerHTML = '<h1> Fertig! </h1>';
 
-  // text for the parents (children get audio instructionsFam)
+  // text for the parents (children get audio instructions)
   instructionsTrainParagraph.innerHTML = `<p> 
   Vielen Dank, dass Sie mit Ihrem Kind an unserer Studie teilnehmen. <br> <br>
   Ihr Kind hat gleich die Aufgabe, einen Ballon zu finden. <br>

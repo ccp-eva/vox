@@ -1,4 +1,5 @@
 import { gsap } from 'gsap';
+import playFullAudio from './playFullAudio';
 
 // ---------------------------------------------------------------------------------------------------------------------
 // FUNCTION FOR ANIMATING BALLOON, EYES, HEDGE
@@ -13,10 +14,6 @@ export default (exp) => {
   const irisLeft = document.getElementById(`${currentAgent}-iris-left`);
   const irisRight = document.getElementById(`${currentAgent}-iris-right`);
   const hedge = document.getElementById('hedge');
-  const audioTrainIntro = document.getElementById('audio-train-intro');
-  // TODO
-  // const audioFamIntro = document.getElementById('audio-fam-intro');
-  // const audioTestIntro = document.getElementById('audio-test-intro');
 
   // we use gsap3 for animation
   const timeline = gsap.timeline({ paused: true });
@@ -29,16 +26,10 @@ export default (exp) => {
   // -------------------------------------------------------------------------------------------------------------------
   const attentionGetter = gsap.timeline({ paused: true });
   attentionGetter
-    .to([exp.agents[exp.trials.count]], {
-      scale: 1.05,
-      opacity: 0,
-      duration: 0.1,
-      transformOrigin: '50% 50%',
-    })
     . to([pupilLeft, pupilRight, irisLeft, irisRight], {
-      scale: 1.1,
-      opacity: 0,
-      duration: 0.1,
+      scale: 1.3,
+      opacity: 0.75,
+      duration: 0.3,
       transformOrigin: '50% 50%',
     }, '<')
     .set([exp.agents[exp.trials.count], pupilLeft, pupilRight, irisLeft, irisRight], {
@@ -131,10 +122,19 @@ export default (exp) => {
   // -------------------------------------------------------------------------------------------------------------------
   // ADD VOICE INSTRUCTIONS
   // -------------------------------------------------------------------------------------------------------------------
-  const playTrain = () => { audioTrainIntro.play(); };
-  // TODO
-  const playFam = () => { audioFamIntro.play(); };
-  const playTest = () => { audioTestIntro.play(); };
+  const audioTrain1 = document.getElementById('audio-train-1');
+  const audioFamHedge1 = document.getElementById('audio-fam-hedge-1');
+  const audioFamHedge2 = document.getElementById('audio-fam-hedge-2');
+  const audioTestHedge1 = document.getElementById('audio-test-hedge-1');
+  const audioTestHedge2 = document.getElementById('audio-test-hedge-2');
+  const audioTestHedge3 = document.getElementById('audio-test-hedge-3');
+
+  const playTrain1 = () => { audioTrain1.play(); };
+  const playFamHedge1 = () => { audioFamHedge1.play(); };
+  const playFamHedge2 = () => { audioFamHedge2.play(); };
+  const playTestHedge1 = () => { audioTestHedge1.play(); };
+  const playTestHedge2 = () => { audioTestHedge2.play(); };
+  const playTestHedge3 = () => { audioTestHedge3.play(); };
 
   // -------------------------------------------------------------------------------------------------------------------
   // define animation depending on trial type
@@ -144,8 +144,8 @@ export default (exp) => {
     case exp.trials.type[exp.trials.count] === 'train':
       // for instructions voice over
       if (exp.trials.voiceover[exp.trials.count]) {
-        timeline.eventCallback('onStart', playTrain);
-        attentionGetter.delay(audioTrainIntro.duration);
+        timeline.eventCallback('onStart', playTrain1);
+        attentionGetter.delay(audioTrain1.duration + delay);
       }
       attentionGetter.play();
       ballonToGround.play();
@@ -156,6 +156,11 @@ export default (exp) => {
 
     // for tablet hedge version fam trials
     case exp.trials.boxesNr[exp.trials.count] === 0 && exp.trials.type[exp.trials.count] === 'fam':
+      if (exp.trials.voiceover[exp.trials.count]) {
+        timeline.eventCallback('onStart', playFamHedge1);
+        attentionGetter.delay(audioFamHedge1.duration + delay);
+        hedgeHalfUp.eventCallback('onStart', playFamHedge2);
+      }
       attentionGetter.play();
       ballonToGround.play();
       hedgeHalfUp.play();
@@ -167,6 +172,13 @@ export default (exp) => {
 
     // for tablet hedge version test trials
     case exp.trials.boxesNr[exp.trials.count] === 0 && exp.trials.type[exp.trials.count] === 'test':
+      if (exp.trials.voiceover[exp.trials.count]) {
+        timeline.eventCallback('onStart', playTestHedge1);
+        hedgeUp.delay(audioTestHedge1.duration + delay);
+        hedgeUp.eventCallback('onComplete', playTestHedge2);
+        attentionGetter.delay(audioTestHedge2.duration + delay);
+        hedgeHalfDown.eventCallback('onStart', playTestHedge3);
+      }
       hedgeUp.play();
       attentionGetter.play();
       ballonToGround.play();

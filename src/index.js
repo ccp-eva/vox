@@ -35,8 +35,8 @@ exp.subjData.touchScreen = !checkForTouchscreen();
 // TRIAL SPECIFICATIONS
 // ---------------------------------------------------------------------------------------------------------------------
 exp.trials = {};
-exp.trials.trainNr = 2;
-exp.trials.famNr = 2;
+exp.trials.trainNr = 1;
+exp.trials.famNr = 1;
 exp.trials.testNr = 2;
 exp.trials.totalNr = exp.trials.trainNr + exp.trials.famNr + exp.trials.testNr;
 // this variable stores in which trial we currently are!
@@ -113,18 +113,21 @@ const clickBubble = document.getElementById('click-bubble');
 const clickableArea = document.getElementById('clickable-area');
 
 const speaker = document.getElementById('speaker');
+const audioAll = document.getElementsByTagName('audio');
 const audioWelcome = document.getElementById('audio-welcome');
-
-const audioInstructionsTablet = document.getElementById('audio-instructions-tablet');
-const audioInstructionsPC = document.getElementById('audio-instructions-PC');
-const audioTransitionTablet = document.getElementById('audio-transition-tablet');
-const audioTransitionPC = document.getElementById('audio-transition-PC');
 const audioGoodbye = document.getElementById('audio-goodbye');
-const audioGeneralPrompt = document.getElementById('audio-general-prompt');
-const audioTrainingPrompt = document.getElementById('audio-train-prompt');
 
-const audioReminderTablet = document.getElementById('audio-reminder-tablet');
-const audioReminderPC = document.getElementById('audio-reminder-PC');
+const audioGeneralPrompt = document.getElementById('audio-general-prompt');
+const audioPromptHedge = document.getElementById('audio-prompt-hedge');
+const audioPromptBox = document.getElementById('audio-prompt-box');
+
+const audioTrainPrompt = document.getElementById('audio-train-prompt');
+const audioTrainPromptLong = document.getElementById('audio-train-prompt-long');
+
+// const audioFamHedge1 = document.getElementById('audio-fam-hedge-1');
+const audioFamHedge2 = document.getElementById('audio-fam-hedge-2');
+const audioTestHedge3 = document.getElementById('audio-test-hedge-3');
+const audioTestBox3 = document.getElementById('audio-test-box-3');
 
 const hedge = document.getElementById('hedge');
 const boxes1Front = document.getElementById('boxes1-front');
@@ -234,7 +237,6 @@ console.log('exp object', exp);
 // gsap timeline that will save our animation specifications
 let timeline = null;
 let targetClickTimer5sec = null;
-// const targetClickTimer10sec = null;
 
 // ---------------------------------------------------------------------------------------------------------------------
 // DEFINE EVENTLISTENER FUNCTIONS
@@ -297,7 +299,71 @@ const handleLosgehtsClick = async function tmp(event) {
   // animate balloon & eye movement to randomized positions
   await timeline.play();
   await pause(200);
-  audioTrainingPrompt.play();
+
+  switch (true) {
+    // for train trials with voiceover
+    case exp.trials.type[exp.trials.count] === 'train'
+          && exp.trials.voiceover[exp.trials.count]:
+      await playFullAudio(audioTrainPromptLong, null);
+      break;
+
+    // for train trials without voiceover
+    case exp.trials.type[exp.trials.count] === 'train'
+          && !exp.trials.voiceover[exp.trials.count]:
+      audioTrainPrompt.play();
+      break;
+
+    // for tablet hedge version fam trials with voiceover
+    case exp.trials.type[exp.trials.count] === 'fam'
+            && exp.trials.boxesNr[exp.trials.count] === 0
+            && exp.trials.voiceover[exp.trials.count]:
+      await playFullAudio(audioFamHedge2, null);
+      await pause(500);
+      await playFullAudio(audioPromptHedge, null);
+      break;
+
+    // for tablet hedge version test trials with voiceover
+    case exp.trials.type[exp.trials.count] === 'test'
+      && exp.trials.boxesNr[exp.trials.count] === 0
+      && exp.trials.voiceover[exp.trials.count]:
+      await playFullAudio(audioTestHedge3, null);
+      await pause(500);
+      await playFullAudio(audioPromptHedge, null);
+      break;
+
+      // for tablet hedge version fam or test trials without voiceover
+    case exp.trials.type[exp.trials.count] !== 'train'
+        && exp.trials.boxesNr[exp.trials.count] === 0
+        && !exp.trials.voiceover[exp.trials.count]:
+      audioPromptHedge.play();
+      break;
+
+    // TODO
+    // for PC box version fam trials with voice over
+    case exp.trials.type[exp.trials.count] === 'fam'
+      && exp.trials.boxesNr[exp.trials.count] > 0
+      && exp.trials.voiceover[exp.trials.count]:
+      await playFullAudio(audioPromptBox, null);
+      break;
+
+    // for PC box version test trials with voice over
+    case exp.trials.type[exp.trials.count] === 'test'
+      && exp.trials.boxesNr[exp.trials.count] > 0
+      && !exp.trials.voiceover[exp.trials.count]:
+      await playFullAudio(audioTestBox3, null);
+      await pause(500);
+      await playFullAudio(audioPromptBox, null);
+      break;
+
+      // for PC box version fam trials without voice over
+    case exp.trials.type[exp.trials.count] !== 'train'
+        && exp.trials.boxesNr[exp.trials.count] > 0
+        && !exp.trials.voiceover[exp.trials.count]:
+      break;
+
+    default:
+      console.error('Error in playing audio prompts');
+  }
 
   // save current time to calculate response time later
   exp.responseLog[exp.trials.count].responseTime = {
@@ -332,12 +398,10 @@ const handleLosgehtsClick = async function tmp(event) {
 // async so we can await animation!
 const handleTargetClick = async function tmp(event) {
   // stop audio that is potentially playing
-  audioTrainingPrompt.pause();
-  audioTrainingPrompt.currentTime = 0;
-  audioReminderTablet.pause();
-  audioReminderTablet.currentTime = 0;
-  audioReminderPC.pause();
-  audioReminderPC.currentTime = 0;
+  for (let i = 0; i < audioAll.length; i++) {
+    audioAll[i].pause();
+    audioAll[i].currentTime = 0;
+  }
 
   // we save current time, so that we can calculate response time
   exp.responseLog[exp.trials.count].responseTime.t1 = new Date().getTime();
@@ -345,7 +409,6 @@ const handleTargetClick = async function tmp(event) {
   // clear timer that awaits participant's click
   // otherwise, it will run even after target click
   clearTimeout(targetClickTimer5sec);
-  // clearTimeout(targetClickTimer10sec);
 
   // remove eventListener that was responsible for "wrong input" sound
   exp.elemSpecs.outerSVG.ID.removeEventListener('click', handleWrongClick, false);
@@ -453,38 +516,19 @@ const handleWrongClick = (event) => {
 // ---------------------------------------------------------------------------------------------------------------------
 // RUNS WHEN SPEAKER IN INSTRUCTIONS HAS BEEN CLICKED
 // ---------------------------------------------------------------------------------------------------------------------
-// TODO switch? audio for new transition!
 const handleSpeakerClick = async function tmp(event) {
   event.preventDefault();
   switch (true) {
-    // for training trials
+    // welcome
     case exp.trials.count === 0:
       await playFullAudio(audioWelcome, instructionsTrainButton);
       showSlide([instructionsTrainButton], []);
       break;
 
-    // for tablet hedge version fam trials
-    case exp.trials.boxesNr[exp.trials.count] === 0 && exp.trials.count === exp.trials.trainNr:
-      await playFullAudio(audioInstructionsTablet, instructionsFamButton);
-      showSlide([instructionsFamButton], []);
-      break;
-
-    // for tablet hedge version test trials
-    case exp.trials.boxesNr[exp.trials.count] === 0 && exp.trials.count === exp.trials.trainNr + exp.trials.famNr:
-      await playFullAudio(audioTransitionTablet, instructionsTestButton);
-      showSlide([instructionsTestButton], []);
-      break;
-
-    // for PC box version fam trials
-    case exp.trials.boxesNr[exp.trials.count] > 0 && exp.trials.count === exp.trials.trainNr:
-      await playFullAudio(audioInstructionsPC, instructionsFamButton);
-      showSlide([instructionsFamButton], []);
-      break;
-
-    // for PC box version test trials
-    case exp.trials.boxesNr[exp.trials.count] > 0 && exp.trials.count === exp.trials.trainNr + exp.trials.famNr:
-      await playFullAudio(audioTransitionPC, instructionsTestButton);
-      showSlide([instructionsTestButton], []);
+    // goodbye
+    case exp.trials.count === exp.trials.totalNr:
+      await playFullAudio(audioGoodbye, goodbyeButton);
+      showSlide([goodbyeButton], []);
       break;
 
     default:
@@ -495,12 +539,24 @@ const handleSpeakerClick = async function tmp(event) {
 // ---------------------------------------------------------------------------------------------------------------------
 // RUNS WHEN PARTICIPANT HASN'T CLICKED WITHIN CERTAIN AMOUNT OF TIME
 // ---------------------------------------------------------------------------------------------------------------------
-// TODO one audio for hedge, one for boxes
 let noTargetClickWithin5sec = () => {
-  if (exp.trials.boxesNr[exp.trials.count] === 0) {
-    audioGeneralPrompt.play();
-  } else if (exp.trials.boxesNr[exp.trials.count] > 0) {
-    audioGeneralPrompt.play();
+  switch (true) {
+    case exp.trials.type[exp.trials.count] === 'train' && exp.trials.voiceover[exp.trials.count]:
+      audioTrainPrompt.play();
+      break;
+
+    case exp.trials.type[exp.trials.count] !== 'train'
+          && exp.trials.boxesNr[exp.trials.count] === 0:
+      audioPromptHedge.play();
+      break;
+
+    case exp.trials.type[exp.trials.count] !== 'train'
+      && exp.trials.boxesNr[exp.trials.count] > 0:
+      audioPromptBox.play();
+      break;
+
+    default:
+      console.error('Error in playing audio prompt');
   }
 };
 // ---------------------------------------------------------------------------------------------------------------------
