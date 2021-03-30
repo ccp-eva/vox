@@ -29,14 +29,14 @@ exp.subjData = {};
 exp.subjData.subjID = 'testID';
 // just for developing: turn off fullscreen mode
 const fullscreen = false;
-exp.subjData.touchScreen = !checkForTouchscreen();
+exp.subjData.touchScreen = checkForTouchscreen();
 
 // ---------------------------------------------------------------------------------------------------------------------
 // TRIAL SPECIFICATIONS
 // ---------------------------------------------------------------------------------------------------------------------
 exp.trials = {};
-exp.trials.trainNr = 1;
-exp.trials.famNr = 1;
+exp.trials.trainNr = 2;
+exp.trials.famNr = 2;
 exp.trials.testNr = 2;
 exp.trials.totalNr = exp.trials.trainNr + exp.trials.famNr + exp.trials.testNr;
 // this variable stores in which trial we currently are!
@@ -301,22 +301,19 @@ const handleLosgehtsClick = async function tmp(event) {
   await pause(200);
 
   switch (true) {
-    // for train trials with voiceover
-    case exp.trials.type[exp.trials.count] === 'train'
-          && exp.trials.voiceover[exp.trials.count]:
-      await playFullAudio(audioTrainPromptLong, null);
+    // for any trial without voiceover
+    case !exp.trials.voiceover[exp.trials.count]:
+      audioGeneralPrompt.play();
       break;
 
-    // for train trials without voiceover
-    case exp.trials.type[exp.trials.count] === 'train'
-          && !exp.trials.voiceover[exp.trials.count]:
-      audioTrainPrompt.play();
+    // for train trials with voiceover
+    case exp.trials.type[exp.trials.count] === 'train':
+      await playFullAudio(audioTrainPromptLong, null);
       break;
 
     // for tablet hedge version fam trials with voiceover
     case exp.trials.type[exp.trials.count] === 'fam'
-            && exp.trials.boxesNr[exp.trials.count] === 0
-            && exp.trials.voiceover[exp.trials.count]:
+            && exp.trials.boxesNr[exp.trials.count] === 0:
       await playFullAudio(audioFamHedge2, null);
       await pause(500);
       await playFullAudio(audioPromptHedge, null);
@@ -324,41 +321,24 @@ const handleLosgehtsClick = async function tmp(event) {
 
     // for tablet hedge version test trials with voiceover
     case exp.trials.type[exp.trials.count] === 'test'
-      && exp.trials.boxesNr[exp.trials.count] === 0
-      && exp.trials.voiceover[exp.trials.count]:
+      && exp.trials.boxesNr[exp.trials.count] === 0:
       await playFullAudio(audioTestHedge3, null);
       await pause(500);
       await playFullAudio(audioPromptHedge, null);
       break;
 
-      // for tablet hedge version fam or test trials without voiceover
-    case exp.trials.type[exp.trials.count] !== 'train'
-        && exp.trials.boxesNr[exp.trials.count] === 0
-        && !exp.trials.voiceover[exp.trials.count]:
-      audioPromptHedge.play();
-      break;
-
-    // TODO
     // for PC box version fam trials with voice over
     case exp.trials.type[exp.trials.count] === 'fam'
-      && exp.trials.boxesNr[exp.trials.count] > 0
-      && exp.trials.voiceover[exp.trials.count]:
+      && exp.trials.boxesNr[exp.trials.count] > 0:
       await playFullAudio(audioPromptBox, null);
       break;
 
     // for PC box version test trials with voice over
     case exp.trials.type[exp.trials.count] === 'test'
-      && exp.trials.boxesNr[exp.trials.count] > 0
-      && !exp.trials.voiceover[exp.trials.count]:
+      && exp.trials.boxesNr[exp.trials.count] > 0:
       await playFullAudio(audioTestBox3, null);
-      await pause(500);
+      await pause(100);
       await playFullAudio(audioPromptBox, null);
-      break;
-
-      // for PC box version fam trials without voice over
-    case exp.trials.type[exp.trials.count] !== 'train'
-        && exp.trials.boxesNr[exp.trials.count] > 0
-        && !exp.trials.voiceover[exp.trials.count]:
       break;
 
     default:

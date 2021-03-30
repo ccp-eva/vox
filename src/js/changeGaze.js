@@ -1,5 +1,4 @@
 import { gsap } from 'gsap';
-import playFullAudio from './playFullAudio';
 
 // ---------------------------------------------------------------------------------------------------------------------
 // FUNCTION FOR ANIMATING BALLOON, EYES, HEDGE
@@ -128,6 +127,9 @@ export default (exp) => {
   const audioTestHedge1 = document.getElementById('audio-test-hedge-1');
   const audioTestHedge2 = document.getElementById('audio-test-hedge-2');
   const audioTestHedge3 = document.getElementById('audio-test-hedge-3');
+  const audioFamBox1 = document.getElementById('audio-fam-box-1');
+  const audioTestBox1 = document.getElementById('audio-test-box-1');
+  const audioTestBox2 = document.getElementById('audio-test-box-2');
 
   const playTrain1 = () => { audioTrain1.play(); };
   const playFamHedge1 = () => { audioFamHedge1.play(); };
@@ -135,6 +137,9 @@ export default (exp) => {
   const playTestHedge1 = () => { audioTestHedge1.play(); };
   const playTestHedge2 = () => { audioTestHedge2.play(); };
   const playTestHedge3 = () => { audioTestHedge3.play(); };
+  const playFamBox1 = () => { audioFamBox1.play(); };
+  const playTestBox1 = () => { audioTestBox1.play(); };
+  const playTestBox2 = () => { audioTestBox2.play(); };
 
   // -------------------------------------------------------------------------------------------------------------------
   // define animation depending on trial type
@@ -192,6 +197,10 @@ export default (exp) => {
 
     // for PC box version fam trials
     case exp.trials.boxesNr[exp.trials.count] > 0 && exp.trials.type[exp.trials.count] === 'fam':
+      if (exp.trials.voiceover[exp.trials.count]) {
+        timeline.eventCallback('onStart', playFamBox1);
+        attentionGetter.delay(audioFamBox1.duration + delay);
+      }
       attentionGetter.play();
       ballonIntoBox.play();
       timeline
@@ -201,8 +210,14 @@ export default (exp) => {
 
     // for PC box version test trials
     case exp.trials.boxesNr[exp.trials.count] > 0 && exp.trials.type[exp.trials.count] === 'test':
-      attentionGetter.play();
+      if (exp.trials.voiceover[exp.trials.count]) {
+        timeline.eventCallback('onStart', playTestBox1);
+        hedgeUp.delay(audioTestBox1.duration + delay);
+        hedgeUp.eventCallback('onStart', playTestBox2);
+        attentionGetter.delay(audioTestBox2.duration + delay);
+      }
       hedgeUp.play();
+      attentionGetter.play();
       ballonIntoBox.play();
       hedgeDown.play();
       timeline
