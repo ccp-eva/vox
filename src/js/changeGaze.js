@@ -1,3 +1,4 @@
+/* eslint-disable no-case-declarations */
 import { gsap } from 'gsap';
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -35,41 +36,6 @@ export default (exp) => {
       scale: 1,
       opacity: 1,
     });
-
-  const hedgeUp = gsap.timeline({ paused: true });
-  hedgeUp
-    .fromTo(hedge,
-      { y: hedge.getBBox().height }, {
-        y: 0,
-        duration: hedgeDuration,
-        ease: 'none',
-      });
-
-  const hedgeDown = gsap.timeline({ paused: true });
-  hedgeDown
-    .to(hedge, {
-      y: hedge.getBBox().height,
-      duration: hedgeDuration,
-      ease: 'none',
-    }, '>');
-
-  const hedgeHalfDown = gsap.timeline({ paused: true });
-  hedgeHalfDown
-    .to(hedge, {
-      y: hedge.getBBox().height - exp.targets[exp.trials.count].getBBox().height - 75,
-      duration: hedgeDuration,
-      ease: 'none',
-    }, '>');
-
-  const hedgeHalfUp = gsap.timeline({ paused: true });
-  hedgeHalfUp
-    .fromTo(hedge,
-      { y: hedge.getBBox().height }, {
-      // -75 because balloon doesn't land directly at border of screen
-        y: hedge.getBBox().height - exp.targets[exp.trials.count].getBBox().height - 75,
-        duration: hedgeDuration / 3,
-        ease: 'none',
-      });
 
   const ballonToGround = gsap.timeline({ paused: true });
   ballonToGround
@@ -123,7 +89,6 @@ export default (exp) => {
   // -------------------------------------------------------------------------------------------------------------------
   const audioTrain1 = document.getElementById('audio-train-1');
   const audioFamHedge1 = document.getElementById('audio-fam-hedge-1');
-  const audioFamHedge2 = document.getElementById('audio-fam-hedge-2');
   const audioTestHedge1 = document.getElementById('audio-test-hedge-1');
   const audioTestHedge2 = document.getElementById('audio-test-hedge-2');
   const audioTestHedge3 = document.getElementById('audio-test-hedge-3');
@@ -133,7 +98,6 @@ export default (exp) => {
 
   const playTrain1 = () => { audioTrain1.play(); };
   const playFamHedge1 = () => { audioFamHedge1.play(); };
-  const playFamHedge2 = () => { audioFamHedge2.play(); };
   const playTestHedge1 = () => { audioTestHedge1.play(); };
   const playTestHedge2 = () => { audioTestHedge2.play(); };
   const playTestHedge3 = () => { audioTestHedge3.play(); };
@@ -161,22 +125,40 @@ export default (exp) => {
 
     // for tablet hedge version fam trials
     case exp.trials.boxesNr[exp.trials.count] === 0 && exp.trials.type[exp.trials.count] === 'fam':
+      const hedgeSetHalfWay = gsap.set(hedge, {
+        y: hedge.getBBox().height - exp.targets[exp.trials.count].getBBox().height - 75,
+      });
+
       if (exp.trials.voiceover[exp.trials.count]) {
         timeline.eventCallback('onStart', playFamHedge1);
         attentionGetter.delay(audioFamHedge1.duration + delay);
-        hedgeHalfUp.eventCallback('onStart', playFamHedge2);
       }
+
       attentionGetter.play();
       ballonToGround.play();
-      hedgeHalfUp.play();
+
       timeline
+        .add(hedgeSetHalfWay)
         .add(attentionGetter, `+=${delay}`)
-        .add(ballonToGround, `+=${delay}`)
-        .add(hedgeHalfUp, `+=${delay}`);
+        .add(ballonToGround, `+=${delay}`);
       break;
 
     // for tablet hedge version test trials
     case exp.trials.boxesNr[exp.trials.count] === 0 && exp.trials.type[exp.trials.count] === 'test':
+      const hedgeHalfDown = gsap.to(hedge, {
+        y: hedge.getBBox().height - exp.targets[exp.trials.count].getBBox().height - 75,
+        duration: hedgeDuration,
+        ease: 'none',
+      });
+
+      const hedgeUp = gsap.fromTo(hedge, {
+        y: hedge.getBBox().height - exp.targets[exp.trials.count].getBBox().height - 75,
+      }, {
+        y: 0,
+        duration: hedgeDuration,
+        ease: 'none',
+      });
+
       if (exp.trials.voiceover[exp.trials.count]) {
         timeline.eventCallback('onStart', playTestHedge1);
         hedgeUp.delay(audioTestHedge1.duration + delay);
@@ -184,10 +166,12 @@ export default (exp) => {
         attentionGetter.delay(audioTestHedge2.duration + delay);
         hedgeHalfDown.eventCallback('onStart', playTestHedge3);
       }
+
       hedgeUp.play();
       attentionGetter.play();
       ballonToGround.play();
       hedgeHalfDown.play();
+
       timeline
         .add(hedgeUp, `+=${delay}`)
         .add(attentionGetter, `+=${delay}`)
@@ -210,18 +194,34 @@ export default (exp) => {
 
     // for PC box version test trials
     case exp.trials.boxesNr[exp.trials.count] > 0 && exp.trials.type[exp.trials.count] === 'test':
+      const hedgeDown = gsap.to(hedge, {
+        y: hedge.getBBox().height,
+        duration: hedgeDuration,
+        ease: 'none',
+      });
+
+      const hedgeWholeWayUp = gsap.fromTo(hedge, {
+        y: hedge.getBBox().height,
+      }, {
+        y: 0,
+        duration: hedgeDuration,
+        ease: 'none',
+      });
+
       if (exp.trials.voiceover[exp.trials.count]) {
         timeline.eventCallback('onStart', playTestBox1);
-        hedgeUp.delay(audioTestBox1.duration + delay);
-        hedgeUp.eventCallback('onStart', playTestBox2);
+        hedgeWholeWayUp.delay(audioTestBox1.duration + delay);
+        hedgeWholeWayUp.eventCallback('onComplete', playTestBox2);
         attentionGetter.delay(audioTestBox2.duration + delay);
       }
-      hedgeUp.play();
+
+      hedgeWholeWayUp.play();
       attentionGetter.play();
       ballonIntoBox.play();
       hedgeDown.play();
+
       timeline
-        .add(hedgeUp, `+=${delay}`)
+        .add(hedgeWholeWayUp, `+=${delay}`)
         .add(attentionGetter, `+=${delay}`)
         .add(ballonIntoBox, `+=${delay}`)
         .add(hedgeDown, `+=${delay}`);

@@ -29,7 +29,7 @@ exp.subjData = {};
 exp.subjData.subjID = 'testID';
 // just for developing: turn off fullscreen mode
 const fullscreen = false;
-exp.subjData.touchScreen = checkForTouchscreen();
+exp.subjData.touchScreen = !checkForTouchscreen();
 
 // ---------------------------------------------------------------------------------------------------------------------
 // TRIAL SPECIFICATIONS
@@ -124,8 +124,6 @@ const audioPromptBox = document.getElementById('audio-prompt-box');
 const audioTrainPrompt = document.getElementById('audio-train-prompt');
 const audioTrainPromptLong = document.getElementById('audio-train-prompt-long');
 
-// const audioFamHedge1 = document.getElementById('audio-fam-hedge-1');
-const audioFamHedge2 = document.getElementById('audio-fam-hedge-2');
 const audioTestHedge3 = document.getElementById('audio-test-hedge-3');
 const audioTestBox3 = document.getElementById('audio-test-box-3');
 
@@ -245,13 +243,13 @@ let targetClickTimer5sec = null;
 // RUNS WHEN INSTRUCTIONS BUTTON IS CLICKED
 // ---------------------------------------------------------------------------------------------------------------------
 // save in const variables in order to pass on event to function
-const handleInstructionsClick = (event) => {
+const handleInstructionsTrainClick = (event) => {
   event.preventDefault();
   if (fullscreen) openFullscreen();
 
   // showSlide: first array gets shown, second array gets hidden
   showSlide([experimentSlide],
-    [textSlide, clickBubble, clickableArea]);
+    [textSlide, clickBubble, clickableArea, instructionsTrainButton]);
 
   // shows only relevant elements etc.
   prepareTrial(exp);
@@ -267,7 +265,7 @@ const handleTransitionClick = (event) => {
   event.preventDefault();
 
   showSlide([experimentSlide],
-    [textSlide, clickBubble]);
+    [textSlide, clickBubble, instructionsFamButton, instructionsTestButton]);
 
   prepareTrial(exp);
   timeline = gsap.timeline({ paused: true });
@@ -314,8 +312,6 @@ const handleLosgehtsClick = async function tmp(event) {
     // for tablet hedge version fam trials with voiceover
     case exp.trials.type[exp.trials.count] === 'fam'
             && exp.trials.boxesNr[exp.trials.count] === 0:
-      await playFullAudio(audioFamHedge2, null);
-      await pause(500);
       await playFullAudio(audioPromptHedge, null);
       break;
 
@@ -323,8 +319,6 @@ const handleLosgehtsClick = async function tmp(event) {
     case exp.trials.type[exp.trials.count] === 'test'
       && exp.trials.boxesNr[exp.trials.count] === 0:
       await playFullAudio(audioTestHedge3, null);
-      await pause(500);
-      await playFullAudio(audioPromptHedge, null);
       break;
 
     // for PC box version fam trials with voice over
@@ -337,8 +331,6 @@ const handleLosgehtsClick = async function tmp(event) {
     case exp.trials.type[exp.trials.count] === 'test'
       && exp.trials.boxesNr[exp.trials.count] > 0:
       await playFullAudio(audioTestBox3, null);
-      await pause(100);
-      await playFullAudio(audioPromptBox, null);
       break;
 
     default:
@@ -403,7 +395,6 @@ const handleTargetClick = async function tmp(event) {
 
   // prepare next trial
   exp.trials.count += 1;
-  console.log('trialnr', exp.trials.count);
 
   // then depending on trialcount, decide what happens next...
   switch (true) {
@@ -421,11 +412,11 @@ const handleTargetClick = async function tmp(event) {
       document.getElementById('foreign-object-center-left').replaceChild(instructionsFamParagraph, instructionsTrainParagraph);
       document.getElementById('foreign-object-center-right').replaceChild(instructionsFamImage, instructionsTrainImage);
 
-      showSlide([textSlide],
+      showSlide([textSlide, instructionsFamButton],
         [experimentSlide,
           hedge, boxes8Front, boxes8Back,
           pig, monkey, sheep,
-          balloonBlue, balloonRed, balloonYellow, balloonGreen, instructionsTrainButton]);
+          balloonBlue, balloonRed, balloonYellow, balloonGreen, instructionsTrainButton, speaker]);
 
       break;
 
@@ -443,11 +434,11 @@ const handleTargetClick = async function tmp(event) {
       document.getElementById('foreign-object-center-left').replaceChild(instructionsTestParagraph, instructionsFamParagraph);
       document.getElementById('foreign-object-center-right').replaceChild(instructionsTestImage, instructionsFamImage);
 
-      showSlide([textSlide],
+      showSlide([textSlide, instructionsTestButton],
         [experimentSlide,
           hedge, boxes8Front, boxes8Back,
           pig, monkey, sheep,
-          balloonBlue, balloonRed, balloonYellow, balloonGreen, instructionsFamButton]);
+          balloonBlue, balloonRed, balloonYellow, balloonGreen, instructionsFamButton, speaker]);
       break;
 
     // for test trials
@@ -507,8 +498,8 @@ const handleSpeakerClick = async function tmp(event) {
 
     // goodbye
     case exp.trials.count === exp.trials.totalNr:
-      await playFullAudio(audioGoodbye, goodbyeButton);
-      showSlide([goodbyeButton], []);
+      await playFullAudio(audioGoodbye, null);
+      // showSlide([goodbyeButton], []);
       break;
 
     default:
@@ -548,12 +539,12 @@ document.getElementById('foreign-object-center-left').appendChild(instructionsTr
 document.getElementById('foreign-object-center-right').appendChild(instructionsTrainImage);
 showSlide([textSlide],
   // first hide buttons, participants can only start once they listened to the instructions
-  // [experimentSlide, instructionsTrainButton, instructionsFamButton, instructionsTestButton, goodbyeButton]);
-  // dev mode: show buttons to jump ahead audio instructions
-  [experimentSlide]);
+  [experimentSlide, instructionsTrainButton, instructionsFamButton, instructionsTestButton, goodbyeButton]);
+// dev mode: show buttons to jump ahead audio instructions
+// [experimentSlide]);
 
 // add event listeners
-instructionsTrainButton.addEventListener('click', handleInstructionsClick, { capture: false, once: true });
+instructionsTrainButton.addEventListener('click', handleInstructionsTrainClick, { capture: false, once: true });
 instructionsFamButton.addEventListener('click', handleTransitionClick, { capture: false, once: true });
 instructionsTestButton.addEventListener('click', handleTransitionClick, { capture: false, once: true });
 goodbyeButton.addEventListener('click', handleGoodbyeClick, { capture: false, once: true });
