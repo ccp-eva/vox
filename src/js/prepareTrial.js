@@ -117,7 +117,9 @@ export default (exp) => {
   const perSecond = 700;
 
   exp.responseLog[exp.trials.count] = {};
-  exp.responseLog[exp.trials.count].wrongClick = 0;
+  exp.responseLog[exp.trials.count].wrongAreaClick = 0;
+  // for early click, start with -1, because "los geht's" click gets added
+  exp.responseLog[exp.trials.count].earlyClick = -1;
 
   // save animation speed in our exp object
   if (exp.trials.boxesNr[exp.trials.count] === 0) {

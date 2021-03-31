@@ -29,15 +29,15 @@ exp.subjData = {};
 exp.subjData.subjID = 'testID';
 // just for developing: turn off fullscreen mode
 const fullscreen = false;
-exp.subjData.touchScreen = !checkForTouchscreen();
+exp.subjData.touchScreen = checkForTouchscreen();
 
 // ---------------------------------------------------------------------------------------------------------------------
 // TRIAL SPECIFICATIONS
 // ---------------------------------------------------------------------------------------------------------------------
 exp.trials = {};
-exp.trials.trainNr = 2;
+exp.trials.trainNr = 1;
 exp.trials.famNr = 2;
-exp.trials.testNr = 2;
+exp.trials.testNr = 5;
 exp.trials.totalNr = exp.trials.trainNr + exp.trials.famNr + exp.trials.testNr;
 // this variable stores in which trial we currently are!
 exp.trials.count = 0;
@@ -291,6 +291,9 @@ const handleLosgehtsClick = async function tmp(event) {
   // hide blurr canvas and button
   showSlide([], [document.getElementById('experiment-button'), document.getElementById('cover-blurr')]);
 
+  // set event listener to see whether participants click too early
+  exp.elemSpecs.outerSVG.ID.addEventListener('click', handleEarlyClick, false);
+
   // animate balloon & eye movement to randomized positions
   await timeline.play();
   await pause(200);
@@ -342,6 +345,9 @@ const handleLosgehtsClick = async function tmp(event) {
 
   targetClickTimer5sec = window.setTimeout(noTargetClickWithin5sec, 5000);
 
+  // remove event listener that checks whether participants clicked too early
+  exp.elemSpecs.outerSVG.ID.removeEventListener('click', handleEarlyClick, false);
+
   switch (true) {
     case exp.trials.type[exp.trials.count] === 'train':
       clickableArea.setAttribute('pointer-events', 'all');
@@ -362,7 +368,7 @@ const handleLosgehtsClick = async function tmp(event) {
     default:
       console.error('Error in setting event listeners');
   }
-  exp.elemSpecs.outerSVG.ID.addEventListener('click', handleWrongClick, false);
+  exp.elemSpecs.outerSVG.ID.addEventListener('click', handleWrongAreaClick, false);
 };
 // ---------------------------------------------------------------------------------------------------------------------
 // RUNS WHEN TARGET (HEDGE OR BOX) IS CLICKED
@@ -383,7 +389,7 @@ const handleTargetClick = async function tmp(event) {
   clearTimeout(targetClickTimer5sec);
 
   // remove eventListener that was responsible for "wrong input" sound
-  exp.elemSpecs.outerSVG.ID.removeEventListener('click', handleWrongClick, false);
+  exp.elemSpecs.outerSVG.ID.removeEventListener('click', handleWrongAreaClick, false);
   event.preventDefault();
 
   // function to save all relevant information
@@ -491,7 +497,12 @@ const handleTargetClick = async function tmp(event) {
 // ---------------------------------------------------------------------------------------------------------------------
 // RUNS WHEN WRONG CLICK
 // ---------------------------------------------------------------------------------------------------------------------
-const handleWrongClick = (event) => {
+const handleEarlyClick = (event) => {
+  event.preventDefault();
+  exp.responseLog[exp.trials.count].earlyClick++;
+};
+
+const handleWrongAreaClick = (event) => {
   event.preventDefault();
   // from participant screen size, calculate where there was a click
   const screenScalingHeight = exp.elemSpecs.outerSVG.origViewBoxHeight / exp.subjData.offsetHeight;
@@ -499,7 +510,7 @@ const handleWrongClick = (event) => {
   const clickScaledY = screenScalingHeight * clickY;
   if (clickScaledY < hedge.getBBox().y) {
     // count how often a participant clicked in the wrong area
-    exp.responseLog[exp.trials.count].wrongClick++;
+    exp.responseLog[exp.trials.count].wrongAreaClick++;
     // IF WANTED: NEGATIVE FEEDBACK FOR NOT CLICKING IN THE HEDGE/BOX AREA
     // audioNegativeFeedback.play();
   }
