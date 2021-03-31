@@ -18,7 +18,8 @@ export default (exp, agentsSingle, targetsSingle) => {
   } else if (!exp.subjData.touchScreen) {
     exp.trials.boxesNr = [].concat(
       new Array(exp.trials.trainNr).fill(0),
-      new Array(exp.trials.famNr + exp.trials.testNr).fill(8),
+      // change here how many boxes are shown
+      new Array(exp.trials.famNr + exp.trials.testNr).fill(exp.trials.boxVersion),
     );
   }
 
@@ -103,16 +104,8 @@ export default (exp, agentsSingle, targetsSingle) => {
     // for PC version with boxes: target can only land in boxes
   } else if (!exp.subjData.touchScreen) {
     const positionsSingleBoxes = [];
-    const box1 = document.getElementById('boxes8-front-box1');
-    const box2 = document.getElementById('boxes8-front-box2');
-    const box3 = document.getElementById('boxes8-front-box3');
-    const box4 = document.getElementById('boxes8-front-box4');
-    const box5 = document.getElementById('boxes8-front-box5');
-    const box6 = document.getElementById('boxes8-front-box6');
-    const box7 = document.getElementById('boxes8-front-box7');
-    const box8 = document.getElementById('boxes8-front-box8');
-
-    [box1, box2, box3, box4, box5, box6, box7, box8].forEach((box, i) => {
+    const boxes = Array.from(document.querySelectorAll(`[id^= "boxes${exp.trials.boxVersion}-front-box"]`));
+    boxes.forEach((box, i) => {
       const section = {
         // so that it starts with 1
         bin: i + 1,

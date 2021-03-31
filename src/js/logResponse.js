@@ -115,20 +115,27 @@ export default (event, exp) => {
     } else {
       // for 8 boxes version: gett all boxes, to see which exact element has been clicked
       // get all boxes (by taking all child elements)
-      const boxesFront = Array.from(document.getElementById('boxes8-front').children);
-      const boxesBack = Array.from(document.getElementById('boxes8-back').children);
+
+      const boxesCurrentFront = Array.from(document.querySelector(`[id$= "boxes${exp.trials.boxesNr[exp.trials.count]}-front"]`).children);
+      const boxesCurrentBack = Array.from(document.querySelector(`[id$= "boxes${exp.trials.boxesNr[exp.trials.count]}-back"]`).children);
+
+      // const boxesFront = Array.from(document.getElementById('boxes8-front').children);
+      // const boxesBack = Array.from(document.getElementById('boxes8-back').children);
+
       const boxIDs = [];
       // get all box IDs
-      for (let i = 0; i < boxesFront.length; i++) {
-        boxIDs.push(boxesFront[i].id);
-        boxIDs.push(boxesBack[i].id);
+      for (let i = 0; i < boxesCurrentFront.length; i++) {
+        boxIDs.push(boxesCurrentFront[i].id);
+        boxIDs.push(boxesCurrentBack[i].id);
       }
       // for each box, see whether it was clicked or not
       let clickedBox = null;
       boxIDs.forEach((box) => {
         if (event.target.closest(`#${box}`) !== null) {
-          // save the id of the one box that was clicked (without the "boxes8-front/back-" prefix)
-          clickedBox = box.replace('boxes8-', '').replace('front-', '').replace('back-', '');
+          // save the id of the one box that was clicked (without the "boxesX-front/back-" prefix)
+          clickedBox = box.replace(`boxes${exp.trials.boxesNr[exp.trials.count]}-`, '')
+            .replace('front-', '')
+            .replace('back-', '');
           exp.responseLog[exp.trials.count].clickedArea = clickedBox;
         }
       });
@@ -163,7 +170,7 @@ export default (event, exp) => {
       }
 
       // save the center X coord of the box that was clicked
-      exp.responseLog[exp.trials.count].clickedBoxCenterX = exp.responseLog[exp.trials.count][`boxes8${clickedBox}CenterX`];
+      exp.responseLog[exp.trials.count].clickedBoxCenterX = exp.responseLog[exp.trials.count][`boxes${exp.trials.boxesNr[exp.trials.count]}${clickedBox}CenterX`];
       exp.responseLog[exp.trials.count].boxesNr = exp.trials.boxesNr[exp.trials.count];
     }
   }

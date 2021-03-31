@@ -32,33 +32,48 @@ export default (exp) => {
   goodbyeHeading.innerHTML = '<h1> Fertig! </h1>';
 
   // text for the parents (children get audio instructions)
-  instructionsTrainParagraph.innerHTML = `<p> 
-  Vielen Dank, dass Sie mit Ihrem Kind an unserer Studie teilnehmen. <br> <br>
-  Ihr Kind hat gleich die Aufgabe, einen Ballon zu finden. <br>
-  Dafür klickt Ihr Kind einfach auf den Bildschirm - dorthin, wo der Ballon ist. <br>
-  Die Aufgabe erklären wir Ihrem Kind in einer Sprachaufnahme. <br>
-  Um diese abzuspielen, schalten Sie Ihren Ton ein und klicken auf das Lautsprecher-Symbol.
-  Sie können sich die Sprachaufnahme mehrmals anhören. 
-  Sobald Sie mit Ihrem Kind das Spiel starten möchten, klicken Sie auf den "los geht's!" Knopf. <br> <br>
-  Bitte geben Sie Ihrem Kind keinerlei Hinweise - alles, was Ihr Kind macht, ist prima! 
-  </p>`;
+  if (exp.subjData.touchScreen) {
+    instructionsTrainParagraph.innerHTML = `<p> 
+    Vielen Dank, dass Sie mit Ihrem Kind an unserer Studie teilnehmen. <br>
+    In unserem Spiel soll Ihr Kind einen Ballon finden. <br> <br>
+
+    Durch einen Klick auf das Lautsprecher-Symbol hören Sie eine kleine Begrüßung.
+    Wenn Sie danach mit Ihrem Kind das Spiel starten möchten, klicken Sie auf den "los geht's!" Knopf.
+    Dann wird Ihr Kind mit einer Sprachaufnahme durch das Ballonspiel geführt. <br> <br>
+
+    <strong> Bitte lassen Sie dafür Ihr Kind selbst auf den Touchscreen klicken. <br>
+    Geben Sie Ihrem Kind keinerlei Hinweise - alles, was Ihr Kind macht, ist prima! </strong> <br> <br>
+    Schalten Sie bitte Ihren Ton ein und klicken auf das Lautsprecher-Symbol. <br>
+    </p>`;
+  } else if (!exp.subjData.touchScreen) {
+    instructionsTrainParagraph.innerHTML = `<p> 
+    Vielen Dank, dass Sie mit Ihrem Kind an unserer Studie teilnehmen. <br>
+    In unserem Spiel soll Ihr Kind einen Ballon finden. <br> <br>
+
+    Durch einen Klick auf das Lautsprecher-Symbol hören Sie eine kleine Begrüßung.
+    Wenn Sie danach mit Ihrem Kind das Spiel starten möchten, klicken Sie auf den "los geht's!" Knopf.
+    Dann wird Ihr Kind mit einer Sprachaufnahme durch das Ballonspiel geführt. <br> <br>
+
+    <strong> Lassen Sie bitte Ihr Kind auf den Bildschirm zeigen. Sie klicken dann genau dorthin, wohin Ihr Kind gezeigt hat.
+    Geben Sie Ihrem Kind keinerlei Hinweise - alles, was Ihr Kind macht, ist prima! </strong> <br> <br>
+    Schalten Sie bitte Ihren Ton ein und klicken auf das Lautsprecher-Symbol. <br>
+    </p>`;
+  }
 
   instructionsFamParagraph.innerHTML = `<p> 
-  <br> <br>
-  Ihr könnt gleich weiterspielen. <br> <br>
+  <br> <br> <br> <br>
+  Gleich könnt ihr weiterspielen. <br> <br>
   Die Aufgabe bleibt die Gleiche - Ihr Kind soll wieder den Ballon finden. <br> <br>
-  Bitte hören Sie sich wieder die Sprachaufnahme an, in dem Sie auf das Lautsprecher-Symbol klicken. <br>
-  Auch diese können Sie sich mehrmals anhören. <br> <br>
-  Sobald Sie weiterspielen möchten, klicken Sie wieder "los geht's!". <br>
+  Wir führen Ihr Kind wieder mit einer Sprachaufnahme durch eine Aufgabe. <br> <br>
+  Sobald ihr weiterspielen möchtet, klicken Sie wieder den "los geht's!" Knopf. <br>
   </p>`;
 
   instructionsTestParagraph.innerHTML = `<p> 
-  <br> <br>
-  Ihr könnt gleich weiterspielen. <br> <br>
+  <br> <br> <br> <br>
+  Gleich könnt ihr weiterspielen. <br> <br>
   Die Aufgabe bleibt die Gleiche - Ihr Kind soll wieder den Ballon finden. <br> <br>
-  Bitte hören Sie sich wieder die Sprachaufnahme an, in dem Sie auf das Lautsprecher-Symbol klicken. <br>
-  Auch diese können Sie sich mehrmals anhören. <br> <br>
-  Sobald Sie weiterspielen möchten, klicken Sie wieder "los geht's!". <br>
+  Wir führen Ihr Kind wieder mit einer Sprachaufnahme durch eine Aufgabe. <br> <br>
+  Sobald ihr weiterspielen möchtet, klicken Sie wieder den "los geht's!" Knopf. <br>
   </p>`;
 
   // goodbye text

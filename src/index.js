@@ -43,6 +43,8 @@ exp.trials.totalNr = exp.trials.trainNr + exp.trials.famNr + exp.trials.testNr;
 exp.trials.count = 0;
 // NOTE: make sure, that the number of voice over fits to the nr of training, fam and test trials!!
 exp.trials.voiceoverNr = 1;
+// constant number of boxes for PC version
+exp.trials.boxVersion = 3;
 
 // ---------------------------------------------------------------------------------------------------------------------
 // SCREEN SIZE
@@ -121,41 +123,27 @@ const audioGeneralPrompt = document.getElementById('audio-general-prompt');
 const audioPromptHedge = document.getElementById('audio-prompt-hedge');
 const audioPromptBox = document.getElementById('audio-prompt-box');
 
-const audioTrainPrompt = document.getElementById('audio-train-prompt');
-const audioTrainPromptLong = document.getElementById('audio-train-prompt-long');
+const audioPromptTrain = document.getElementById('audio-prompt-train');
+const audioPromptTrainLong = document.getElementById('audio-prompt-train-long');
 
 const audioTestHedge3 = document.getElementById('audio-test-hedge-3');
 const audioTestBox3 = document.getElementById('audio-test-box-3');
 
 const hedge = document.getElementById('hedge');
 const boxes1Front = document.getElementById('boxes1-front');
-const boxes1Back = document.getElementById('boxes1-back');
-const boxes2Front = document.getElementById('boxes2-front');
-const boxes2Back = document.getElementById('boxes2-back');
-const boxes3Front = document.getElementById('boxes3-front');
-const boxes3Back = document.getElementById('boxes3-back');
-const boxes4Front = document.getElementById('boxes4-front');
-const boxes4Back = document.getElementById('boxes4-back');
-const boxes5Front = document.getElementById('boxes5-front');
-const boxes5Back = document.getElementById('boxes5-back');
-const boxes6Front = document.getElementById('boxes6-front');
-const boxes6Back = document.getElementById('boxes6-back');
-const boxes7Front = document.getElementById('boxes7-front');
-const boxes7Back = document.getElementById('boxes7-back');
 
-[boxes1Front, boxes1Back,
-  boxes2Front, boxes2Back,
-  boxes3Front, boxes3Back,
-  boxes4Front, boxes4Back,
-  boxes5Front, boxes5Back,
-  boxes6Front, boxes6Back,
-  boxes7Front, boxes7Back]
-  .forEach((box) => {
-    box.setAttribute('visibility', 'hidden');
-  });
-const boxes8Front = document.getElementById('boxes8-front');
-const boxes8Back = document.getElementById('boxes8-back');
+// console.log('boxes8-test'.replace(/\d+/, 'test'));
+const boxesAllFront = Array.from(document.querySelectorAll('[id$=-front]'));
+const boxesAllBack = Array.from(document.querySelectorAll('[id$=-back]'));
 
+boxesAllFront.forEach((box) => {
+  box.setAttribute('visibility', 'hidden');
+});
+boxesAllBack.forEach((box) => {
+  box.setAttribute('visibility', 'hidden');
+});
+
+// take first box as reference for box measurements
 exp.elemSpecs.boxes = {
   width: boxes1Front.getBBox().width,
   height: boxes1Front.getBBox().height,
@@ -221,8 +209,8 @@ exp.elemSpecs.targets = {
   // calculate y coords for balloon (-20 for little distance from lower border)
   groundY: exp.elemSpecs.outerSVG.origViewBoxHeight - balloonBlue.getBBox().height - 20,
   // define y coord for target to be right above the boxes
-  aboveBoxesY: boxes8Front.getBBox().y - balloonBlue.getBBox().height,
-  // partlyInBoxesY: boxes8Front.getBBox().y - balloonBlue.getBBox().height / 3,
+  aboveBoxesY: boxes1Front.getBBox().y - balloonBlue.getBBox().height,
+  // partlyInBoxesY: boxes1Front.getBBox().y - balloonBlue.getBBox().height / 3,
 };
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -235,6 +223,15 @@ console.log('exp object', exp);
 // gsap timeline that will save our animation specifications
 let timeline = null;
 let targetClickTimer5sec = null;
+
+// const boxesCurrentFront = document.querySelector(`[id$= "boxes${exp.trials.boxVersion}-front"]`);
+// const boxesCurrentBack = document.querySelector(`[id$= "boxes${exp.trials.boxVersion}-back"]`);
+// showSlide([boxesCurrentFront, boxesCurrentBack], []);
+
+// console.log(exp.trials.boxesNr[exp.trials.count]);
+// const boxesCurrentFront = document.querySelector(`[id$= "boxes${exp.trials.boxesNr[exp.trials.count]}-front"]`);
+// const boxesCurrentBack = document.querySelector(`[id$= "boxes${exp.trials.boxesNr[exp.trials.count]}-back"]`);
+// console.log(boxesCurrentFront);
 
 // ---------------------------------------------------------------------------------------------------------------------
 // DEFINE EVENTLISTENER FUNCTIONS
@@ -306,7 +303,7 @@ const handleLosgehtsClick = async function tmp(event) {
 
     // for train trials with voiceover
     case exp.trials.type[exp.trials.count] === 'train':
-      await playFullAudio(audioTrainPromptLong, null);
+      await playFullAudio(audioPromptTrainLong, null);
       break;
 
     // for tablet hedge version fam trials with voiceover
@@ -355,9 +352,12 @@ const handleLosgehtsClick = async function tmp(event) {
       hedge.addEventListener('click', handleTargetClick, { capture: false, once: true });
       break;
     case exp.trials.boxesNr[exp.trials.count] > 0:
+      const boxesCurrentFront = document.querySelector(`[id$= "boxes${exp.trials.boxesNr[exp.trials.count]}-front"]`);
+      const boxesCurrentBack = document.querySelector(`[id$= "boxes${exp.trials.boxesNr[exp.trials.count]}-back"]`);
+
       clickableArea.setAttribute('pointer-events', 'none');
-      boxes8Front.addEventListener('click', handleTargetClick, { capture: false, once: true });
-      boxes8Back.addEventListener('click', handleTargetClick, { capture: false, once: true });
+      boxesCurrentFront.addEventListener('click', handleTargetClick, { capture: false, once: true });
+      boxesCurrentBack.addEventListener('click', handleTargetClick, { capture: false, once: true });
       break;
     default:
       console.error('Error in setting event listeners');
@@ -414,9 +414,15 @@ const handleTargetClick = async function tmp(event) {
 
       showSlide([textSlide, instructionsFamButton],
         [experimentSlide,
-          hedge, boxes8Front, boxes8Back,
-          pig, monkey, sheep,
+          hedge, pig, monkey, sheep,
           balloonBlue, balloonRed, balloonYellow, balloonGreen, instructionsTrainButton, speaker]);
+
+      // if last trial had boxes, then hide them!
+      if (exp.trials.boxesNr[exp.trials.count - 1] > 0) {
+        const boxesCurrentFront = document.querySelector(`[id$= "boxes${exp.trials.boxesNr[exp.trials.count - 1]}-front"]`);
+        const boxesCurrentBack = document.querySelector(`[id$= "boxes${exp.trials.boxesNr[exp.trials.count - 1]}-back"]`);
+        showSlide([], [boxesCurrentFront, boxesCurrentBack]);
+      }
 
       break;
 
@@ -436,9 +442,16 @@ const handleTargetClick = async function tmp(event) {
 
       showSlide([textSlide, instructionsTestButton],
         [experimentSlide,
-          hedge, boxes8Front, boxes8Back,
-          pig, monkey, sheep,
+          hedge, pig, monkey, sheep,
           balloonBlue, balloonRed, balloonYellow, balloonGreen, instructionsFamButton, speaker]);
+
+      // if last trial had boxes, then hide them!
+      if (exp.trials.boxesNr[exp.trials.count - 1] > 0) {
+        const boxesCurrentFront = document.querySelector(`[id$= "boxes${exp.trials.boxesNr[exp.trials.count - 1]}-front"]`);
+        const boxesCurrentBack = document.querySelector(`[id$= "boxes${exp.trials.boxesNr[exp.trials.count - 1]}-back"]`);
+        showSlide([], [boxesCurrentFront, boxesCurrentBack]);
+      }
+
       break;
 
     // for test trials
@@ -456,11 +469,18 @@ const handleTargetClick = async function tmp(event) {
       document.getElementById('foreign-object-center-left').replaceChild(goodbyeParagraph, instructionsTestParagraph);
       document.getElementById('foreign-object-center-right').replaceChild(goodbyeImage, instructionsTestImage);
 
-      showSlide([textSlide],
+      showSlide([textSlide, speaker, goodbyeButton],
         [experimentSlide,
-          hedge, boxes8Front, boxes8Back,
-          pig, monkey, sheep,
+          hedge, pig, monkey, sheep,
           balloonBlue, balloonRed, balloonYellow, balloonGreen, instructionsTestButton]);
+
+      // if last trial had boxes, then hide them!
+      if (exp.trials.boxesNr[exp.trials.count - 1] > 0) {
+        const boxesCurrentFront = document.querySelector(`[id$= "boxes${exp.trials.boxesNr[exp.trials.count - 1]}-front"]`);
+        const boxesCurrentBack = document.querySelector(`[id$= "boxes${exp.trials.boxesNr[exp.trials.count - 1]}-back"]`);
+        showSlide([], [boxesCurrentFront, boxesCurrentBack]);
+      }
+
       break;
 
     // error handling
@@ -512,8 +532,8 @@ const handleSpeakerClick = async function tmp(event) {
 // ---------------------------------------------------------------------------------------------------------------------
 let noTargetClickWithin5sec = () => {
   switch (true) {
-    case exp.trials.type[exp.trials.count] === 'train' && exp.trials.voiceover[exp.trials.count]:
-      audioTrainPrompt.play();
+    case exp.trials.type[exp.trials.count] === 'train':
+      audioPromptTrain.play();
       break;
 
     case exp.trials.type[exp.trials.count] !== 'train'

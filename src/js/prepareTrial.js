@@ -25,8 +25,13 @@ export default (exp) => {
   const eyelineLeft = document.getElementById(`${currentAgent}-eyeline-left`);
   const eyelineRight = document.getElementById(`${currentAgent}-eyeline-right`);
   const hedge = document.getElementById('hedge');
-  const boxes8Front = document.getElementById('boxes8-front');
-  const boxes8Back = document.getElementById('boxes8-back');
+
+  let boxesCurrentFront = null;
+  let boxesCurrentBack = null;
+  if (exp.trials.boxesNr[exp.trials.count] > 0) {
+    boxesCurrentFront = document.querySelector(`[id$= "boxes${exp.trials.boxesNr[exp.trials.count]}-front"]`);
+    boxesCurrentBack = document.querySelector(`[id$= "boxes${exp.trials.boxesNr[exp.trials.count]}-back"]`);
+  }
 
   // set eyes to center
   // original value stored in e.g. pupilLeft.getBBox().x
@@ -39,18 +44,18 @@ export default (exp) => {
   // depending on trial type, show or hide hedge and boxes
   switch (true) {
     case exp.trials.type[exp.trials.count] === 'train':
-      showSlide([], [hedge, boxes8Front, boxes8Back]);
+      showSlide([], [hedge]);
       break;
     // for tablet hedge version
     case exp.trials.boxesNr[exp.trials.count] === 0:
-      showSlide([hedge], [boxes8Front, boxes8Back]);
+      showSlide([hedge], []);
       break;
     // for PC box version
     case exp.trials.boxesNr[exp.trials.count] > 0 && exp.trials.type[exp.trials.count] === 'fam':
-      showSlide([boxes8Front, boxes8Back], [hedge]);
+      showSlide([boxesCurrentFront, boxesCurrentBack], [hedge]);
       break;
     case exp.trials.boxesNr[exp.trials.count] > 0 && exp.trials.type[exp.trials.count] === 'test':
-      showSlide([hedge, boxes8Front, boxes8Back], []);
+      showSlide([hedge, boxesCurrentFront, boxesCurrentBack], []);
       break;
     default:
       console.error('Error in showing hedges/boxes');
