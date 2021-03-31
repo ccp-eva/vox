@@ -28,7 +28,7 @@ const exp = {};
 exp.subjData = {};
 exp.subjData.subjID = 'testID';
 // just for developing: turn off fullscreen mode
-const fullscreen = false;
+const fullscreen = true;
 exp.subjData.touchScreen = checkForTouchscreen();
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -36,8 +36,8 @@ exp.subjData.touchScreen = checkForTouchscreen();
 // ---------------------------------------------------------------------------------------------------------------------
 exp.trials = {};
 exp.trials.trainNr = 1;
-exp.trials.famNr = 2;
-exp.trials.testNr = 5;
+exp.trials.famNr = 6;
+exp.trials.testNr = 16;
 exp.trials.totalNr = exp.trials.trainNr + exp.trials.famNr + exp.trials.testNr;
 // this variable stores in which trial we currently are!
 exp.trials.count = 0;
@@ -223,15 +223,6 @@ console.log('exp object', exp);
 // gsap timeline that will save our animation specifications
 let timeline = null;
 let targetClickTimer5sec = null;
-
-// const boxesCurrentFront = document.querySelector(`[id$= "boxes${exp.trials.boxVersion}-front"]`);
-// const boxesCurrentBack = document.querySelector(`[id$= "boxes${exp.trials.boxVersion}-back"]`);
-// showSlide([boxesCurrentFront, boxesCurrentBack], []);
-
-// console.log(exp.trials.boxesNr[exp.trials.count]);
-// const boxesCurrentFront = document.querySelector(`[id$= "boxes${exp.trials.boxesNr[exp.trials.count]}-front"]`);
-// const boxesCurrentBack = document.querySelector(`[id$= "boxes${exp.trials.boxesNr[exp.trials.count]}-back"]`);
-// console.log(boxesCurrentFront);
 
 // ---------------------------------------------------------------------------------------------------------------------
 // DEFINE EVENTLISTENER FUNCTIONS
