@@ -1,7 +1,8 @@
-import instructionsFamImageTabletSrc from 'url:../images/instructions-tablet-half-sheep.png';
-import instructionsFamImagePCSrc from 'url:../images/instructions-PC-sheep.png';
-import instructionsTestImageTabletSrc from 'url:../images/transition-tablet-monkey.png';
-import instructionsTestImagePCSrc from 'url:../images/transition-PC-monkey.png';
+import instructionsTrainImageSrc from 'url:../images/train.png';
+import instructionsFamBoxImageSrc from 'url:../images/fam-box.png';
+import instructionsFamHedgeImageSrc from 'url:../images/fam-hedge.png';
+import instructionsTestBoxImageSrc from 'url:../images/test-box.png';
+import instructionsTestHedgeImageSrc from 'url:../images/test-hedge.png';
 import goodbyeImageSrc from 'url:../images/familypic.png';
 
 export default (exp) => {
@@ -13,12 +14,12 @@ export default (exp) => {
   const instructionsFamHeading = document.createElement('div');
   const instructionsFamParagraph = document.createElement('div');
   const instructionsFamImage = document.createElement('img');
-  instructionsFamImage.style = 'height: inherit';
+  instructionsFamImage.style = 'width: inherit';
 
   const instructionsTestHeading = document.createElement('div');
   const instructionsTestParagraph = document.createElement('div');
   const instructionsTestImage = document.createElement('img');
-  instructionsTestImage.style = 'height: inherit';
+  instructionsTestImage.style = 'width: inherit';
 
   const goodbyeHeading = document.createElement('div');
   const goodbyeParagraph = document.createElement('div');
@@ -45,6 +46,9 @@ export default (exp) => {
     Geben Sie Ihrem Kind keinerlei Hinweise - alles, was Ihr Kind macht, ist prima! </strong> <br> <br>
     Schalten Sie bitte Ihren Ton ein und klicken auf das Lautsprecher-Symbol. <br>
     </p>`;
+
+    instructionsFamImage.src = instructionsFamHedgeImageSrc;
+    instructionsTestImage.src = instructionsTestHedgeImageSrc;
   } else if (!exp.subjData.touchScreen) {
     instructionsTrainParagraph.innerHTML = `<p> 
     Vielen Dank, dass Sie mit Ihrem Kind an unserer Studie teilnehmen. <br>
@@ -58,6 +62,9 @@ export default (exp) => {
     Geben Sie Ihrem Kind keinerlei Hinweise - alles, was Ihr Kind macht, ist prima! </strong> <br> <br>
     Schalten Sie bitte Ihren Ton ein und klicken auf das Lautsprecher-Symbol. <br>
     </p>`;
+
+    instructionsFamImage.src = instructionsFamBoxImageSrc;
+    instructionsTestImage.src = instructionsTestBoxImageSrc;
   }
 
   instructionsFamParagraph.innerHTML = `<p> 
@@ -90,18 +97,8 @@ export default (exp) => {
 
   // add instruction pictures
   // for tablet version
-  instructionsTrainImage.src = goodbyeImageSrc;
+  instructionsTrainImage.src = instructionsTrainImageSrc;
   goodbyeImage.src = goodbyeImageSrc;
-
-  if (exp.subjData.touchScreen) {
-    instructionsFamImage.src = instructionsFamImageTabletSrc;
-    instructionsTestImage.src = instructionsTestImageTabletSrc;
-
-  // for PC version
-  } else if (!exp.subjData.touchScreen) {
-    instructionsFamImage.src = instructionsFamImagePCSrc;
-    instructionsTestImage.src = instructionsTestImagePCSrc;
-  }
 
   return ({
     instructionsTrainHeading,
