@@ -26,7 +26,13 @@ const exp = {};
 // PARTICIPANT ID & TOUCH
 // ---------------------------------------------------------------------------------------------------------------------
 exp.subjData = {};
-exp.subjData.subjID = 'testID';
+
+// get url object
+const url = new URL(window.location.href);
+
+// use id parameter’s value if available else use 'testID'
+exp.subjData.subjID = url.searchParams.get('id') || 'testID';
+
 // just for developing: turn off fullscreen mode
 const fullscreen = true;
 exp.subjData.touchScreen = checkForTouchscreen();
