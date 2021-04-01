@@ -42,8 +42,8 @@ exp.subjData.touchScreen = checkForTouchscreen();
 // ---------------------------------------------------------------------------------------------------------------------
 exp.trials = {};
 exp.trials.trainNr = 1;
-exp.trials.famNr = 6;
-exp.trials.testNr = 16;
+exp.trials.famNr = 2;
+exp.trials.testNr = 11;
 exp.trials.totalNr = exp.trials.trainNr + exp.trials.famNr + exp.trials.testNr;
 // this variable stores in which trial we currently are!
 exp.trials.count = 0;
