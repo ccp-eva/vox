@@ -239,7 +239,6 @@ let targetClickTimer5sec = null;
 // save in const variables in order to pass on event to function
 const handleInstructionsTrainClick = (event) => {
   event.preventDefault();
-  if (fullscreen) openFullscreen();
 
   // showSlide: first array gets shown, second array gets hidden
   showSlide([experimentSlide],
@@ -271,11 +270,12 @@ const handleTransitionClick = (event) => {
 // ---------------------------------------------------------------------------------------------------------------------
 const handleGoodbyeClick = (event) => {
   event.preventDefault();
+  if (fullscreen) closeFullscreen();
 
   showSlide([],
-    [textSlide]);
+    [textSlide, speaker, goodbyeButton]);
 
-  downloadData(exp.responseLog, exp.subjData.subjID);
+  // downloadData(exp.responseLog, exp.subjData.subjID);
 };
 // ---------------------------------------------------------------------------------------------------------------------
 // RUNS WHEN "los geht's" BUTTON IS CLICKED
@@ -467,7 +467,9 @@ const handleTargetClick = async function tmp(event) {
 
     // for goodbye after test trials
     case exp.trials.count === exp.trials.totalNr:
-      if (fullscreen) closeFullscreen();
+      // save data, upload to server
+      downloadData(exp.responseLog, exp.subjData.subjID);
+
       document.getElementById('foreign-object-heading').replaceChild(goodbyeHeading, instructionsTestHeading);
       document.getElementById('foreign-object-center-left').replaceChild(goodbyeParagraph, instructionsTestParagraph);
       document.getElementById('foreign-object-center-right').replaceChild(goodbyeImage, instructionsTestImage);
@@ -520,6 +522,7 @@ const handleSpeakerClick = async function tmp(event) {
   switch (true) {
     // welcome
     case exp.trials.count === 0:
+      if (fullscreen) openFullscreen();
       await playFullAudio(audioWelcome, instructionsTrainButton);
       showSlide([instructionsTrainButton], []);
       break;
