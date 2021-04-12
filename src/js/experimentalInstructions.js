@@ -1,4 +1,4 @@
-import instructionsTrainImageSrc from 'url:../images/train.png';
+import instructionsTrainImageSrc from 'url:../images/touch.png';
 import instructionsFamBoxImageSrc from 'url:../images/fam-box.png';
 import instructionsFamHedgeImageSrc from 'url:../images/fam-hedge.png';
 import instructionsTestBoxImageSrc from 'url:../images/test-box.png';

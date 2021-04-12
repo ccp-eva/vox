@@ -87,7 +87,7 @@ export default (exp) => {
   // -------------------------------------------------------------------------------------------------------------------
   // ADD VOICE INSTRUCTIONS
   // -------------------------------------------------------------------------------------------------------------------
-  const audioTrain1 = document.getElementById('audio-train-1');
+  const audioTrain1 = document.getElementById('audio-touch-1');
   const audioFamHedge1 = document.getElementById('audio-fam-hedge-1');
   const audioTestHedge1 = document.getElementById('audio-test-hedge-1');
   const audioTestHedge2 = document.getElementById('audio-test-hedge-2');
@@ -110,7 +110,7 @@ export default (exp) => {
   // -------------------------------------------------------------------------------------------------------------------
   switch (true) {
     // for training trials
-    case exp.trials.type[exp.trials.count] === 'train':
+    case exp.trials.type[exp.trials.count] === 'touch':
       // for instructions voice over
       if (exp.trials.voiceover[exp.trials.count]) {
         timeline.eventCallback('onStart', playTrain1);

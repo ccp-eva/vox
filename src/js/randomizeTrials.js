@@ -8,16 +8,16 @@ import randomNumber from './randomNumber';
 // ---------------------------------------------------------------------------------------------------------------------
 export default (exp, agentsSingle, targetsSingle) => {
   // create array with entry for each fam and test trial
-  const trainTrials = new Array(exp.trials.trainNr).fill('train');
+  const touchTrials = new Array(exp.trials.touchNr).fill('touch');
   const famTrials = new Array(exp.trials.famNr).fill('fam');
   const testTrials = new Array(exp.trials.testNr).fill('test');
-  exp.trials.type = trainTrials.concat(famTrials, testTrials);
+  exp.trials.type = touchTrials.concat(famTrials, testTrials);
 
   if (exp.subjData.touchScreen) {
     exp.trials.boxesNr = new Array(exp.trials.totalNr).fill(0);
   } else if (!exp.subjData.touchScreen) {
     exp.trials.boxesNr = [].concat(
-      new Array(exp.trials.trainNr).fill(0),
+      new Array(exp.trials.touchNr).fill(0),
       // change here how many boxes are shown
       new Array(exp.trials.famNr + exp.trials.testNr).fill(exp.trials.boxVersion),
     );
@@ -27,8 +27,8 @@ export default (exp, agentsSingle, targetsSingle) => {
   exp.trials.voiceover = Array(exp.trials.totalNr).fill(false);
   for (let i = 1; i <= exp.trials.voiceoverNr; i++) {
     exp.trials.voiceover[0 + i - 1] = true;
-    exp.trials.voiceover[exp.trials.trainNr + i - 1] = true;
-    exp.trials.voiceover[exp.trials.trainNr + exp.trials.famNr + i - 1] = true;
+    exp.trials.voiceover[exp.trials.touchNr + i - 1] = true;
+    exp.trials.voiceover[exp.trials.touchNr + exp.trials.famNr + i - 1] = true;
   }
 
   // calculate how many times each agent should be repeated, based on trialNumber

@@ -43,7 +43,7 @@ export default (exp) => {
 
   // depending on trial type, show or hide hedge and boxes
   switch (true) {
-    case exp.trials.type[exp.trials.count] === 'train':
+    case exp.trials.type[exp.trials.count] === 'touch':
       showSlide([], [hedge]);
       break;
     // for tablet hedge version
