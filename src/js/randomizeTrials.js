@@ -7,7 +7,7 @@ import randomNumber from './randomNumber';
 // saves all important arrays in our exp object
 // ---------------------------------------------------------------------------------------------------------------------
 export default (exp, agentsSingle, targetsSingle) => {
-  // create array with entry for each fam and test trial
+  // create array with entry for each touch, fam and test trial
   const touchTrials = new Array(exp.trials.touchNr).fill('touch');
   const famTrials = new Array(exp.trials.famNr).fill('fam');
   const testTrials = new Array(exp.trials.testNr).fill('test');
@@ -35,10 +35,10 @@ export default (exp, agentsSingle, targetsSingle) => {
   const agentsDiv = divideWithRemainder(exp.trials.type.length, agentsSingle.length);
 
   let agents = [];
-  agentsSingle.forEach((agent) => {
-    agents = agents.concat(new Array(agentsDiv.quotient).fill(agent));
-  });
-  agents = shuffleArray(agents);
+  for (let i = 0; i < agentsDiv.quotient; i++) {
+    const agentsShuffled = shuffleArray(agentsSingle);
+    agents = agents.concat(agentsShuffled);
+  }
 
   // if our trialNumber is not divisable by number of agents, put random agents for remainder number:
   // create random array with agents
@@ -49,16 +49,17 @@ export default (exp, agentsSingle, targetsSingle) => {
     agentsTmp.splice(0, agentsTmp.length - agentsDiv.remainder);
     agents = agents.concat(agentsTmp);
   }
+
   exp.agents = agents;
 
   // SAME FOR TARGET
   const targetsDiv = divideWithRemainder(exp.trials.type.length, targetsSingle.length);
 
   let targets = [];
-  targetsSingle.forEach((target) => {
-    targets = targets.concat(new Array(targetsDiv.quotient).fill(target));
-  });
-  targets = shuffleArray(targets);
+  for (let i = 0; i < targetsDiv.quotient; i++) {
+    const targetsShuffled = shuffleArray(targetsSingle);
+    targets = targets.concat(targetsShuffled);
+  }
 
   if (targetsDiv.remainder > 0) {
     const targetsTmp = shuffleArray(targetsSingle);
