@@ -1,10 +1,10 @@
 // ---------------------------------------------------------------------------------------------------------------------
 // PLAYS AUDIO AND RETURNS PROMISE (so that we can await end of audio)
 // ---------------------------------------------------------------------------------------------------------------------
-export default (audio, button) => new Promise((resolve) => { // return a promise
-  if (button !== null) button.setAttribute('visibility', 'hidden');
-  // for developing, play sound way faster
-  // audio.playbackRate = 10;
+export default (audio, src) => new Promise((resolve, reject) => {
+  audio.src = src;
   audio.play();
   audio.onended = resolve;
-});
+  // WHEN ACTIVE: GETS THROWN; THEN OBVIOUSLY PROMISE "OVER"; AWAIT DONE...
+  // audio.onerror = reject(new Error(`Error in playing audio ${audio.src}`));
+}).catch((error) => console.log(error));

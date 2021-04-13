@@ -1,4 +1,18 @@
+// import animation library
 import { gsap } from 'gsap';
+
+// import audio sources
+import welcomeSrc from 'url:./sounds/welcome.mp3';
+import goodbyeSrc from 'url:./sounds/goodbye.mp3';
+import promptGeneralSrc from 'url:./sounds/prompt-general.mp3';
+import promptHedgeSrc from 'url:./sounds/prompt-hedge.mp3';
+import promptBoxSrc from 'url:./sounds/prompt-box.mp3';
+import promptTouchSrc from 'url:./sounds/prompt-touch.mp3';
+import promptTouchLongSrc from 'url:./sounds/prompt-touch-long.mp3';
+import testHedge3Src from 'url:./sounds/test-hedge-3.mp3';
+import testBox3Src from 'url:./sounds/test-box-3.mp3';
+
+// import self-written functions
 import logResponse from './js/logResponse';
 import prepareTrial from './js/prepareTrial';
 import changeGaze from './js/changeGaze';
@@ -11,6 +25,7 @@ import openFullscreen from './js/openFullscreen';
 import closeFullscreen from './js/closeFullscreen';
 import experimentalInstructions from './js/experimentalInstructions';
 import playFullAudio from './js/playFullAudio';
+
 // import calculateBoxPositions from './js/calculateBoxPositions';
 
 // TODO hedge!!
@@ -47,8 +62,8 @@ exp.trials.testNr = devmode ? 2 : 11;
 exp.trials.totalNr = exp.trials.touchNr + exp.trials.famNr + exp.trials.testNr;
 // this variable stores in which trial we currently are!
 exp.trials.count = 0;
-// NOTE: make sure, that the number of voice over fits to the nr of training, fam and test trials!!
-exp.trials.voiceoverNr = 0;
+// NOTE: make sure, that the number of voice over fits to the nr of touch training, fam and test trials!!
+exp.trials.voiceoverNr = devmode ? 1 : 1;
 // constant number of boxes for PC version
 exp.trials.boxVersion = 3;
 
@@ -74,9 +89,9 @@ foreignObjects.forEach((elem) => {
 });
 
 const {
-  instructionsTrainHeading,
-  instructionsTrainParagraph,
-  instructionsTrainImage,
+  instructionsTouchHeading,
+  instructionsTouchParagraph,
+  instructionsTouchImage,
 
   instructionsFamHeading,
   instructionsFamParagraph,
@@ -112,29 +127,14 @@ exp.elemSpecs = {
 const textSlide = document.getElementById('text-slide');
 const experimentSlide = document.getElementById('experiment-slide');
 
-const instructionsTrainButton = document.getElementById('instructions-touch-button');
+const instructionsTouchButton = document.getElementById('instructions-touch-button');
 const instructionsFamButton = document.getElementById('instructions-fam-button');
 const instructionsTestButton = document.getElementById('instructions-test-button');
 const goodbyeButton = document.getElementById('goodbye-button');
 const losgehtsButton = document.getElementById('experiment-button');
 const clickBubble = document.getElementById('click-bubble');
 const clickableArea = document.getElementById('clickable-area');
-
 const speaker = document.getElementById('speaker');
-const audioAll = document.getElementsByTagName('audio');
-const audioWelcome = document.getElementById('audio-welcome');
-const audioGoodbye = document.getElementById('audio-goodbye');
-
-const audioGeneralPrompt = document.getElementById('audio-general-prompt');
-const audioPromptHedge = document.getElementById('audio-prompt-hedge');
-const audioPromptBox = document.getElementById('audio-prompt-box');
-
-const audioPromptTrain = document.getElementById('audio-prompt-touch');
-const audioPromptTrainLong = document.getElementById('audio-prompt-touch-long');
-
-const audioTestHedge3 = document.getElementById('audio-test-hedge-3');
-const audioTestBox3 = document.getElementById('audio-test-box-3');
-
 const hedge = document.getElementById('hedge');
 const boxes1Front = document.getElementById('boxes1-front');
 
@@ -231,18 +231,32 @@ let timeline = null;
 let targetClickTimer5sec = null;
 
 // ---------------------------------------------------------------------------------------------------------------------
+// UNLOCK AUDIOS
+// ---------------------------------------------------------------------------------------------------------------------
+exp.soundEffect = new Audio();
+console.log(exp.soundEffect);
+console.log(exp.soundEffect.src);
+
+// event touchstart only works for touchscreens
+document.body.addEventListener('touchstart', () => {
+  console.log('first user interaction');
+  // on first user interaction, later we adjust the source
+  exp.soundEffect.play();
+}, { capture: false, once: true });
+
+// ---------------------------------------------------------------------------------------------------------------------
 // DEFINE EVENTLISTENER FUNCTIONS
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------
 // RUNS WHEN INSTRUCTIONS BUTTON IS CLICKED
 // ---------------------------------------------------------------------------------------------------------------------
 // save in const variables in order to pass on event to function
-const handleInstructionsTrainClick = (event) => {
+const handleInstructionsTouchClick = (event) => {
   event.preventDefault();
 
   // showSlide: first array gets shown, second array gets hidden
   showSlide([experimentSlide],
-    [textSlide, clickBubble, clickableArea, instructionsTrainButton]);
+    [textSlide, clickBubble, clickableArea, instructionsTouchButton]);
 
   // shows only relevant elements etc.
   prepareTrial(exp);
@@ -270,10 +284,12 @@ const handleTransitionClick = (event) => {
 // ---------------------------------------------------------------------------------------------------------------------
 const handleGoodbyeClick = (event) => {
   event.preventDefault();
-  for (let i = 0; i < audioAll.length; i++) {
-    audioAll[i].pause();
-    audioAll[i].currentTime = 0;
-  }
+
+  // pause audio
+  exp.soundEffect.pause();
+  exp.soundEffect.currentTime = 0;
+
+  // disable fullscreen mode
   if (!devmode) closeFullscreen();
 
   showSlide([],
@@ -302,36 +318,41 @@ const handleLosgehtsClick = async function tmp(event) {
   switch (true) {
     // for any trial without voiceover
     case !exp.trials.voiceover[exp.trials.count]:
-      audioGeneralPrompt.play();
+      exp.soundEffect.src = promptGeneralSrc;
+      exp.soundEffect.play();
       break;
 
     // for touch trials with voiceover
     case exp.trials.type[exp.trials.count] === 'touch':
-      await playFullAudio(audioPromptTrainLong, null);
+      await playFullAudio(exp.soundEffect, promptTouchLongSrc);
       break;
 
     // for tablet hedge version fam trials with voiceover
     case exp.trials.type[exp.trials.count] === 'fam'
             && exp.trials.boxesNr[exp.trials.count] === 0:
-      await playFullAudio(audioPromptHedge, null);
+      // exp.soundEffect.src = promptHedgeSrc;
+      await playFullAudio(exp.soundEffect, promptHedgeSrc);
       break;
 
     // for tablet hedge version test trials with voiceover
     case exp.trials.type[exp.trials.count] === 'test'
       && exp.trials.boxesNr[exp.trials.count] === 0:
-      await playFullAudio(audioTestHedge3, null);
+      // exp.soundEffect.src = testHedge3Src;
+      await playFullAudio(exp.soundEffect, testHedge3Src);
       break;
 
     // for PC box version fam trials with voice over
     case exp.trials.type[exp.trials.count] === 'fam'
       && exp.trials.boxesNr[exp.trials.count] > 0:
-      await playFullAudio(audioPromptBox, null);
+      // exp.soundEffect.src = promptBoxSrc;
+      await playFullAudio(exp.soundEffect, promptBoxSrc);
       break;
 
     // for PC box version test trials with voice over
     case exp.trials.type[exp.trials.count] === 'test'
       && exp.trials.boxesNr[exp.trials.count] > 0:
-      await playFullAudio(audioTestBox3, null);
+      // exp.soundEffect.src = testBox3Src;
+      await playFullAudio(exp.soundEffect, testBox3Src);
       break;
 
     default:
@@ -377,10 +398,8 @@ const handleLosgehtsClick = async function tmp(event) {
 // async so we can await animation!
 const handleTargetClick = async function tmp(event) {
   // stop audio that is potentially playing
-  for (let i = 0; i < audioAll.length; i++) {
-    audioAll[i].pause();
-    audioAll[i].currentTime = 0;
-  }
+  exp.soundEffect.pause();
+  exp.soundEffect.currentTime = 0;
 
   // we save current time, so that we can calculate response time
   exp.responseLog[exp.trials.count].responseTime.t1 = new Date().getTime();
@@ -413,16 +432,16 @@ const handleTargetClick = async function tmp(event) {
       exp.responseLog[exp.trials.count].durationAnimationComplete = timeline.duration();
       break;
 
-    // for transition from training into familiarization
+    // for transition from touching into familiarization
     case exp.trials.count === exp.trials.touchNr:
-      document.getElementById('foreign-object-heading').replaceChild(instructionsFamHeading, instructionsTrainHeading);
-      document.getElementById('foreign-object-center-left').replaceChild(instructionsFamParagraph, instructionsTrainParagraph);
-      document.getElementById('foreign-object-center-right').replaceChild(instructionsFamImage, instructionsTrainImage);
+      document.getElementById('foreign-object-heading').replaceChild(instructionsFamHeading, instructionsTouchHeading);
+      document.getElementById('foreign-object-center-left').replaceChild(instructionsFamParagraph, instructionsTouchParagraph);
+      document.getElementById('foreign-object-center-right').replaceChild(instructionsFamImage, instructionsTouchImage);
 
       showSlide([textSlide, instructionsFamButton],
         [experimentSlide,
           hedge, pig, monkey, sheep,
-          balloonBlue, balloonRed, balloonYellow, balloonGreen, instructionsTrainButton, speaker]);
+          balloonBlue, balloonRed, balloonYellow, balloonGreen, instructionsTouchButton, speaker]);
 
       // if last trial had boxes, then hide them!
       if (exp.trials.boxesNr[exp.trials.count - 1] > 0) {
@@ -514,26 +533,39 @@ const handleWrongAreaClick = (event) => {
   if (clickScaledY < hedge.getBBox().y) {
     // count how often a participant clicked in the wrong area
     exp.responseLog[exp.trials.count].wrongAreaClick++;
-    // IF WANTED: NEGATIVE FEEDBACK FOR NOT CLICKING IN THE HEDGE/BOX AREA
-    // audioNegativeFeedback.play();
   }
 };
 // ---------------------------------------------------------------------------------------------------------------------
 // RUNS WHEN SPEAKER IN INSTRUCTIONS HAS BEEN CLICKED
 // ---------------------------------------------------------------------------------------------------------------------
+
+// DOESNT CATCH ERROR SOMEHOW...
+// async function setSrc(audioSrc) {
+//   try {
+//     exp.soundEffect.src = audioSrc;
+//   } catch (err) { console.log(`error in setting audio src: ${err}`); }
+// }
+
 const handleSpeakerClick = async function tmp(event) {
   event.preventDefault();
   switch (true) {
     // welcome
     case exp.trials.count === 0:
+      // enable fullscreen mode
       if (!devmode) openFullscreen();
-      await playFullAudio(audioWelcome, instructionsTrainButton);
-      showSlide([instructionsTrainButton], []);
+
+      // play instructions audio, only show button once audio is finished playing
+      // exp.soundEffect.src = welcomeSrc;
+      // await setSrc(welcomeSrc);
+      showSlide([], [instructionsTouchButton]);
+      await playFullAudio(exp.soundEffect, welcomeSrc);
+      showSlide([instructionsTouchButton], []);
       break;
 
     // goodbye
     case exp.trials.count === exp.trials.totalNr:
-      await playFullAudio(audioGoodbye, null);
+      // exp.soundEffect.src = goodbyeSrc;
+      await playFullAudio(exp.soundEffect, goodbyeSrc);
       // showSlide([goodbyeButton], []);
       break;
 
@@ -548,17 +580,20 @@ const handleSpeakerClick = async function tmp(event) {
 let noTargetClickWithin5sec = () => {
   switch (true) {
     case exp.trials.type[exp.trials.count] === 'touch':
-      audioPromptTrain.play();
+      exp.soundEffect.src = promptTouchSrc;
+      exp.soundEffect.play();
       break;
 
     case exp.trials.type[exp.trials.count] !== 'touch'
           && exp.trials.boxesNr[exp.trials.count] === 0:
-      audioPromptHedge.play();
+      exp.soundEffect.src = promptHedgeSrc;
+      exp.soundEffect.play();
       break;
 
     case exp.trials.type[exp.trials.count] !== 'touch'
       && exp.trials.boxesNr[exp.trials.count] > 0:
-      audioPromptBox.play();
+      exp.soundEffect.src = promptBoxSrc;
+      exp.soundEffect.play();
       break;
 
     default:
@@ -569,18 +604,18 @@ let noTargetClickWithin5sec = () => {
 // ACTUALLY RUNNING:
 // ---------------------------------------------------------------------------------------------------------------------
 // INSTRUCTIONS: show slide
-document.getElementById('foreign-object-heading').appendChild(instructionsTrainHeading);
-document.getElementById('foreign-object-center-left').appendChild(instructionsTrainParagraph);
-document.getElementById('foreign-object-center-right').appendChild(instructionsTrainImage);
+document.getElementById('foreign-object-heading').appendChild(instructionsTouchHeading);
+document.getElementById('foreign-object-center-left').appendChild(instructionsTouchParagraph);
+document.getElementById('foreign-object-center-right').appendChild(instructionsTouchImage);
 showSlide([textSlide],
   // first hide buttons, participants can only start once they listened to the instructions
-  [experimentSlide, instructionsTrainButton, instructionsFamButton, instructionsTestButton, goodbyeButton]);
+  [experimentSlide, instructionsTouchButton, instructionsFamButton, instructionsTestButton, goodbyeButton]);
 
 // dev mode: show buttons to jump ahead audio instructions
-if (devmode) showSlide([instructionsTrainButton], []);
+if (devmode) showSlide([instructionsTouchButton], []);
 
 // add event listeners
-instructionsTrainButton.addEventListener('click', handleInstructionsTrainClick, { capture: false, once: true });
+instructionsTouchButton.addEventListener('click', handleInstructionsTouchClick, { capture: false, once: true });
 instructionsFamButton.addEventListener('click', handleTransitionClick, { capture: false, once: true });
 instructionsTestButton.addEventListener('click', handleTransitionClick, { capture: false, once: true });
 goodbyeButton.addEventListener('click', handleGoodbyeClick, { capture: false, once: true });

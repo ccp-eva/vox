@@ -1,4 +1,4 @@
-import instructionsTrainImageSrc from 'url:../images/touch.png';
+import instructionsTouchImageSrc from 'url:../images/touch.png';
 import instructionsFamBoxImageSrc from 'url:../images/fam-box.png';
 import instructionsFamHedgeImageSrc from 'url:../images/fam-hedge.png';
 import instructionsTestBoxImageSrc from 'url:../images/test-box.png';
@@ -6,10 +6,10 @@ import instructionsTestHedgeImageSrc from 'url:../images/test-hedge.png';
 import goodbyeImageSrc from 'url:../images/familypic.png';
 
 export default (exp) => {
-  const instructionsTrainHeading = document.createElement('div');
-  const instructionsTrainParagraph = document.createElement('div');
-  const instructionsTrainImage = document.createElement('img');
-  instructionsTrainImage.style = 'width: inherit';
+  const instructionsTouchHeading = document.createElement('div');
+  const instructionsTouchParagraph = document.createElement('div');
+  const instructionsTouchImage = document.createElement('img');
+  instructionsTouchImage.style = 'width: inherit';
 
   const instructionsFamHeading = document.createElement('div');
   const instructionsFamParagraph = document.createElement('div');
@@ -27,14 +27,14 @@ export default (exp) => {
   goodbyeImage.style = 'width: inherit';
 
   // headings
-  instructionsTrainHeading.innerHTML = '<h1> Herzlich Willkommen! </h1>';
+  instructionsTouchHeading.innerHTML = '<h1> Herzlich Willkommen! </h1>';
   instructionsFamHeading.innerHTML = '<h1> Super! Den ersten Teil habt ihr geschafft! </h1>';
   instructionsTestHeading.innerHTML = '<h1> Super! Jetzt kommt der letzte Teil. </h1>';
   goodbyeHeading.innerHTML = '<h1> Fertig! </h1>';
 
   // text for the parents (children get audio instructions)
   if (exp.subjData.touchScreen) {
-    instructionsTrainParagraph.innerHTML = `<p> 
+    instructionsTouchParagraph.innerHTML = `<p> 
     Vielen Dank, dass Sie mit Ihrem Kind an unserer Studie teilnehmen. <br>
     In unserem Spiel soll Ihr Kind einen Ballon finden. <br> <br>
 
@@ -50,7 +50,7 @@ export default (exp) => {
     instructionsFamImage.src = instructionsFamHedgeImageSrc;
     instructionsTestImage.src = instructionsTestHedgeImageSrc;
   } else if (!exp.subjData.touchScreen) {
-    instructionsTrainParagraph.innerHTML = `<p> 
+    instructionsTouchParagraph.innerHTML = `<p> 
     Vielen Dank, dass Sie mit Ihrem Kind an unserer Studie teilnehmen. <br>
     In unserem Spiel soll Ihr Kind einen Ballon finden. <br> <br>
 
@@ -97,13 +97,13 @@ export default (exp) => {
 
   // add instruction pictures
   // for tablet version
-  instructionsTrainImage.src = instructionsTrainImageSrc;
+  instructionsTouchImage.src = instructionsTouchImageSrc;
   goodbyeImage.src = goodbyeImageSrc;
 
   return ({
-    instructionsTrainHeading,
-    instructionsTrainParagraph,
-    instructionsTrainImage,
+    instructionsTouchHeading,
+    instructionsTouchParagraph,
+    instructionsTouchImage,
 
     instructionsFamHeading,
     instructionsFamParagraph,

@@ -1,5 +1,13 @@
 /* eslint-disable no-case-declarations */
 import { gsap } from 'gsap';
+import touch1Src from 'url:../sounds/touch-1.mp3';
+import famHedge1Src from 'url:../sounds/fam-hedge-1.mp3';
+import testHedge1Src from 'url:../sounds/test-hedge-1.mp3';
+import testHedge2Src from 'url:../sounds/test-hedge-2.mp3';
+import testHedge3Src from 'url:../sounds/test-hedge-3.mp3';
+import famBox1Src from 'url:../sounds/fam-box-1.mp3';
+import testBox1Src from 'url:../sounds/test-box-1.mp3';
+import testBox2Src from 'url:../sounds/test-box-2.mp3';
 
 // ---------------------------------------------------------------------------------------------------------------------
 // FUNCTION FOR ANIMATING BALLOON, EYES, HEDGE
@@ -87,34 +95,50 @@ export default (exp) => {
   // -------------------------------------------------------------------------------------------------------------------
   // ADD VOICE INSTRUCTIONS
   // -------------------------------------------------------------------------------------------------------------------
-  const audioTrain1 = document.getElementById('audio-touch-1');
-  const audioFamHedge1 = document.getElementById('audio-fam-hedge-1');
-  const audioTestHedge1 = document.getElementById('audio-test-hedge-1');
-  const audioTestHedge2 = document.getElementById('audio-test-hedge-2');
-  const audioTestHedge3 = document.getElementById('audio-test-hedge-3');
-  const audioFamBox1 = document.getElementById('audio-fam-box-1');
-  const audioTestBox1 = document.getElementById('audio-test-box-1');
-  const audioTestBox2 = document.getElementById('audio-test-box-2');
-
-  const playTrain1 = () => { audioTrain1.play(); };
-  const playFamHedge1 = () => { audioFamHedge1.play(); };
-  const playTestHedge1 = () => { audioTestHedge1.play(); };
-  const playTestHedge2 = () => { audioTestHedge2.play(); };
-  const playTestHedge3 = () => { audioTestHedge3.play(); };
-  const playFamBox1 = () => { audioFamBox1.play(); };
-  const playTestBox1 = () => { audioTestBox1.play(); };
-  const playTestBox2 = () => { audioTestBox2.play(); };
+  const playTouch1 = () => {
+    exp.soundEffect.src = touch1Src;
+    exp.soundEffect.play();
+  };
+  const playFamHedge1 = () => {
+    exp.soundEffect.src = famHedge1Src;
+    exp.soundEffect.play();
+  };
+  const playTestHedge1 = () => {
+    exp.soundEffect.src = testHedge1Src;
+    exp.soundEffect.play();
+  };
+  const playTestHedge2 = () => {
+    exp.soundEffect.src = testHedge2Src;
+    exp.soundEffect.play();
+  };
+  const playTestHedge3 = () => {
+    exp.soundEffect.src = testHedge3Src;
+    exp.soundEffect.play();
+  };
+  const playFamBox1 = () => {
+    exp.soundEffect.src = famBox1Src;
+    exp.soundEffect.play();
+  };
+  const playTestBox1 = () => {
+    exp.soundEffect.src = testBox1Src;
+    exp.soundEffect.play();
+  };
+  const playTestBox2 = () => {
+    exp.soundEffect.src = testBox2Src;
+    exp.soundEffect.play();
+  };
 
   // -------------------------------------------------------------------------------------------------------------------
   // define animation depending on trial type
   // -------------------------------------------------------------------------------------------------------------------
   switch (true) {
-    // for training trials
+    // for touch training trials
     case exp.trials.type[exp.trials.count] === 'touch':
       // for instructions voice over
       if (exp.trials.voiceover[exp.trials.count]) {
-        timeline.eventCallback('onStart', playTrain1);
-        attentionGetter.delay(audioTrain1.duration + delay);
+        timeline.eventCallback('onStart', playTouch1);
+        // touch1 duration
+        attentionGetter.delay(13 + delay);
       }
       attentionGetter.play();
       ballonToGround.play();
@@ -131,7 +155,8 @@ export default (exp) => {
 
       if (exp.trials.voiceover[exp.trials.count]) {
         timeline.eventCallback('onStart', playFamHedge1);
-        attentionGetter.delay(audioFamHedge1.duration + delay);
+        // famHedge1 duration
+        attentionGetter.delay(16 + delay);
       }
 
       attentionGetter.play();
@@ -161,9 +186,11 @@ export default (exp) => {
 
       if (exp.trials.voiceover[exp.trials.count]) {
         timeline.eventCallback('onStart', playTestHedge1);
-        hedgeUp.delay(audioTestHedge1.duration + delay);
+        // testHedge1 duration
+        hedgeUp.delay(9 + delay);
         hedgeUp.eventCallback('onComplete', playTestHedge2);
-        attentionGetter.delay(audioTestHedge2.duration + delay);
+        // testHedge2 duration
+        attentionGetter.delay(12 + delay);
         hedgeHalfDown.eventCallback('onStart', playTestHedge3);
       }
 
@@ -183,7 +210,8 @@ export default (exp) => {
     case exp.trials.boxesNr[exp.trials.count] > 0 && exp.trials.type[exp.trials.count] === 'fam':
       if (exp.trials.voiceover[exp.trials.count]) {
         timeline.eventCallback('onStart', playFamBox1);
-        attentionGetter.delay(audioFamBox1.duration + delay);
+        // famBox1 duration
+        attentionGetter.delay(15 + delay);
       }
       attentionGetter.play();
       ballonIntoBox.play();
@@ -210,9 +238,11 @@ export default (exp) => {
 
       if (exp.trials.voiceover[exp.trials.count]) {
         timeline.eventCallback('onStart', playTestBox1);
-        hedgeWholeWayUp.delay(audioTestBox1.duration + delay);
+        // testBox1 duration
+        hedgeWholeWayUp.delay(9 + delay);
         hedgeWholeWayUp.eventCallback('onComplete', playTestBox2);
-        attentionGetter.delay(audioTestBox2.duration + delay);
+        // testBox2 duration
+        attentionGetter.delay(12 + delay);
       }
 
       hedgeWholeWayUp.play();

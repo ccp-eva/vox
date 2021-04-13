@@ -1,4 +1,6 @@
 import { gsap } from 'gsap';
+import positiveFeedbackSrc from 'url:../sounds/positive-feedback.mp3';
+
 // ---------------------------------------------------------------------------------------------------------------------
 // FUNCTION FOR LOGGING ALL RELEVANT TRIAL INFOS
 // ---------------------------------------------------------------------------------------------------------------------
@@ -43,7 +45,8 @@ export default (event, exp) => {
   });
 
   // play positive user feedback
-  document.getElementById('audio-positive-feedback').play();
+  exp.soundEffect.src = positiveFeedbackSrc;
+  exp.soundEffect.play();
 
   // get upper left corner of target
   exp.responseLog[exp.trials.count].targetX = exp.positions[exp.trials.count].x;
