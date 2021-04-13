@@ -12,6 +12,15 @@ import promptTouchLongSrc from 'url:./sounds/prompt-touch-long.mp3';
 import testHedge3Src from 'url:./sounds/test-hedge-3.mp3';
 import testBox3Src from 'url:./sounds/test-box-3.mp3';
 
+// these, we need in our animation function. here, we'll calculate duration
+import touch1Src from 'url:./sounds/touch-1.mp3';
+import famHedge1Src from 'url:./sounds/fam-hedge-1.mp3';
+import testHedge1Src from 'url:./sounds/test-hedge-1.mp3';
+import testHedge2Src from 'url:./sounds/test-hedge-2.mp3';
+import famBox1Src from 'url:./sounds/fam-box-1.mp3';
+import testBox1Src from 'url:./sounds/test-box-1.mp3';
+import testBox2Src from 'url:./sounds/test-box-2.mp3';
+
 // import self-written functions
 import logResponse from './js/logResponse';
 import prepareTrial from './js/prepareTrial';
@@ -49,7 +58,7 @@ const url = new URL(window.location.href);
 exp.subjData.subjID = url.searchParams.get('id') || 'testID';
 
 // just for developing: turn off fullscreen mode
-const devmode = true;
+const devmode = false;
 exp.subjData.touchScreen = checkForTouchscreen();
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -120,6 +129,20 @@ exp.elemSpecs = {
     origViewBoxHeight: parseFloat(document.getElementById('outer-svg').getAttribute('viewBox').split(' ')[3]),
   },
 };
+
+// ---------------------------------------------------------------------------------------------------------------------
+// SAVE DURATION OF AUDIO FILES
+// ---------------------------------------------------------------------------------------------------------------------
+exp.elemSpecs.animAudioDur = {};
+const animAudioSrcs = [touch1Src, famHedge1Src, testHedge1Src, testHedge2Src, famBox1Src, testBox1Src, testBox2Src];
+
+animAudioSrcs.forEach((src) => {
+  const audioTmp = new Audio();
+  audioTmp.src = src;
+  audioTmp.onloadedmetadata = () => {
+    exp.elemSpecs.animAudioDur[src] = audioTmp.duration;
+  };
+});
 
 // ---------------------------------------------------------------------------------------------------------------------
 // GET ALL RELEVANT ELEMENTS IN SVG
@@ -234,8 +257,6 @@ let targetClickTimer5sec = null;
 // UNLOCK AUDIOS
 // ---------------------------------------------------------------------------------------------------------------------
 exp.soundEffect = new Audio();
-console.log(exp.soundEffect);
-console.log(exp.soundEffect.src);
 
 // event touchstart only works for touchscreens
 document.body.addEventListener('touchstart', () => {
@@ -294,8 +315,6 @@ const handleGoodbyeClick = (event) => {
 
   showSlide([],
     [textSlide, speaker, goodbyeButton]);
-
-  // downloadData(exp.responseLog, exp.subjData.subjID);
 };
 // ---------------------------------------------------------------------------------------------------------------------
 // RUNS WHEN "los geht's" BUTTON IS CLICKED
@@ -330,28 +349,24 @@ const handleLosgehtsClick = async function tmp(event) {
     // for tablet hedge version fam trials with voiceover
     case exp.trials.type[exp.trials.count] === 'fam'
             && exp.trials.boxesNr[exp.trials.count] === 0:
-      // exp.soundEffect.src = promptHedgeSrc;
       await playFullAudio(exp.soundEffect, promptHedgeSrc);
       break;
 
     // for tablet hedge version test trials with voiceover
     case exp.trials.type[exp.trials.count] === 'test'
       && exp.trials.boxesNr[exp.trials.count] === 0:
-      // exp.soundEffect.src = testHedge3Src;
       await playFullAudio(exp.soundEffect, testHedge3Src);
       break;
 
     // for PC box version fam trials with voice over
     case exp.trials.type[exp.trials.count] === 'fam'
       && exp.trials.boxesNr[exp.trials.count] > 0:
-      // exp.soundEffect.src = promptBoxSrc;
       await playFullAudio(exp.soundEffect, promptBoxSrc);
       break;
 
     // for PC box version test trials with voice over
     case exp.trials.type[exp.trials.count] === 'test'
       && exp.trials.boxesNr[exp.trials.count] > 0:
-      // exp.soundEffect.src = testBox3Src;
       await playFullAudio(exp.soundEffect, testBox3Src);
       break;
 
@@ -539,13 +554,6 @@ const handleWrongAreaClick = (event) => {
 // RUNS WHEN SPEAKER IN INSTRUCTIONS HAS BEEN CLICKED
 // ---------------------------------------------------------------------------------------------------------------------
 
-// DOESNT CATCH ERROR SOMEHOW...
-// async function setSrc(audioSrc) {
-//   try {
-//     exp.soundEffect.src = audioSrc;
-//   } catch (err) { console.log(`error in setting audio src: ${err}`); }
-// }
-
 const handleSpeakerClick = async function tmp(event) {
   event.preventDefault();
   switch (true) {
@@ -555,8 +563,6 @@ const handleSpeakerClick = async function tmp(event) {
       if (!devmode) openFullscreen();
 
       // play instructions audio, only show button once audio is finished playing
-      // exp.soundEffect.src = welcomeSrc;
-      // await setSrc(welcomeSrc);
       showSlide([], [instructionsTouchButton]);
       await playFullAudio(exp.soundEffect, welcomeSrc);
       showSlide([instructionsTouchButton], []);
@@ -564,9 +570,7 @@ const handleSpeakerClick = async function tmp(event) {
 
     // goodbye
     case exp.trials.count === exp.trials.totalNr:
-      // exp.soundEffect.src = goodbyeSrc;
       await playFullAudio(exp.soundEffect, goodbyeSrc);
-      // showSlide([goodbyeButton], []);
       break;
 
     default:

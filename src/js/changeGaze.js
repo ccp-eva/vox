@@ -4,7 +4,7 @@ import touch1Src from 'url:../sounds/touch-1.mp3';
 import famHedge1Src from 'url:../sounds/fam-hedge-1.mp3';
 import testHedge1Src from 'url:../sounds/test-hedge-1.mp3';
 import testHedge2Src from 'url:../sounds/test-hedge-2.mp3';
-import testHedge3Src from 'url:../sounds/test-hedge-3.mp3';
+// import testHedge3Src from 'url:../sounds/test-hedge-3.mp3';
 import famBox1Src from 'url:../sounds/fam-box-1.mp3';
 import testBox1Src from 'url:../sounds/test-box-1.mp3';
 import testBox2Src from 'url:../sounds/test-box-2.mp3';
@@ -111,10 +111,10 @@ export default (exp) => {
     exp.soundEffect.src = testHedge2Src;
     exp.soundEffect.play();
   };
-  const playTestHedge3 = () => {
-    exp.soundEffect.src = testHedge3Src;
-    exp.soundEffect.play();
-  };
+  // const playTestHedge3 = () => {
+  //   exp.soundEffect.src = testHedge3Src;
+  //   exp.soundEffect.play();
+  // };
   const playFamBox1 = () => {
     exp.soundEffect.src = famBox1Src;
     exp.soundEffect.play();
@@ -137,8 +137,7 @@ export default (exp) => {
       // for instructions voice over
       if (exp.trials.voiceover[exp.trials.count]) {
         timeline.eventCallback('onStart', playTouch1);
-        // touch1 duration
-        attentionGetter.delay(13 + delay);
+        attentionGetter.delay(exp.elemSpecs.animAudioDur[touch1Src] + delay);
       }
       attentionGetter.play();
       ballonToGround.play();
@@ -155,8 +154,7 @@ export default (exp) => {
 
       if (exp.trials.voiceover[exp.trials.count]) {
         timeline.eventCallback('onStart', playFamHedge1);
-        // famHedge1 duration
-        attentionGetter.delay(16 + delay);
+        attentionGetter.delay(exp.elemSpecs.animAudioDur[famHedge1Src] + delay);
       }
 
       attentionGetter.play();
@@ -186,12 +184,10 @@ export default (exp) => {
 
       if (exp.trials.voiceover[exp.trials.count]) {
         timeline.eventCallback('onStart', playTestHedge1);
-        // testHedge1 duration
-        hedgeUp.delay(9 + delay);
+        hedgeUp.delay(exp.elemSpecs.animAudioDur[testHedge1Src] + delay);
         hedgeUp.eventCallback('onComplete', playTestHedge2);
-        // testHedge2 duration
-        attentionGetter.delay(12 + delay);
-        hedgeHalfDown.eventCallback('onStart', playTestHedge3);
+        attentionGetter.delay(exp.elemSpecs.animAudioDur[testHedge2Src] + delay);
+        // hedgeHalfDown.eventCallback('onStart', playTestHedge3);
       }
 
       hedgeUp.play();
@@ -210,8 +206,7 @@ export default (exp) => {
     case exp.trials.boxesNr[exp.trials.count] > 0 && exp.trials.type[exp.trials.count] === 'fam':
       if (exp.trials.voiceover[exp.trials.count]) {
         timeline.eventCallback('onStart', playFamBox1);
-        // famBox1 duration
-        attentionGetter.delay(15 + delay);
+        attentionGetter.delay(exp.elemSpecs.animAudioDur[famBox1Src] + delay);
       }
       attentionGetter.play();
       ballonIntoBox.play();
@@ -238,11 +233,9 @@ export default (exp) => {
 
       if (exp.trials.voiceover[exp.trials.count]) {
         timeline.eventCallback('onStart', playTestBox1);
-        // testBox1 duration
-        hedgeWholeWayUp.delay(9 + delay);
+        hedgeWholeWayUp.delay(exp.elemSpecs.animAudioDur[testBox1Src] + delay);
         hedgeWholeWayUp.eventCallback('onComplete', playTestBox2);
-        // testBox2 duration
-        attentionGetter.delay(12 + delay);
+        attentionGetter.delay(exp.elemSpecs.animAudioDur[testBox2Src] + delay);
       }
 
       hedgeWholeWayUp.play();
