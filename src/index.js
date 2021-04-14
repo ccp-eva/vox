@@ -58,7 +58,7 @@ const url = new URL(window.location.href);
 exp.subjData.subjID = url.searchParams.get('id') || 'testID';
 
 // just for developing: turn off fullscreen mode
-const devmode = false;
+const devmode = true;
 exp.subjData.touchScreen = checkForTouchscreen();
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -72,7 +72,7 @@ exp.trials.totalNr = exp.trials.touchNr + exp.trials.famNr + exp.trials.testNr;
 // this variable stores in which trial we currently are!
 exp.trials.count = 0;
 // NOTE: make sure, that the number of voice over fits to the nr of touch training, fam and test trials!!
-exp.trials.voiceoverNr = devmode ? 1 : 1;
+exp.trials.voiceoverNr = devmode ? 0 : 1;
 // constant number of boxes for PC version
 exp.trials.boxVersion = 3;
 
@@ -431,6 +431,12 @@ const handleTargetClick = async function tmp(event) {
   logResponse(event, exp);
   console.log('responseLog: ', exp.responseLog[exp.trials.count]);
 
+  // just for safety: upload data to server already
+  // if participants passed touch+fam training and at least 4 test trials
+  if (exp.trials.count >= exp.trials.touchNr + exp.trials.famNr + 4) {
+    devmode ? console.log('download data for safety') : downloadData(exp.responseLog, exp.subjData.subjID);
+  }
+
   // so that we don't rush into next trial
   await pause(500);
 
@@ -506,6 +512,7 @@ const handleTargetClick = async function tmp(event) {
     // for goodbye after test trials
     case exp.trials.count === exp.trials.totalNr:
       // save data, upload to server
+      // when participants complete experiment, this is the one and only responseLog we need
       downloadData(exp.responseLog, exp.subjData.subjID);
 
       document.getElementById('foreign-object-heading').replaceChild(goodbyeHeading, instructionsTestHeading);
