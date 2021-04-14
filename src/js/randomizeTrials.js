@@ -127,7 +127,7 @@ export default (exp, agentsSingle, targetsSingle) => {
     }
   }
   // TODO do we actually want to shuffle here?
-  // positions = shuffleArray(positions);
+  positions = shuffleArray(positions);
 
   // how many trials are completely randomized
   const randomPositionsNr = exp.trials.touchNr + exp.trials.famNr <= possiblePositionsNr
