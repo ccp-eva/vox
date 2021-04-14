@@ -69,8 +69,8 @@ export default (exp, agentsSingle, targetsSingle) => {
   exp.targets = targets;
 
   // FOR POSITIONS OF TARGET:
-  // for fam trials and touchscreen with hedge:
-  // ten equally big sections, where targets can land
+  // define possible positions
+  // for touch training and trials with hedge: ten equally big sections, where targets can land
   let positions = [];
   const positionsSingleContinuous = [];
   const bins = 10;
@@ -86,77 +86,68 @@ export default (exp, agentsSingle, targetsSingle) => {
     positionsSingleContinuous.push(section);
   }
 
-  // for touchscreen with hedge, the target lands in random locations for all trials
+  // for box version
+  const positionsSingleBoxes = [];
+  const boxes = Array.from(document.querySelectorAll(`[id^= "boxes${exp.trials.boxVersion}-front-box"]`));
+  boxes.forEach((box, i) => {
+    const section = {
+      // so that it starts with 1
+      bin: i + 1,
+      type: 'boxLocation',
+      // add half a target width for placing upper left balloon corner in middle of box
+      x: box.getBBox().x + box.getBBox().width / 2 - targetsSingle[0].getBBox().width / 2,
+      y: exp.elemSpecs.targets.groundY,
+    };
+    positionsSingleBoxes.push(section);
+  });
+
   // TODO if we want to show boxes/hedge indepedent of touchscreen, this has to change!
-  if (exp.subjData.touchScreen) {
-    // for touch+fam trials that are less than all nr of bins:
-    // take the most extreme positions
-    if (exp.trials.touchNr + exp.trials.famNr <= bins) {
-      let lower = 0;
-      let upper = bins - 1;
-      for (let i = 0; i < exp.trials.touchNr + exp.trials.famNr; i++) {
+  // for touchscreen with hedge, the target lands in random locations for all trials
+  // for PC with boxes, target lands in box positions
+  const possiblePositionsCoords = exp.subjData.touchScreen ? positionsSingleContinuous : positionsSingleBoxes;
+  // ...same as positionsSingleContinuous.length or positionsSingleBoxes.length
+  const possiblePositionsNr = exp.subjData.touchScreen ? bins : exp.trials.boxVersion;
+
+  // for touch+fam trials that are less than all nr of possible locations:
+  // take the most extreme positions
+  if (exp.trials.touchNr + exp.trials.famNr <= possiblePositionsNr) {
+    let lower = 0;
+    let upper = possiblePositionsNr - 1;
+    for (let i = 0; i < exp.trials.touchNr + exp.trials.famNr; i++) {
       // alternate from which end of the array we take the position
       // for even numbers, take from the upper end; for odd, take from lower end
-        if (i % 2 === 0) {
-          positions.push(positionsSingleContinuous[upper]);
-          upper--;
-        }
-        if (i % 2 !== 0) {
-          positions.push(positionsSingleContinuous[lower]);
-          lower++;
-        }
+      if (i % 2 === 0) {
+        positions.push(possiblePositionsCoords[upper]);
+        upper--;
+      }
+      if (i % 2 !== 0) {
+        positions.push(possiblePositionsCoords[lower]);
+        lower++;
       }
     }
-    // TODO do we actually want to shuffle here?
-    // positions = shuffleArray(positions);
-
-    // how many trials are completely randomized
-    const randomPos = exp.trials.touchNr + exp.trials.famNr <= bins ? exp.trials.testNr : exp.trials.totalNr;
-
-    // how many times can we repeat each section
-    const positionsDiv = divideWithRemainder(randomPos, positionsSingleContinuous.length);
-
-    for (let i = 0; i < positionsDiv.quotient; i++) {
-      const positionsShuffled = shuffleArray(positionsSingleContinuous);
-      positions = positions.concat(positionsShuffled);
-    }
-
-    // if division with remainder, fill up array
-    if (positionsDiv.remainder > 0) {
-      const positionsTmp = shuffleArray(positionsSingleContinuous);
-      positionsTmp.splice(0, positionsTmp.length - positionsDiv.remainder);
-      positions = positions.concat(positionsTmp);
-    }
-
-  // for PC version with boxes: target can only land in boxes
-  } else if (!exp.subjData.touchScreen) {
-    const positionsSingleBoxes = [];
-    const boxes = Array.from(document.querySelectorAll(`[id^= "boxes${exp.trials.boxVersion}-front-box"]`));
-    boxes.forEach((box, i) => {
-      const section = {
-        // so that it starts with 1
-        bin: i + 1,
-        type: 'boxLocation',
-        // add half a target width for placing upper left balloon corner in middle of box
-        x: box.getBBox().x + box.getBBox().width / 2 - targetsSingle[0].getBBox().width / 2,
-        y: exp.elemSpecs.targets.groundY,
-      };
-      positionsSingleBoxes.push(section);
-    });
-
-    const positionsDiv = divideWithRemainder(exp.trials.totalNr, positionsSingleBoxes.length);
-
-    positionsSingleBoxes.forEach((section) => {
-      positions = positions.concat(new Array(positionsDiv.quotient).fill(section));
-    });
-    positions = shuffleArray(positions);
-
-    if (positionsDiv.remainder > 0) {
-      const positionsTmp = shuffleArray(positionsSingleBoxes);
-      positionsTmp.splice(0, positionsTmp.length - positionsDiv.remainder);
-      positions = positions.concat(positionsTmp);
-    }
   }
+  // TODO do we actually want to shuffle here?
+  // positions = shuffleArray(positions);
+
+  // how many trials are completely randomized
+  const randomPositionsNr = exp.trials.touchNr + exp.trials.famNr <= possiblePositionsNr
+    ? exp.trials.testNr : exp.trials.totalNr;
+
+  // how many times can we repeat each section
+  const positionsDiv = divideWithRemainder(randomPositionsNr, possiblePositionsCoords.length);
+
+  for (let i = 0; i < positionsDiv.quotient; i++) {
+    const positionsShuffled = shuffleArray(possiblePositionsCoords);
+    positions = positions.concat(positionsShuffled);
+  }
+
+  // if division with remainder, fill up array
+  if (positionsDiv.remainder > 0) {
+    const positionsTmp = shuffleArray(possiblePositionsCoords);
+    positionsTmp.splice(0, positionsTmp.length - positionsDiv.remainder);
+    positions = positions.concat(positionsTmp);
+  }
+
   exp.positions = positions;
   exp.responseLog = [];
 };
