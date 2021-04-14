@@ -73,27 +73,53 @@ export default (exp, agentsSingle, targetsSingle) => {
   // ten equally big sections, where targets can land
   let positions = [];
   const positionsSingleContinuous = [];
+  const bins = 10;
   let prevMax = 0;
-  for (let i = 1; i <= 10; i++) {
+  for (let i = 1; i <= bins; i++) {
     const section = {
       bin: i,
       type: 'randomLocation',
-      x: randomNumber(prevMax, (exp.elemSpecs.targets.borderRight / 10) * i),
+      x: randomNumber(prevMax, (exp.elemSpecs.targets.borderRight / bins) * i),
       y: exp.elemSpecs.targets.groundY,
     };
-    prevMax = (exp.elemSpecs.targets.borderRight / 10) * i;
+    prevMax = (exp.elemSpecs.targets.borderRight / bins) * i;
     positionsSingleContinuous.push(section);
   }
 
   // for touchscreen with hedge, the target lands in random locations for all trials
   // TODO if we want to show boxes/hedge indepedent of touchscreen, this has to change!
   if (exp.subjData.touchScreen) {
+    // for touch+fam trials that are less than all nr of bins:
+    // take the most extreme positions
+    if (exp.trials.touchNr + exp.trials.famNr <= bins) {
+      let lower = 0;
+      let upper = bins - 1;
+      for (let i = 0; i < exp.trials.touchNr + exp.trials.famNr; i++) {
+      // alternate from which end of the array we take the position
+      // for even numbers, take from the upper end; for odd, take from lower end
+        if (i % 2 === 0) {
+          positions.push(positionsSingleContinuous[upper]);
+          upper--;
+        }
+        if (i % 2 !== 0) {
+          positions.push(positionsSingleContinuous[lower]);
+          lower++;
+        }
+      }
+    }
+    // TODO do we actually want to shuffle here?
+    // positions = shuffleArray(positions);
+
+    // how many trials are completely randomized
+    const randomPos = exp.trials.touchNr + exp.trials.famNr <= bins ? exp.trials.testNr : exp.trials.totalNr;
+
     // how many times can we repeat each section
-    const positionsDiv = divideWithRemainder(exp.trials.type.length, positionsSingleContinuous.length);
-    positionsSingleContinuous.forEach((section) => {
-      positions = positions.concat(new Array(positionsDiv.quotient).fill(section));
-    });
-    positions = shuffleArray(positions);
+    const positionsDiv = divideWithRemainder(randomPos, positionsSingleContinuous.length);
+
+    for (let i = 0; i < positionsDiv.quotient; i++) {
+      const positionsShuffled = shuffleArray(positionsSingleContinuous);
+      positions = positions.concat(positionsShuffled);
+    }
 
     // if division with remainder, fill up array
     if (positionsDiv.remainder > 0) {
@@ -102,7 +128,7 @@ export default (exp, agentsSingle, targetsSingle) => {
       positions = positions.concat(positionsTmp);
     }
 
-    // for PC version with boxes: target can only land in boxes
+  // for PC version with boxes: target can only land in boxes
   } else if (!exp.subjData.touchScreen) {
     const positionsSingleBoxes = [];
     const boxes = Array.from(document.querySelectorAll(`[id^= "boxes${exp.trials.boxVersion}-front-box"]`));
