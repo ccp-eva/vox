@@ -10,7 +10,7 @@ import showSlide from './showSlide';
 // ---------------------------------------------------------------------------------------------------------------------
 export default (exp) => {
   // show blurred canvas and button
-  showSlide([document.getElementById('experiment-button'), document.getElementById('cover-blurr')], []);
+  showSlide([document.getElementById('experimentslide-button'), document.getElementById('cover-blurr')], []);
 
   // show agent and target of the current trial only, hide the other ones
   showElement(exp.agents, exp.trials.count);

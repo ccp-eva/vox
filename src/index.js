@@ -97,23 +97,7 @@ foreignObjects.forEach((elem) => {
   elem.replaceWith(obj);
 });
 
-const {
-  instructionsTouchHeading,
-  instructionsTouchParagraph,
-  instructionsTouchImage,
-
-  instructionsFamHeading,
-  instructionsFamParagraph,
-  instructionsFamImage,
-
-  instructionsTestHeading,
-  instructionsTestParagraph,
-  instructionsTestImage,
-
-  goodbyeHeading,
-  goodbyeParagraph,
-  goodbyeImage,
-} = experimentalInstructions(exp);
+const txt = experimentalInstructions(exp);
 
 // ---------------------------------------------------------------------------------------------------------------------
 // SAVE VIEWBOX VALUES
@@ -147,21 +131,16 @@ animAudioSrcs.forEach((src) => {
 // ---------------------------------------------------------------------------------------------------------------------
 // GET ALL RELEVANT ELEMENTS IN SVG
 // ---------------------------------------------------------------------------------------------------------------------
-const textSlide = document.getElementById('text-slide');
-const experimentSlide = document.getElementById('experiment-slide');
-
-const instructionsTouchButton = document.getElementById('instructions-touch-button');
-const instructionsFamButton = document.getElementById('instructions-fam-button');
-const instructionsTestButton = document.getElementById('instructions-test-button');
-const goodbyeButton = document.getElementById('goodbye-button');
-const losgehtsButton = document.getElementById('experiment-button');
+const textslide = document.getElementById('textslide');
+const textslideButton = document.getElementById('textslide-button');
+const textslideButtonText = document.getElementById('textslide-button-text');
+const experimentslide = document.getElementById('experimentslide');
+const experimentslideButton = document.getElementById('experimentslide-button');
 const clickBubble = document.getElementById('click-bubble');
 const clickableArea = document.getElementById('clickable-area');
 const speaker = document.getElementById('speaker');
 const hedge = document.getElementById('hedge');
 const boxes1Front = document.getElementById('boxes1-front');
-
-// console.log('boxes8-test'.replace(/\d+/, 'test'));
 const boxesAllFront = Array.from(document.querySelectorAll('[id$=-front]'));
 const boxesAllBack = Array.from(document.querySelectorAll('[id$=-back]'));
 
@@ -269,31 +248,33 @@ document.body.addEventListener('touchstart', () => {
 // DEFINE EVENTLISTENER FUNCTIONS
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------
-// RUNS WHEN INSTRUCTIONS BUTTON IS CLICKED
+// RUNS WHEN WELCOME BUTTON IS CLICKED
 // ---------------------------------------------------------------------------------------------------------------------
 // save in const variables in order to pass on event to function
-const handleInstructionsTouchClick = (event) => {
+const handleWelcomeClick = (event) => {
   event.preventDefault();
+  document.getElementById('foreign-object-heading').replaceChild(txt.instructionsTouchHeading, txt.welcomeHeading);
+  document.getElementById('foreign-object-center-left').replaceChild(txt.instructionsTouchParagraph, txt.welcomeParagraph);
+  document.getElementById('foreign-object-center-right').replaceChild(txt.instructionsTouchImage, txt.familyImage);
 
-  // showSlide: first array gets shown, second array gets hidden
-  showSlide([experimentSlide],
-    [textSlide, clickBubble, clickableArea, instructionsTouchButton]);
-
-  // shows only relevant elements etc.
-  prepareTrial(exp);
-  timeline = gsap.timeline({ paused: true });
-  timeline.add(changeGaze(exp));
-  exp.responseLog[exp.trials.count].durationAnimationComplete = timeline.duration();
+  textslideButtonText.innerHTML = 'los geht\'s';
+  if (devmode) {
+    showSlide([speaker], []);
+  } else {
+    showSlide([speaker], [textslideButton]);
+    // enable fullscreen mode
+    openFullscreen();
+  }
+  textslideButton.addEventListener('click', handleTransitionClick, { capture: false, once: true });
 };
 // ---------------------------------------------------------------------------------------------------------------------
-// RUNS WHEN TRANSITION BUTTON IS CLICKED (between fam and test trials)
-// (nearly same as instructions click!)
+// RUNS WHEN TRANSITION BUTTON IS CLICKED (between touch, fam and test trials)
 // ---------------------------------------------------------------------------------------------------------------------
 const handleTransitionClick = (event) => {
   event.preventDefault();
 
-  showSlide([experimentSlide],
-    [textSlide, clickBubble, instructionsFamButton, instructionsTestButton]);
+  showSlide([experimentslide],
+    [textslide, textslideButton, clickBubble, speaker]);
 
   prepareTrial(exp);
   timeline = gsap.timeline({ paused: true });
@@ -314,18 +295,18 @@ const handleGoodbyeClick = (event) => {
   if (!devmode) closeFullscreen();
 
   showSlide([],
-    [textSlide, speaker, goodbyeButton]);
+    [textslide, speaker, textslideButton]);
 };
 // ---------------------------------------------------------------------------------------------------------------------
 // RUNS WHEN "los geht's" BUTTON IS CLICKED
 // ---------------------------------------------------------------------------------------------------------------------
-const handleLosgehtsClick = async function tmp(event) {
+const handleExperimentslideButtonClick = async function tmp(event) {
   event.preventDefault();
   console.log('');
   console.log('trial: ', exp.trials.count);
 
   // hide blurr canvas and button
-  showSlide([], [document.getElementById('experiment-button'), document.getElementById('cover-blurr')]);
+  showSlide([], [experimentslideButton, document.getElementById('cover-blurr')]);
 
   // set event listener to see whether participants click too early
   exp.elemSpecs.outerSVG.ID.addEventListener('click', handleEarlyClick, false);
@@ -455,14 +436,16 @@ const handleTargetClick = async function tmp(event) {
 
     // for transition from touching into familiarization
     case exp.trials.count === exp.trials.touchNr:
-      document.getElementById('foreign-object-heading').replaceChild(instructionsFamHeading, instructionsTouchHeading);
-      document.getElementById('foreign-object-center-left').replaceChild(instructionsFamParagraph, instructionsTouchParagraph);
-      document.getElementById('foreign-object-center-right').replaceChild(instructionsFamImage, instructionsTouchImage);
+      document.getElementById('foreign-object-heading').replaceChild(txt.instructionsFamHeading, txt.instructionsTouchHeading);
+      document.getElementById('foreign-object-center-left').replaceChild(txt.instructionsFamParagraph, txt.instructionsTouchParagraph);
+      document.getElementById('foreign-object-center-right').replaceChild(txt.instructionsFamImage, txt.instructionsTouchImage);
 
-      showSlide([textSlide, instructionsFamButton],
-        [experimentSlide,
+      textslideButton.addEventListener('click', handleTransitionClick, { capture: false, once: true });
+
+      showSlide([textslide, textslideButton],
+        [experimentslide,
           hedge, pig, monkey, sheep,
-          balloonBlue, balloonRed, balloonYellow, balloonGreen, instructionsTouchButton, speaker]);
+          balloonBlue, balloonRed, balloonYellow, balloonGreen, speaker]);
 
       // if last trial had boxes, then hide them!
       if (exp.trials.boxesNr[exp.trials.count - 1] > 0) {
@@ -483,14 +466,16 @@ const handleTargetClick = async function tmp(event) {
 
     // for transition from familiarization to test trials
     case exp.trials.count === exp.trials.touchNr + exp.trials.famNr:
-      document.getElementById('foreign-object-heading').replaceChild(instructionsTestHeading, instructionsFamHeading);
-      document.getElementById('foreign-object-center-left').replaceChild(instructionsTestParagraph, instructionsFamParagraph);
-      document.getElementById('foreign-object-center-right').replaceChild(instructionsTestImage, instructionsFamImage);
+      document.getElementById('foreign-object-heading').replaceChild(txt.instructionsTestHeading, txt.instructionsFamHeading);
+      document.getElementById('foreign-object-center-left').replaceChild(txt.instructionsTestParagraph, txt.instructionsFamParagraph);
+      document.getElementById('foreign-object-center-right').replaceChild(txt.instructionsTestImage, txt.instructionsFamImage);
 
-      showSlide([textSlide, instructionsTestButton],
-        [experimentSlide,
+      textslideButton.addEventListener('click', handleTransitionClick, { capture: false, once: true });
+
+      showSlide([textslide, textslideButton],
+        [experimentslide,
           hedge, pig, monkey, sheep,
-          balloonBlue, balloonRed, balloonYellow, balloonGreen, instructionsFamButton, speaker]);
+          balloonBlue, balloonRed, balloonYellow, balloonGreen, speaker]);
 
       // if last trial had boxes, then hide them!
       if (exp.trials.boxesNr[exp.trials.count - 1] > 0) {
@@ -513,16 +498,20 @@ const handleTargetClick = async function tmp(event) {
     case exp.trials.count === exp.trials.totalNr:
       // save data, upload to server
       // when participants complete experiment, this is the one and only responseLog we need
-      downloadData(exp.responseLog, exp.subjData.subjID);
+      devmode ? console.log('download data at the end') : downloadData(exp.responseLog, exp.subjData.subjID);
 
-      document.getElementById('foreign-object-heading').replaceChild(goodbyeHeading, instructionsTestHeading);
-      document.getElementById('foreign-object-center-left').replaceChild(goodbyeParagraph, instructionsTestParagraph);
-      document.getElementById('foreign-object-center-right').replaceChild(goodbyeImage, instructionsTestImage);
+      document.getElementById('foreign-object-heading').replaceChild(txt.goodbyeHeading, txt.instructionsTestHeading);
+      document.getElementById('foreign-object-center-left').replaceChild(txt.goodbyeParagraph, txt.instructionsTestParagraph);
+      document.getElementById('foreign-object-center-right').replaceChild(txt.familyImage, txt.instructionsTestImage);
 
-      showSlide([textSlide, speaker, goodbyeButton],
-        [experimentSlide,
+      textslideButton.addEventListener('click', handleGoodbyeClick, { capture: false, once: true });
+
+      textslideButtonText.innerHTML = 'tschüss';
+
+      showSlide([textslide, speaker, textslideButton],
+        [experimentslide,
           hedge, pig, monkey, sheep,
-          balloonBlue, balloonRed, balloonYellow, balloonGreen, instructionsTestButton]);
+          balloonBlue, balloonRed, balloonYellow, balloonGreen]);
 
       // if last trial had boxes, then hide them!
       if (exp.trials.boxesNr[exp.trials.count - 1] > 0) {
@@ -566,13 +555,10 @@ const handleSpeakerClick = async function tmp(event) {
   switch (true) {
     // welcome
     case exp.trials.count === 0:
-      // enable fullscreen mode
-      if (!devmode) openFullscreen();
-
       // play instructions audio, only show button once audio is finished playing
-      showSlide([], [instructionsTouchButton]);
+      showSlide([], [textslideButton]);
       await playFullAudio(exp.soundEffect, welcomeSrc);
-      showSlide([instructionsTouchButton], []);
+      showSlide([textslideButton], []);
       break;
 
     // goodbye
@@ -615,20 +601,16 @@ let noTargetClickWithin5sec = () => {
 // ACTUALLY RUNNING:
 // ---------------------------------------------------------------------------------------------------------------------
 // INSTRUCTIONS: show slide
-document.getElementById('foreign-object-heading').appendChild(instructionsTouchHeading);
-document.getElementById('foreign-object-center-left').appendChild(instructionsTouchParagraph);
-document.getElementById('foreign-object-center-right').appendChild(instructionsTouchImage);
-showSlide([textSlide],
-  // first hide buttons, participants can only start once they listened to the instructions
-  [experimentSlide, instructionsTouchButton, instructionsFamButton, instructionsTestButton, goodbyeButton]);
+document.getElementById('foreign-object-heading').appendChild(txt.welcomeHeading);
+document.getElementById('foreign-object-center-left').appendChild(txt.welcomeParagraph);
+document.getElementById('foreign-object-center-right').appendChild(txt.familyImage);
+textslideButtonText.innerHTML = 'weiter';
 
-// dev mode: show buttons to jump ahead audio instructions
-if (devmode) showSlide([instructionsTouchButton], []);
+showSlide([textslide],
+  // first hide buttons, participants can only start once they listened to the instructions
+  [experimentslide, speaker, clickableArea]);
 
 // add event listeners
-instructionsTouchButton.addEventListener('click', handleInstructionsTouchClick, { capture: false, once: true });
-instructionsFamButton.addEventListener('click', handleTransitionClick, { capture: false, once: true });
-instructionsTestButton.addEventListener('click', handleTransitionClick, { capture: false, once: true });
-goodbyeButton.addEventListener('click', handleGoodbyeClick, { capture: false, once: true });
-losgehtsButton.addEventListener('click', handleLosgehtsClick, { capture: false });
+textslideButton.addEventListener('click', handleWelcomeClick, { capture: false, once: true });
+experimentslideButton.addEventListener('click', handleExperimentslideButtonClick, { capture: false });
 speaker.addEventListener('click', handleSpeakerClick, { capture: false, once: false });

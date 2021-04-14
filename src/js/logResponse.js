@@ -7,8 +7,8 @@ import positiveFeedbackSrc from 'url:../sounds/positive-feedback.mp3';
 export default (event, exp) => {
   // get user screen size
   // offset and client properties don't work, they include padding/borders etc. when we style our svg in the CSS
-  exp.responseLog[exp.trials.count].clientScreenWidth = document.getElementById('experiment-slide').getBoundingClientRect().width;
-  exp.responseLog[exp.trials.count].clientScreenHeight = document.getElementById('experiment-slide').getBoundingClientRect().height;
+  exp.responseLog[exp.trials.count].clientScreenWidth = document.getElementById('experimentslide').getBoundingClientRect().width;
+  exp.responseLog[exp.trials.count].clientScreenHeight = document.getElementById('experimentslide').getBoundingClientRect().height;
 
   // how much smaller/bigger is the SVG coordinate system wrt the screen size?
   // we could do the same with origViewBoxWidth / clientScreenWidth, will result in the same value
