@@ -185,6 +185,7 @@ export default (event, exp) => {
   exp.responseLog[exp.trials.count].agent = `${exp.agents[exp.trials.count].getAttribute('id')}`;
   exp.responseLog[exp.trials.count].target = `${exp.targets[exp.trials.count].getAttribute('id')}`;
   exp.responseLog[exp.trials.count].trialType = exp.trials.type[exp.trials.count];
+  exp.responseLog[exp.trials.count].voiceover = exp.trials.voiceover[exp.trials.count];
 
   if (exp.trials.boxesNr[exp.trials.count] === 0) {
     exp.responseLog[exp.trials.count].targetPosition = exp.positions[exp.trials.count].bin;
