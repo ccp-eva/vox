@@ -58,7 +58,7 @@ export default (exp) => {
     txt.instructionsTouchParagraph.innerHTML = `<p> 
     Durch einen Klick auf das Lautsprecher-Symbol hören Sie eine kleine Begrüßung.
     Die Sprachaufnahme können Sie sich so oft anhören, wie Sie möchten. <br>
-    Nachdem die Sprachaufnahme vollständig abgespielt ist, erscheint ein blauer "los geht's Knopf.
+    Nachdem die Sprachaufnahme vollständig abgespielt ist, erscheint ein blauer "los geht's" Knopf unten auf der Seite.
     Diesen drücken Sie bitte, wenn Sie mit Ihrem Kind das Spiel starten möchten.
     Dann wird Ihr Kind mit einer Sprachaufnahme durch das Ballonspiel geführt. <br> <br>
 
@@ -73,7 +73,7 @@ export default (exp) => {
     txt.instructionsTouchParagraph.innerHTML = `<p> 
     Durch einen Klick auf das Lautsprecher-Symbol hören Sie eine kleine Begrüßung.
     Die Sprachaufnahme können Sie sich so oft anhören, wie Sie möchten. <br>
-    Nachdem die Sprachaufnahme vollständig abgespielt ist, erscheint ein blauer "los geht's Knopf.
+    Nachdem die Sprachaufnahme vollständig abgespielt ist, erscheint ein blauer "los geht's" Knopf unten auf der Seite.
     Diesen drücken Sie bitte, wenn Sie mit Ihrem Kind das Spiel starten möchten.
     Dann wird Ihr Kind mit einer Sprachaufnahme durch das Ballonspiel geführt. <br> <br>
 
