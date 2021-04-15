@@ -36,16 +36,3 @@ p {
     text-anchor: middle;
     fill: white;
 }
-
-@media screen and (min-width: 320px) and (max-width: 767px) and (orientation: portrait) {
-    html {
-      transform: rotate(-90deg);
-      transform-origin: left top;
-      width: 85vh;
-      height: 85vw;
-      overflow-x: hidden;
-      position: absolute;
-      top: 100%;
-      left: 0;
-    }
-  }

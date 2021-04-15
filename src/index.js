@@ -34,7 +34,6 @@ import openFullscreen from './js/openFullscreen';
 import closeFullscreen from './js/closeFullscreen';
 import experimentalInstructions from './js/experimentalInstructions';
 import playFullAudio from './js/playFullAudio';
-
 // import calculateBoxPositions from './js/calculateBoxPositions';
 
 // TODO hedge!!
@@ -78,7 +77,6 @@ exp.trials.boxVersion = 3;
 
 // ---------------------------------------------------------------------------------------------------------------------
 // SCREEN SIZE
-// if (clientWidth < 600 || clientHeight < 200) alert('Please view on bigger screen!');
 // ---------------------------------------------------------------------------------------------------------------------
 exp.subjData.offsetWidth = document.body.offsetWidth;
 exp.subjData.offsetHeight = document.body.offsetHeight;
@@ -238,9 +236,8 @@ let targetClickTimer5sec = null;
 exp.soundEffect = new Audio();
 
 // event touchstart only works for touchscreens
+// on first user interaction, later we adjust the source
 document.body.addEventListener('touchstart', () => {
-  console.log('first user interaction');
-  // on first user interaction, later we adjust the source
   exp.soundEffect.play();
 }, { capture: false, once: true });
 
@@ -544,6 +541,7 @@ const handleWrongAreaClick = (event) => {
   if (clickScaledY < hedge.getBBox().y) {
     // count how often a participant clicked in the wrong area
     exp.responseLog[exp.trials.count].wrongAreaClick++;
+    console.log(exp.responseLog[exp.trials.count].wrongAreaClick);
   }
 };
 // ---------------------------------------------------------------------------------------------------------------------
@@ -614,3 +612,20 @@ showSlide([textslide],
 textslideButton.addEventListener('click', handleWelcomeClick, { capture: false, once: true });
 experimentslideButton.addEventListener('click', handleExperimentslideButtonClick, { capture: false });
 speaker.addEventListener('click', handleSpeakerClick, { capture: false, once: false });
+
+// initially check device orientation
+if (window.innerHeight > window.innerWidth) {
+  // eslint-disable-next-line no-alert
+  alert('Bitte benutzen Sie Ihr Gerät im Querformat!');
+}
+
+// detect device orientation changes and alert, if portrait mode is used instead of landscape
+window.addEventListener('orientationchange', () => {
+  const afterOrientationChange = () => {
+    // eslint-disable-next-line no-alert
+    if (window.innerHeight > window.innerWidth) alert('Bitte benutzen Sie Ihr Gerät im Querformat!');
+  };
+  // the orientationchange event is triggered before the rotation is complete.
+  // therefore, await resize and then evaluate innerHeight & innerWidth
+  window.addEventListener('resize', afterOrientationChange, { capture: false, once: true });
+});
