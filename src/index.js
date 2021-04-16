@@ -57,7 +57,7 @@ const url = new URL(window.location.href);
 exp.subjData.subjID = url.searchParams.get('id') || 'testID';
 
 // just for developing: turn off fullscreen mode
-const devmode = true;
+const devmode = false;
 exp.subjData.touchScreen = checkForTouchscreen();
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -541,7 +541,6 @@ const handleWrongAreaClick = (event) => {
   if (clickScaledY < hedge.getBBox().y) {
     // count how often a participant clicked in the wrong area
     exp.responseLog[exp.trials.count].wrongAreaClick++;
-    console.log(exp.responseLog[exp.trials.count].wrongAreaClick);
   }
 };
 // ---------------------------------------------------------------------------------------------------------------------
