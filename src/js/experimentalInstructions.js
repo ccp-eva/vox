@@ -1,7 +1,5 @@
 import instructionsTouchImageSrc from 'url:../images/touch.png';
-import instructionsFamBoxImageSrc from 'url:../images/fam-box.png';
 import instructionsFamHedgeImageSrc from 'url:../images/fam-hedge.png';
-import instructionsTestBoxImageSrc from 'url:../images/test-box.png';
 import instructionsTestHedgeImageSrc from 'url:../images/test-hedge.png';
 import familyImageSrc from 'url:../images/familypic.png';
 
@@ -54,8 +52,7 @@ export default (exp) => {
 
     </p>`;
 
-  if (exp.subjData.touchScreen) {
-    txt.instructionsTouchParagraph.innerHTML = `<p> 
+  txt.instructionsTouchParagraph.innerHTML = `<p> 
     Durch einen Klick auf das Lautsprecher-Symbol hören Sie eine kleine Begrüßung.
     Die Sprachaufnahme können Sie sich so oft anhören, wie Sie möchten. <br>
     Nachdem die Sprachaufnahme vollständig abgespielt ist, erscheint ein blauer "los geht's" Knopf unten auf der Seite.
@@ -67,25 +64,8 @@ export default (exp) => {
     Bitte klicken Sie auf das Lautsprecher-Symbol. <br>
     </p>`;
 
-    txt.instructionsFamImage.src = instructionsFamHedgeImageSrc;
-    txt.instructionsTestImage.src = instructionsTestHedgeImageSrc;
-  } else if (!exp.subjData.touchScreen) {
-    txt.instructionsTouchParagraph.innerHTML = `<p> 
-    Durch einen Klick auf das Lautsprecher-Symbol hören Sie eine kleine Begrüßung.
-    Die Sprachaufnahme können Sie sich so oft anhören, wie Sie möchten. <br>
-    Nachdem die Sprachaufnahme vollständig abgespielt ist, erscheint ein blauer "los geht's" Knopf unten auf der Seite.
-    Diesen drücken Sie bitte, wenn Sie mit Ihrem Kind das Spiel starten möchten.
-    Dann wird Ihr Kind mit einer Sprachaufnahme durch das Ballonspiel geführt. <br> <br>
-
-    <strong> Lassen Sie bitte Ihr Kind auf den Bildschirm zeigen. 
-    Sie klicken dann genau dorthin, wohin Ihr Kind gezeigt hat.
-    Geben Sie Ihrem Kind keinerlei Hinweise - alles, was Ihr Kind macht, ist prima! </strong> <br> <br>
-    Schalten Sie bitte Ihren Ton ein und klicken auf das Lautsprecher-Symbol. <br>
-    </p>`;
-
-    txt.instructionsFamImage.src = instructionsFamBoxImageSrc;
-    txt.instructionsTestImage.src = instructionsTestBoxImageSrc;
-  }
+  txt.instructionsFamImage.src = instructionsFamHedgeImageSrc;
+  txt.instructionsTestImage.src = instructionsTestHedgeImageSrc;
 
   txt.instructionsFamParagraph.innerHTML = `<p> 
   <br> <br> <br> <br>

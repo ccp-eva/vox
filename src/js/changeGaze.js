@@ -4,9 +4,6 @@ import touch1Src from 'url:../sounds/touch-1.mp3';
 import famHedge1Src from 'url:../sounds/fam-hedge-1.mp3';
 import testHedge1Src from 'url:../sounds/test-hedge-1.mp3';
 import testHedge2Src from 'url:../sounds/test-hedge-2.mp3';
-import famBox1Src from 'url:../sounds/fam-box-1.mp3';
-import testBox1Src from 'url:../sounds/test-box-1.mp3';
-import testBox2Src from 'url:../sounds/test-box-2.mp3';
 
 // ---------------------------------------------------------------------------------------------------------------------
 // FUNCTION FOR ANIMATING BALLOON, EYES, HEDGE
@@ -65,32 +62,6 @@ export default (exp) => {
       y: exp.elemSpecs.eyes[currentAgent].right.centerFinal.y,
     }, '<');
 
-  const ballonIntoBox = gsap.timeline({ paused: true });
-  ballonIntoBox
-    .to(exp.targets[exp.trials.count], {
-      duration: exp.responseLog[exp.trials.count].durationAnimationBalloonCenterBox,
-      ease: 'none',
-      x: exp.elemSpecs.targets.centerBox.x,
-      y: exp.elemSpecs.targets.centerBox.y,
-    })
-    .to([pupilLeft, irisLeft], {
-      duration: exp.responseLog[exp.trials.count].durationAnimationBalloonTotal,
-      ease: 'none',
-      x: exp.elemSpecs.eyes[currentAgent].left.centerFinal.x,
-      y: exp.elemSpecs.eyes[currentAgent].left.centerFinal.y,
-    }, '<')
-    .to([pupilRight, irisRight], {
-      duration: exp.responseLog[exp.trials.count].durationAnimationBalloonTotal,
-      ease: 'none',
-      x: exp.elemSpecs.eyes[currentAgent].right.centerFinal.x,
-      y: exp.elemSpecs.eyes[currentAgent].right.centerFinal.y,
-    }, '<')
-    .to(exp.targets[exp.trials.count], {
-      duration: exp.responseLog[exp.trials.count].durationAnimationBalloonBoxFinal,
-      ease: 'none',
-      y: exp.elemSpecs.targets.centerFinal.y,
-    }, `-=${exp.responseLog[exp.trials.count].durationAnimationBalloonBoxFinal}`);
-
   // -------------------------------------------------------------------------------------------------------------------
   // ADD VOICE INSTRUCTIONS
   // -------------------------------------------------------------------------------------------------------------------
@@ -110,19 +81,6 @@ export default (exp) => {
     exp.soundEffect.src = testHedge2Src;
     exp.soundEffect.play();
   };
-  const playFamBox1 = () => {
-    exp.soundEffect.src = famBox1Src;
-    exp.soundEffect.play();
-  };
-  const playTestBox1 = () => {
-    exp.soundEffect.src = testBox1Src;
-    exp.soundEffect.play();
-  };
-  const playTestBox2 = () => {
-    exp.soundEffect.src = testBox2Src;
-    exp.soundEffect.play();
-  };
-
   // -------------------------------------------------------------------------------------------------------------------
   // define animation depending on trial type
   // -------------------------------------------------------------------------------------------------------------------
@@ -142,7 +100,7 @@ export default (exp) => {
       break;
 
     // for tablet hedge version fam trials
-    case exp.trials.boxesNr[exp.trials.count] === 0 && exp.trials.type[exp.trials.count] === 'fam':
+    case exp.trials.type[exp.trials.count] === 'fam':
       const hedgeSetHalfWay = gsap.set(hedge, {
         y: hedge.getBBox().height - exp.targets[exp.trials.count].getBBox().height - 75,
       });
@@ -162,7 +120,7 @@ export default (exp) => {
       break;
 
     // for tablet hedge version test trials
-    case exp.trials.boxesNr[exp.trials.count] === 0 && exp.trials.type[exp.trials.count] === 'test':
+    case exp.trials.type[exp.trials.count] === 'test':
       const hedgeHalfDown = gsap.to(hedge, {
         y: hedge.getBBox().height - exp.targets[exp.trials.count].getBBox().height - 75,
         duration: hedgeDuration,
@@ -194,54 +152,6 @@ export default (exp) => {
         .add(attentionGetter, `+=${delay}`)
         .add(ballonToGround, `+=${delay}`)
         .add(hedgeHalfDown, `+=${delay}`);
-      break;
-
-    // for PC box version fam trials
-    case exp.trials.boxesNr[exp.trials.count] > 0 && exp.trials.type[exp.trials.count] === 'fam':
-      if (exp.trials.voiceover[exp.trials.count]) {
-        timeline.eventCallback('onStart', playFamBox1);
-        attentionGetter.delay(exp.elemSpecs.animAudioDur[famBox1Src] + delay);
-      }
-      attentionGetter.play();
-      ballonIntoBox.play();
-      timeline
-        .add(attentionGetter, `+=${delay}`)
-        .add(ballonIntoBox, `+=${delay}`);
-      break;
-
-    // for PC box version test trials
-    case exp.trials.boxesNr[exp.trials.count] > 0 && exp.trials.type[exp.trials.count] === 'test':
-      const hedgeDown = gsap.to(hedge, {
-        y: hedge.getBBox().height,
-        duration: hedgeDuration,
-        ease: 'none',
-      });
-
-      const hedgeWholeWayUp = gsap.fromTo(hedge, {
-        y: hedge.getBBox().height,
-      }, {
-        y: 0,
-        duration: hedgeDuration,
-        ease: 'none',
-      });
-
-      if (exp.trials.voiceover[exp.trials.count]) {
-        timeline.eventCallback('onStart', playTestBox1);
-        hedgeWholeWayUp.delay(exp.elemSpecs.animAudioDur[testBox1Src] + delay);
-        hedgeWholeWayUp.eventCallback('onComplete', playTestBox2);
-        attentionGetter.delay(exp.elemSpecs.animAudioDur[testBox2Src] + delay);
-      }
-
-      hedgeWholeWayUp.play();
-      attentionGetter.play();
-      ballonIntoBox.play();
-      hedgeDown.play();
-
-      timeline
-        .add(hedgeWholeWayUp, `+=${delay}`)
-        .add(attentionGetter, `+=${delay}`)
-        .add(ballonIntoBox, `+=${delay}`)
-        .add(hedgeDown, `+=${delay}`);
       break;
 
     default:

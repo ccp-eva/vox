@@ -26,13 +26,6 @@ export default (exp) => {
   const eyelineRight = document.getElementById(`${currentAgent}-eyeline-right`);
   const hedge = document.getElementById('hedge');
 
-  let boxesCurrentFront = null;
-  let boxesCurrentBack = null;
-  if (exp.trials.boxesNr[exp.trials.count] > 0) {
-    boxesCurrentFront = document.querySelector(`[id$= "boxes${exp.trials.boxesNr[exp.trials.count]}-front"]`);
-    boxesCurrentBack = document.querySelector(`[id$= "boxes${exp.trials.boxesNr[exp.trials.count]}-back"]`);
-  }
-
   // set eyes to center
   // original value stored in e.g. pupilLeft.getBBox().x
   // but we just need to remove the transform attribute
@@ -47,18 +40,11 @@ export default (exp) => {
       showSlide([], [hedge]);
       break;
     // for tablet hedge version
-    case exp.trials.boxesNr[exp.trials.count] === 0:
+    case exp.trials.type[exp.trials.count] !== 'touch':
       showSlide([hedge], []);
       break;
-    // for PC box version
-    case exp.trials.boxesNr[exp.trials.count] > 0 && exp.trials.type[exp.trials.count] === 'fam':
-      showSlide([boxesCurrentFront, boxesCurrentBack], [hedge]);
-      break;
-    case exp.trials.boxesNr[exp.trials.count] > 0 && exp.trials.type[exp.trials.count] === 'test':
-      showSlide([hedge, boxesCurrentFront, boxesCurrentBack], []);
-      break;
     default:
-      console.error('Error in showing hedges/boxes');
+      console.error('Error in showing hedge');
   }
 
   // calculate how far the balloon will fly
@@ -66,12 +52,6 @@ export default (exp) => {
   exp.elemSpecs.targets.centerFinal = {
     x: exp.positions[exp.trials.count].x - exp.elemSpecs.targets.center.x,
     y: exp.positions[exp.trials.count].y - exp.elemSpecs.targets.center.y,
-  };
-
-  // for PC fam trials where balloon first lands above boxes
-  exp.elemSpecs.targets.centerBox = {
-    x: exp.positions[exp.trials.count].x - exp.elemSpecs.targets.center.x,
-    y: exp.elemSpecs.targets.aboveBoxesY - exp.elemSpecs.targets.center.y,
   };
 
   // calculate where eyes should move in the trial
@@ -103,17 +83,6 @@ export default (exp) => {
     { x: exp.positions[exp.trials.count].x, y: exp.positions[exp.trials.count].y },
   );
 
-  // for fam trials box version: balloon lands over box, then goes inside
-  const distanceCenterBox = distancePoints(
-    exp.elemSpecs.targets.center,
-    { x: exp.positions[exp.trials.count].x, y: exp.elemSpecs.targets.aboveBoxesY },
-  );
-
-  const distanceBoxFinal = distancePoints(
-    { x: exp.positions[exp.trials.count].x, y: exp.elemSpecs.targets.aboveBoxesY },
-    { x: exp.positions[exp.trials.count].x, y: exp.positions[exp.trials.count].y },
-  );
-
   const perSecond = 700;
 
   exp.responseLog[exp.trials.count] = {};
@@ -122,11 +91,5 @@ export default (exp) => {
   exp.responseLog[exp.trials.count].earlyClick = -1;
 
   // save animation speed in our exp object
-  if (exp.trials.boxesNr[exp.trials.count] === 0) {
-    exp.responseLog[exp.trials.count].durationAnimationBalloonTotal = distanceCenterFinal / perSecond;
-  } else if (exp.trials.boxesNr[exp.trials.count] > 0) {
-    exp.responseLog[exp.trials.count].durationAnimationBalloonCenterBox = distanceCenterBox / perSecond;
-    exp.responseLog[exp.trials.count].durationAnimationBalloonBoxFinal = distanceBoxFinal / perSecond;
-    exp.responseLog[exp.trials.count].durationAnimationBalloonTotal = (distanceCenterBox / perSecond) + (distanceBoxFinal / perSecond);
-  }
+  exp.responseLog[exp.trials.count].durationAnimationBalloonTotal = distanceCenterFinal / perSecond;
 };

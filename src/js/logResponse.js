@@ -105,78 +105,7 @@ export default (event, exp) => {
   }
 
   // for tablet version, just save which area was clicked (either clickable-area or hedge)
-  if (exp.trials.boxesNr[exp.trials.count] === 0) {
-    exp.responseLog[exp.trials.count].clickedArea = event.currentTarget.id;
-
-    // for PC version of experiment, check which box was clicked
-  } else if (exp.trials.boxesNr[exp.trials.count] > 0) {
-    // if participants clicked on the part of the balooon that is still visible,
-    // simply save in which box the balloon is in
-    if (event.currentTarget.id.includes('balloon')) {
-      exp.responseLog[exp.trials.count].clickedArea = `box${exp.positions[exp.trials.count].bin}`;
-    // if participants clicked on a box, save on which one
-    } else {
-      // for 8 boxes version: gett all boxes, to see which exact element has been clicked
-      // get all boxes (by taking all child elements)
-
-      const boxesCurrentFront = Array.from(document.querySelector(`[id$= "boxes${exp.trials.boxesNr[exp.trials.count]}-front"]`).children);
-      const boxesCurrentBack = Array.from(document.querySelector(`[id$= "boxes${exp.trials.boxesNr[exp.trials.count]}-back"]`).children);
-
-      // const boxesFront = Array.from(document.getElementById('boxes8-front').children);
-      // const boxesBack = Array.from(document.getElementById('boxes8-back').children);
-
-      const boxIDs = [];
-      // get all box IDs
-      for (let i = 0; i < boxesCurrentFront.length; i++) {
-        boxIDs.push(boxesCurrentFront[i].id);
-        boxIDs.push(boxesCurrentBack[i].id);
-      }
-      // for each box, see whether it was clicked or not
-      let clickedBox = null;
-      boxIDs.forEach((box) => {
-        if (event.target.closest(`#${box}`) !== null) {
-          // save the id of the one box that was clicked (without the "boxesX-front/back-" prefix)
-          clickedBox = box.replace(`boxes${exp.trials.boxesNr[exp.trials.count]}-`, '')
-            .replace('front-', '')
-            .replace('back-', '');
-          exp.responseLog[exp.trials.count].clickedArea = clickedBox;
-        }
-      });
-
-      // log positions of all boxes
-
-      // TODO: needed? space between boxes?
-      // * spaceOverall = origViewBoxWidth - boxesNr * boxesWidth
-      // * spaceSingle = spaceOverall / (boxesNr + 1)
-      // exp.responseLog[exp.trials.count].spaceBetweenBoxes = (
-      //   (exp.elemSpecs.outerSVG.origViewBoxWidth - exp.elemSpecs.boxes.currentVersion * exp.elemSpecs.boxes.width)
-      //   / (exp.elemSpecs.boxes.currentVersion + 1));
-
-      // create array for dynamic variable creation
-      const b = [];
-      // special case for one-box-version
-      b.boxes1 = [document.getElementById('boxes1-front')];
-
-      // get all svg elements
-      for (let i = 2; i <= 8; i++) {
-        b[`boxes${i}`] = Array.from(document.getElementById(`boxes${i}-front`).children);
-      }
-
-      // for each box, calculate CenterX and CenterY positions
-      const boxCoords = [];
-      for (let i = 1; i <= 8; i++) {
-        for (let j = 0; j < i; j++) {
-          const currentBox = b[`boxes${i}`][j];
-          exp.responseLog[exp.trials.count][`boxes${i}box${j + 1}CenterX`] = currentBox.getBBox().x + currentBox.getBBox().width / 2;
-          exp.responseLog[exp.trials.count][`boxes${i}box${j + 1}CenterY`] = currentBox.getBBox().y + currentBox.getBBox().height / 2;
-        }
-      }
-
-      // save the center X coord of the box that was clicked
-      exp.responseLog[exp.trials.count].clickedBoxCenterX = exp.responseLog[exp.trials.count][`boxes${exp.trials.boxesNr[exp.trials.count]}${clickedBox}CenterX`];
-      exp.responseLog[exp.trials.count].boxesNr = exp.trials.boxesNr[exp.trials.count];
-    }
-  }
+  exp.responseLog[exp.trials.count].clickedArea = event.currentTarget.id;
 
   // log all important trial infos
   exp.responseLog[exp.trials.count].subjID = exp.subjData.subjID;
@@ -187,11 +116,7 @@ export default (event, exp) => {
   exp.responseLog[exp.trials.count].trialType = exp.trials.type[exp.trials.count];
   exp.responseLog[exp.trials.count].voiceover = exp.trials.voiceover[exp.trials.count];
 
-  if (exp.trials.boxesNr[exp.trials.count] === 0) {
-    exp.responseLog[exp.trials.count].targetPosition = exp.positions[exp.trials.count].bin;
-  } else if (exp.trials.boxesNr[exp.trials.count] > 0) {
-    exp.responseLog[exp.trials.count].targetPosition = `box${exp.positions[exp.trials.count].bin}`;
-  }
+  exp.responseLog[exp.trials.count].targetPosition = exp.positions[exp.trials.count].bin;
 
   exp.responseLog[exp.trials.count].responseTime = exp.responseLog[exp.trials.count].responseTime.t1 - exp.responseLog[exp.trials.count].responseTime.t0;
 

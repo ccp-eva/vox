@@ -6,20 +6,15 @@ import welcomeSrc from 'url:./sounds/welcome.mp3';
 import goodbyeSrc from 'url:./sounds/goodbye.mp3';
 import promptGeneralSrc from 'url:./sounds/prompt-general.mp3';
 import promptHedgeSrc from 'url:./sounds/prompt-hedge.mp3';
-import promptBoxSrc from 'url:./sounds/prompt-box.mp3';
 import promptTouchSrc from 'url:./sounds/prompt-touch.mp3';
 import promptTouchLongSrc from 'url:./sounds/prompt-touch-long.mp3';
 import testHedge3Src from 'url:./sounds/test-hedge-3.mp3';
-import testBox3Src from 'url:./sounds/test-box-3.mp3';
 
 // these, we need in our animation function. here, we'll calculate duration
 import touch1Src from 'url:./sounds/touch-1.mp3';
 import famHedge1Src from 'url:./sounds/fam-hedge-1.mp3';
 import testHedge1Src from 'url:./sounds/test-hedge-1.mp3';
 import testHedge2Src from 'url:./sounds/test-hedge-2.mp3';
-import famBox1Src from 'url:./sounds/fam-box-1.mp3';
-import testBox1Src from 'url:./sounds/test-box-1.mp3';
-import testBox2Src from 'url:./sounds/test-box-2.mp3';
 
 // import self-written functions
 import logResponse from './js/logResponse';
@@ -34,7 +29,6 @@ import openFullscreen from './js/openFullscreen';
 import closeFullscreen from './js/closeFullscreen';
 import experimentalInstructions from './js/experimentalInstructions';
 import playFullAudio from './js/playFullAudio';
-// import calculateBoxPositions from './js/calculateBoxPositions';
 
 // TODO hedge!!
 
@@ -72,8 +66,6 @@ exp.trials.totalNr = exp.trials.touchNr + exp.trials.famNr + exp.trials.testNr;
 exp.trials.count = 0;
 // NOTE: make sure, that the number of voice over fits to the nr of touch training, fam and test trials!!
 exp.trials.voiceoverNr = devmode ? 0 : 1;
-// constant number of boxes for PC version
-exp.trials.boxVersion = 3;
 
 // ---------------------------------------------------------------------------------------------------------------------
 // SCREEN SIZE
@@ -116,7 +108,7 @@ exp.elemSpecs = {
 // SAVE DURATION OF AUDIO FILES
 // ---------------------------------------------------------------------------------------------------------------------
 exp.elemSpecs.animAudioDur = {};
-const animAudioSrcs = [touch1Src, famHedge1Src, testHedge1Src, testHedge2Src, famBox1Src, testBox1Src, testBox2Src];
+const animAudioSrcs = [touch1Src, famHedge1Src, testHedge1Src, testHedge2Src];
 
 animAudioSrcs.forEach((src) => {
   const audioTmp = new Audio();
@@ -138,22 +130,6 @@ const clickBubble = document.getElementById('click-bubble');
 const clickableArea = document.getElementById('clickable-area');
 const speaker = document.getElementById('speaker');
 const hedge = document.getElementById('hedge');
-const boxes1Front = document.getElementById('boxes1-front');
-const boxesAllFront = Array.from(document.querySelectorAll('[id$=-front]'));
-const boxesAllBack = Array.from(document.querySelectorAll('[id$=-back]'));
-
-boxesAllFront.forEach((box) => {
-  box.setAttribute('visibility', 'hidden');
-});
-boxesAllBack.forEach((box) => {
-  box.setAttribute('visibility', 'hidden');
-});
-
-// take first box as reference for box measurements
-exp.elemSpecs.boxes = {
-  width: boxes1Front.getBBox().width,
-  height: boxes1Front.getBBox().height,
-};
 
 // if you change animal agents or targets, then change ID here...
 const pig = document.getElementById('pig');
@@ -214,9 +190,6 @@ exp.elemSpecs.targets = {
   borderRight: exp.elemSpecs.outerSVG.origViewBoxWidth - balloonBlue.getBBox().width,
   // calculate y coords for balloon (-20 for little distance from lower border)
   groundY: exp.elemSpecs.outerSVG.origViewBoxHeight - balloonBlue.getBBox().height - 20,
-  // define y coord for target to be right above the boxes
-  aboveBoxesY: boxes1Front.getBBox().y - balloonBlue.getBBox().height,
-  // partlyInBoxesY: boxes1Front.getBBox().y - balloonBlue.getBBox().height / 3,
 };
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -325,27 +298,13 @@ const handleExperimentslideButtonClick = async function tmp(event) {
       break;
 
     // for tablet hedge version fam trials with voiceover
-    case exp.trials.type[exp.trials.count] === 'fam'
-            && exp.trials.boxesNr[exp.trials.count] === 0:
+    case exp.trials.type[exp.trials.count] === 'fam':
       await playFullAudio(exp.soundEffect, promptHedgeSrc);
       break;
 
     // for tablet hedge version test trials with voiceover
-    case exp.trials.type[exp.trials.count] === 'test'
-      && exp.trials.boxesNr[exp.trials.count] === 0:
+    case exp.trials.type[exp.trials.count] === 'test':
       await playFullAudio(exp.soundEffect, testHedge3Src);
-      break;
-
-    // for PC box version fam trials with voice over
-    case exp.trials.type[exp.trials.count] === 'fam'
-      && exp.trials.boxesNr[exp.trials.count] > 0:
-      await playFullAudio(exp.soundEffect, promptBoxSrc);
-      break;
-
-    // for PC box version test trials with voice over
-    case exp.trials.type[exp.trials.count] === 'test'
-      && exp.trials.boxesNr[exp.trials.count] > 0:
-      await playFullAudio(exp.soundEffect, testBox3Src);
       break;
 
     default:
@@ -368,17 +327,9 @@ const handleExperimentslideButtonClick = async function tmp(event) {
       clickableArea.setAttribute('pointer-events', 'all');
       clickableArea.addEventListener('click', handleTargetClick, { capture: false, once: true });
       break;
-    case exp.trials.boxesNr[exp.trials.count] === 0:
+    case exp.trials.type[exp.trials.count] !== 'touch':
       clickableArea.setAttribute('pointer-events', 'none');
       hedge.addEventListener('click', handleTargetClick, { capture: false, once: true });
-      break;
-    case exp.trials.boxesNr[exp.trials.count] > 0:
-      const boxesCurrentFront = document.querySelector(`[id$= "boxes${exp.trials.boxesNr[exp.trials.count]}-front"]`);
-      const boxesCurrentBack = document.querySelector(`[id$= "boxes${exp.trials.boxesNr[exp.trials.count]}-back"]`);
-
-      clickableArea.setAttribute('pointer-events', 'none');
-      boxesCurrentFront.addEventListener('click', handleTargetClick, { capture: false, once: true });
-      boxesCurrentBack.addEventListener('click', handleTargetClick, { capture: false, once: true });
       break;
     default:
       console.error('Error in setting event listeners');
@@ -444,13 +395,6 @@ const handleTargetClick = async function tmp(event) {
           hedge, pig, monkey, sheep,
           balloonBlue, balloonRed, balloonYellow, balloonGreen, speaker]);
 
-      // if last trial had boxes, then hide them!
-      if (exp.trials.boxesNr[exp.trials.count - 1] > 0) {
-        const boxesCurrentFront = document.querySelector(`[id$= "boxes${exp.trials.boxesNr[exp.trials.count - 1]}-front"]`);
-        const boxesCurrentBack = document.querySelector(`[id$= "boxes${exp.trials.boxesNr[exp.trials.count - 1]}-back"]`);
-        showSlide([], [boxesCurrentFront, boxesCurrentBack]);
-      }
-
       break;
 
     // for familiarization trials
@@ -473,13 +417,6 @@ const handleTargetClick = async function tmp(event) {
         [experimentslide,
           hedge, pig, monkey, sheep,
           balloonBlue, balloonRed, balloonYellow, balloonGreen, speaker]);
-
-      // if last trial had boxes, then hide them!
-      if (exp.trials.boxesNr[exp.trials.count - 1] > 0) {
-        const boxesCurrentFront = document.querySelector(`[id$= "boxes${exp.trials.boxesNr[exp.trials.count - 1]}-front"]`);
-        const boxesCurrentBack = document.querySelector(`[id$= "boxes${exp.trials.boxesNr[exp.trials.count - 1]}-back"]`);
-        showSlide([], [boxesCurrentFront, boxesCurrentBack]);
-      }
 
       break;
 
@@ -509,13 +446,6 @@ const handleTargetClick = async function tmp(event) {
         [experimentslide,
           hedge, pig, monkey, sheep,
           balloonBlue, balloonRed, balloonYellow, balloonGreen]);
-
-      // if last trial had boxes, then hide them!
-      if (exp.trials.boxesNr[exp.trials.count - 1] > 0) {
-        const boxesCurrentFront = document.querySelector(`[id$= "boxes${exp.trials.boxesNr[exp.trials.count - 1]}-front"]`);
-        const boxesCurrentBack = document.querySelector(`[id$= "boxes${exp.trials.boxesNr[exp.trials.count - 1]}-back"]`);
-        showSlide([], [boxesCurrentFront, boxesCurrentBack]);
-      }
 
       break;
 
@@ -578,15 +508,8 @@ let noTargetClickWithin5sec = () => {
       exp.soundEffect.play();
       break;
 
-    case exp.trials.type[exp.trials.count] !== 'touch'
-          && exp.trials.boxesNr[exp.trials.count] === 0:
+    case exp.trials.type[exp.trials.count] !== 'touch':
       exp.soundEffect.src = promptHedgeSrc;
-      exp.soundEffect.play();
-      break;
-
-    case exp.trials.type[exp.trials.count] !== 'touch'
-      && exp.trials.boxesNr[exp.trials.count] > 0:
-      exp.soundEffect.src = promptBoxSrc;
       exp.soundEffect.play();
       break;
 

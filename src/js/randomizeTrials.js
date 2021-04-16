@@ -13,16 +13,6 @@ export default (exp, agentsSingle, targetsSingle) => {
   const testTrials = new Array(exp.trials.testNr).fill('test');
   exp.trials.type = touchTrials.concat(famTrials, testTrials);
 
-  if (exp.subjData.touchScreen) {
-    exp.trials.boxesNr = new Array(exp.trials.totalNr).fill(0);
-  } else if (!exp.subjData.touchScreen) {
-    exp.trials.boxesNr = [].concat(
-      new Array(exp.trials.touchNr).fill(0),
-      // change here how many boxes are shown
-      new Array(exp.trials.famNr + exp.trials.testNr).fill(exp.trials.boxVersion),
-    );
-  }
-
   // create boolean that stores whether trial should have an instruction voice over
   exp.trials.voiceover = Array(exp.trials.totalNr).fill(false);
   for (let i = 1; i <= exp.trials.voiceoverNr; i++) {
@@ -86,27 +76,11 @@ export default (exp, agentsSingle, targetsSingle) => {
     positionsSingleContinuous.push(section);
   }
 
-  // for box version
-  const positionsSingleBoxes = [];
-  const boxes = Array.from(document.querySelectorAll(`[id^= "boxes${exp.trials.boxVersion}-front-box"]`));
-  boxes.forEach((box, i) => {
-    const section = {
-      // so that it starts with 1
-      bin: i + 1,
-      type: 'boxLocation',
-      // add half a target width for placing upper left balloon corner in middle of box
-      x: box.getBBox().x + box.getBBox().width / 2 - targetsSingle[0].getBBox().width / 2,
-      y: exp.elemSpecs.targets.groundY,
-    };
-    positionsSingleBoxes.push(section);
-  });
-
   // TODO if we want to show boxes/hedge indepedent of touchscreen, this has to change!
   // for touchscreen with hedge, the target lands in random locations for all trials
-  // for PC with boxes, target lands in box positions
-  const possiblePositionsCoords = exp.subjData.touchScreen ? positionsSingleContinuous : positionsSingleBoxes;
+  const possiblePositionsCoords = positionsSingleContinuous;
   // ...same as positionsSingleContinuous.length or positionsSingleBoxes.length
-  const possiblePositionsNr = exp.subjData.touchScreen ? bins : exp.trials.boxVersion;
+  const possiblePositionsNr = bins;
 
   // for touch+fam trials that are less than all nr of possible locations:
   // take the most extreme positions
