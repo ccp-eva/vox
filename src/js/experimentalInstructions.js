@@ -31,37 +31,35 @@ export default (exp) => {
   txt.familyImage.style = 'width: inherit';
 
   // headings
-  txt.welcomeHeading.innerHTML = '<h1> Willkommen zu unserer Online-Kinderstudie! </h1>';
-  txt.instructionsTouchHeading.innerHTML = '<h1> Gleich geht es los... </h1>';
-  txt.instructionsFamHeading.innerHTML = '<h1> Super! Den ersten Teil habt ihr geschafft! </h1>';
-  txt.instructionsTestHeading.innerHTML = '<h1> Super! Jetzt kommt der letzte Teil. </h1>';
-  txt.goodbyeHeading.innerHTML = '<h1> Fertig! </h1>';
+  txt.welcomeHeading.innerHTML = '<h1> Welcome to our online study for children! </h1>';
+  txt.instructionsTouchHeading.innerHTML = '<h1> Before we start... </h1>';
+  txt.instructionsFamHeading.innerHTML = '<h1> Great! Well done! </h1>';
+  txt.instructionsTestHeading.innerHTML = '<h1> Great! Here comes the last part. </h1>';
+  txt.goodbyeHeading.innerHTML = '<h1> Finished! </h1>';
 
   // text for the parents (children get audio instructions)
   txt.welcomeParagraph.innerHTML = `<p> 
     <br> <br>
-    Vielen Dank für Ihr Interesse an unserer Studie! <br> <br>
+    Thanks a lot for your interest in our study! <br> <br>
+    In our game, we will ask your child to look for balloons. <br>
+    We hope that you and your child will enjoy the little game! <br> <br>
+    On the next page, you will get to know more about the game. <br>
+    Please turn on your volume. <br> <br>
 
-    In unserem Spiel soll Ihr Kind einen Ballon finden. <br>
-    Wir hoffen, dass Sie und Ihr Kind Spaß dabei haben werden. <br> <br>
-
-    Auf der nächsten Seite erfahren Sie mehr über das Spiel. <br>
-    Bitte schalten Sie Ihren Ton ein. <br> <br>
-
-    <strong> Klicken Sie auf den blauen "weiter"-Knopf, um den Vollbildmodus zu aktivieren und zur nächsten Seite zu gelangen. </strong>
+    <strong> Please click on the blue "continue" button to open the next page in fullscreen mode. </strong>
 
     </p>`;
 
   txt.instructionsTouchParagraph.innerHTML = `<p> 
-    Durch einen Klick auf das Lautsprecher-Symbol hören Sie eine kleine Begrüßung.
-    Die Sprachaufnahme können Sie sich so oft anhören, wie Sie möchten. <br>
-    Nachdem die Sprachaufnahme vollständig abgespielt ist, erscheint ein blauer "los geht's" Knopf unten auf der Seite.
-    Diesen drücken Sie bitte, wenn Sie mit Ihrem Kind das Spiel starten möchten.
-    Dann wird Ihr Kind mit einer Sprachaufnahme durch das Ballonspiel geführt. <br> <br>
+    By clicking on the speaker button, you can listen to a small welcome message.
+    You can listen to the voice recording as often as you want. <br> <br>
+    Once the recording stopped playing, a blue "let's go" button will appear on the screen.
+    Click the button to start the game. 
+    Your child will then be guided through the balloon game with the help of voice recordings. <br> <br>
 
-    <strong> Bitte lassen Sie dafür Ihr Kind selbst auf den Touchscreen klicken. <br>
-    Geben Sie Ihrem Kind keinerlei Hinweise - alles, was Ihr Kind macht, ist prima! </strong> <br> <br>
-    Bitte klicken Sie auf das Lautsprecher-Symbol. <br>
+    <strong> Please let your child click on the touch screen during the game. <br>
+    Do not give any tips to your child - everything they do is great! <br> <br>
+    Please click on the speaker button to play the welcome message. </strong>
     </p>`;
 
   txt.instructionsFamImage.src = instructionsFamHedgeImageSrc;
@@ -69,30 +67,29 @@ export default (exp) => {
 
   txt.instructionsFamParagraph.innerHTML = `<p> 
   <br> <br> <br> <br>
-  Gleich könnt ihr weiterspielen. <br> <br>
-  Die Aufgabe bleibt die Gleiche - Ihr Kind soll wieder den Ballon finden. <br> <br>
-  Wir führen Ihr Kind wieder mit einer Sprachaufnahme durch eine Aufgabe. <br> <br>
-  Sobald ihr weiterspielen möchtet, klicken Sie wieder den "los geht's!" Knopf. <br>
+  Soon you can continue playing. <br> <br>
+  The task stays the same - your child has to find a balloon again. <br> <br>
+  We will again guide your child through the game with a voice recording. <br> <br>
+  Whenever you want to continue playing, please press the blue "let's go" button. <br>
   </p>`;
 
   txt.instructionsTestParagraph.innerHTML = `<p> 
   <br> <br> <br> <br>
-  Gleich könnt ihr weiterspielen. <br> <br>
-  Die Aufgabe bleibt die Gleiche - Ihr Kind soll wieder den Ballon finden. <br> <br>
-  Wir führen Ihr Kind wieder mit einer Sprachaufnahme durch eine Aufgabe. <br> <br>
-  Sobald ihr weiterspielen möchtet, klicken Sie wieder den "los geht's!" Knopf. <br>
+  Soon you can continue playing. <br> <br>
+  The task stays the same - your child has to find a balloon again. <br> <br>
+  We will again guide your child through the game with a voice recording. <br> <br>
+  Whenever you want to continue playing, please press the blue "let's go" button. <br>
   </p>`;
 
   // goodbye text
   txt.goodbyeParagraph.innerHTML = `<p> 
    <br> <br>
-   Wunderbar!
-   Das hat Ihr Kind klasse gemacht! <br> <br>
-   Wenn Sie auf das Lautsprecher-Symbol klicken, 
-   kann Ihr Kind ein kleines Dankeschön und eine Verabschiedung hören. <br> <br>
-   Vielen herzlichen Dank, dass Sie mit Ihrem Kind an unserer Studie teilgenommen haben. <br> <br>
-   Beste Grüße, <br> 
-   Ihr Forschungsteam vom Max-Planck-Institut
+   Way to go!
+   That was very well done! <br> <br>
+   You can listen to a small goodbye message by clicking on the speaker button.
+   Thank you very much for participating in our online study for children! <br> <br>
+   Best regards, <br>
+   your research team from the Max Planck Institute
    </p>`;
 
   // add instruction pictures

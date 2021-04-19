@@ -30,8 +30,6 @@ import closeFullscreen from './js/closeFullscreen';
 import experimentalInstructions from './js/experimentalInstructions';
 import playFullAudio from './js/playFullAudio';
 
-// TODO hedge!!
-
 // ---------------------------------------------------------------------------------------------------------------------
 // EXP OBJECT
 // in this object, we save all of our variables, easier to pass on to functions
@@ -126,6 +124,7 @@ const textslideButton = document.getElementById('textslide-button');
 const textslideButtonText = document.getElementById('textslide-button-text');
 const experimentslide = document.getElementById('experimentslide');
 const experimentslideButton = document.getElementById('experimentslide-button');
+const experimentslideButtonText = document.getElementById('experimentslide-button-text');
 const clickBubble = document.getElementById('click-bubble');
 const clickableArea = document.getElementById('clickable-area');
 const speaker = document.getElementById('speaker');
@@ -227,7 +226,7 @@ const handleWelcomeClick = (event) => {
   document.getElementById('foreign-object-center-left').replaceChild(txt.instructionsTouchParagraph, txt.welcomeParagraph);
   document.getElementById('foreign-object-center-right').replaceChild(txt.instructionsTouchImage, txt.familyImage);
 
-  textslideButtonText.innerHTML = 'los geht\'s';
+  textslideButtonText.innerHTML = 'let\'s go';
   if (devmode) {
     showSlide([speaker], []);
   } else {
@@ -440,7 +439,7 @@ const handleTargetClick = async function tmp(event) {
 
       textslideButton.addEventListener('click', handleGoodbyeClick, { capture: false, once: true });
 
-      textslideButtonText.innerHTML = 'tschüss';
+      textslideButtonText.innerHTML = 'goodbye';
 
       showSlide([textslide, speaker, textslideButton],
         [experimentslide,
@@ -524,7 +523,8 @@ let noTargetClickWithin5sec = () => {
 document.getElementById('foreign-object-heading').appendChild(txt.welcomeHeading);
 document.getElementById('foreign-object-center-left').appendChild(txt.welcomeParagraph);
 document.getElementById('foreign-object-center-right').appendChild(txt.familyImage);
-textslideButtonText.innerHTML = 'weiter';
+textslideButtonText.innerHTML = 'continue';
+experimentslideButtonText.innerHTML = 'let\'s go';
 
 showSlide([textslide],
   // first hide buttons, participants can only start once they listened to the instructions
@@ -538,14 +538,14 @@ speaker.addEventListener('click', handleSpeakerClick, { capture: false, once: fa
 // initially check device orientation
 if (window.innerHeight > window.innerWidth) {
   // eslint-disable-next-line no-alert
-  alert('Bitte benutzen Sie Ihr Gerät im Querformat!');
+  alert('Please use your device in landscape view!');
 }
 
 // detect device orientation changes and alert, if portrait mode is used instead of landscape
 window.addEventListener('orientationchange', () => {
   const afterOrientationChange = () => {
     // eslint-disable-next-line no-alert
-    if (window.innerHeight > window.innerWidth) alert('Bitte benutzen Sie Ihr Gerät im Querformat!');
+    if (window.innerHeight > window.innerWidth) alert('Please use your device in landscape view!');
   };
   // the orientationchange event is triggered before the rotation is complete.
   // therefore, await resize and then evaluate innerHeight & innerWidth
