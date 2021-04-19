@@ -31,7 +31,7 @@ export default (exp) => {
   txt.familyImage.style = 'width: inherit';
 
   // headings
-  txt.welcomeHeading.innerHTML = '<h1> Welcome to our online study for children! </h1>';
+  txt.welcomeHeading.innerHTML = '<h1> Welcome to our online study! </h1>';
   txt.instructionsTouchHeading.innerHTML = '<h1> Before we start... </h1>';
   txt.instructionsFamHeading.innerHTML = '<h1> Great! Well done! </h1>';
   txt.instructionsTestHeading.innerHTML = '<h1> Great! Here comes the last part. </h1>';
@@ -41,25 +41,27 @@ export default (exp) => {
   txt.welcomeParagraph.innerHTML = `<p> 
     <br> <br>
     Thanks a lot for your interest in our study! <br> <br>
-    In our game, we will ask your child to look for balloons. <br>
-    We hope that you and your child will enjoy the little game! <br> <br>
-    On the next page, you will get to know more about the game. <br>
-    Please turn on your volume. <br> <br>
+  
+    Your task will be to search for balloons.
+    On the next page, you will get to know more about the game.
+    We hope that you will enjoy it! <br> <br>
+    
+    <strong> Please note that this game was originally designed for children. 
+    We would like to ask you to try your best and answer as accurately as possible. </strong> <br> <br>
 
-    <strong> Please click on the blue "continue" button to open the next page in fullscreen mode. </strong>
+    <strong> Please turn on your volume and click on the blue "continue" button to open the next page in fullscreen mode. </strong>
 
     </p>`;
 
   txt.instructionsTouchParagraph.innerHTML = `<p> 
-    By clicking on the speaker button, you can listen to a small welcome message.
+    By clicking on the speaker button, you can listen to a short welcome message.
     You can listen to the voice recording as often as you want. <br> <br>
     Once the recording stopped playing, a blue "let's go" button will appear on the screen.
     Click the button to start the game. 
-    Your child will then be guided through the balloon game with the help of voice recordings. <br> <br>
+    You will then be guided through the balloon game with the help of voice recordings. <br> <br>
 
-    <strong> Please let your child click on the touch screen during the game. <br>
-    Do not give any tips to your child - everything they do is great! <br> <br>
-    Please click on the speaker button to play the welcome message. </strong>
+    <strong> Please note that the instructions were created for children. <br> <br>
+    Click on the speaker button to play the welcome message. </strong>
     </p>`;
 
   txt.instructionsFamImage.src = instructionsFamHedgeImageSrc;
@@ -68,16 +70,16 @@ export default (exp) => {
   txt.instructionsFamParagraph.innerHTML = `<p> 
   <br> <br> <br> <br>
   Soon you can continue playing. <br> <br>
-  The task stays the same - your child has to find a balloon again. <br> <br>
-  We will again guide your child through the game with a voice recording. <br> <br>
+  The task stays the same - you will be asked to find the balloon again. <br> <br>
+  We will again guide you through the game with a voice recording. <br> <br>
   Whenever you want to continue playing, please press the blue "let's go" button. <br>
   </p>`;
 
   txt.instructionsTestParagraph.innerHTML = `<p> 
   <br> <br> <br> <br>
   Soon you can continue playing. <br> <br>
-  The task stays the same - your child has to find a balloon again. <br> <br>
-  We will again guide your child through the game with a voice recording. <br> <br>
+  The task stays the same - you will be asked to find the balloon again. <br> <br>
+  We will again guide you through the game with a voice recording. <br> <br>
   Whenever you want to continue playing, please press the blue "let's go" button. <br>
   </p>`;
 
@@ -87,7 +89,7 @@ export default (exp) => {
    Way to go!
    That was very well done! <br> <br>
    You can listen to a small goodbye message by clicking on the speaker button.
-   Thank you very much for participating in our online study for children! <br> <br>
+   Thank you very much for participating in our online study! <br> <br>
    Best regards, <br>
    your research team from the Max Planck Institute
    </p>`;
