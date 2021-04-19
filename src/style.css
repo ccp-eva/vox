@@ -8,16 +8,24 @@
     "Segoe UI Symbol" !important;
 }
 
-/* body {
+body {
     height: 100vh;
+    display: -webkit-box;
+    display: -ms-flexbox;
     display: flex;
-    align-items: center;
+    -webkit-box-pack: center;
+    -ms-flex-pack: center;
     justify-content: center;
-} */
+    -webkit-box-align: center;
+    -ms-flex-align: center;
+    align-items: center;
+  }
 
-svg {
-    max-height: 100vh;
-}
+  svg {
+    --aspectRatio: 1.7777777;
+    width: min(100vw, (100vh * var(--aspectRatio)));
+    height: min(100vh, (100vw / var(--aspectRatio)));
+  }
 
 h1 {
     font-size: 60px;
