@@ -44,7 +44,7 @@ export default (exp) => {
   
     Your task will be to search for balloons.
     On the next page, you will get to know more about the game.
-    We hope that you will enjoy it! <br> <br>
+    We hope that you'll enjoy it! <br> <br>
     
     <strong> Please note that this game was originally designed for children. 
     We would like to ask you to try your best and answer as accurately as possible. </strong> <br> <br>
@@ -69,7 +69,7 @@ export default (exp) => {
 
   txt.instructionsFamParagraph.innerHTML = `<p> 
   <br> <br> <br> <br>
-  Soon you can continue playing. <br> <br>
+  Soon, you can continue playing. <br> <br>
   The task stays the same - you will be asked to find the balloon again. <br> <br>
   We will again guide you through the game with a voice recording. <br> <br>
   Whenever you want to continue playing, please press the blue "let's go" button. <br>
@@ -77,7 +77,7 @@ export default (exp) => {
 
   txt.instructionsTestParagraph.innerHTML = `<p> 
   <br> <br> <br> <br>
-  Soon you can continue playing. <br> <br>
+  Soon, you can continue playing. <br> <br>
   The task stays the same - you will be asked to find the balloon again. <br> <br>
   We will again guide you through the game with a voice recording. <br> <br>
   Whenever you want to continue playing, please press the blue "let's go" button. <br>
@@ -88,7 +88,7 @@ export default (exp) => {
    <br> <br>
    Way to go!
    That was very well done! <br> <br>
-   You can listen to a small goodbye message by clicking on the speaker button.
+   You can listen to a short goodbye message by clicking on the speaker button.
    Thank you very much for participating in our online study! <br> <br>
    Best regards, <br>
    your research team from the Max Planck Institute
