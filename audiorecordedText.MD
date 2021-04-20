@@ -1,103 +1,117 @@
 # Gafo Instruktionstext
 
----
-
 ## Tablet Hecken Version
 
 ### Willkommen
-
-"Willkommen zu unserem Ballon-Spiel!
+"Hallo! Wir spielen jetzt das Ballon-Spiel! 
 Siehst du die Tiere auf dem Bild da? 
 Wir möchten gleich zusammen mit den Tieren mit einem Ballon spielen. 
 Was genau passiert, erklären wir dir jetzt ganz in Ruhe."
 
-### Während der Eingewöhnung:
-**Die Kinder sehen, wie der Ballon auf den Boden fliegt und sollen direkt auf den Ballon klicken.**
+---
+### Während touch training:
+*Die Kinder sehen alles und sollen direkt auf den Ballon klicken.*
 
-"Schau mal, da steht ein Tier im Fenster.
+"Schau mal, da steht ein Tier im Fenster. 
 Und siehst du den Ballon da? 
 Der Ballon fällt immer runter und landet auf dem Boden. 
-Deine Aufgabe ist es, den Ballon zu finden. 
-Die Tiere helfen Dir und schauen immer den Ballon an.
-Wo ist der Ballon? Klicke auf den Ballon!" 
+Und du musst ihn dann finden. 
+Das Tier hilft Dir und schaut immer den Ballon an. 
 
-### Während des ersten Familiarisierungstrials: 
-**Die Kinder sehen, wie der Ballon auf den Boden fliegt, dann fährt Hecke hoch und die Kinder sollen auf die Hecke klicken**
+Wo ist der Ballon? Drück auf den Ballon!" 
 
-"Klasse, du hast den Ballon gefunden!
-Siehst du wieder das Tier und den Ballon auf dem Bild?
-Der Ballon fällt wieder nach unten auf den Boden. 
-Dann wächst eine Hecke aus dem Boden. 
-Die Hecke verdeckt den Ballon.
-Deine Aufgabe ist es wieder, den Ballon zu finden.
-Die Tiere helfen dir und schauen dorthin, wo der Ballon ist.
-Wo ist der Ballon? Klicke auf die Hecke - wo der Ballon ist."
+---
 
-### Vor den Testtrials:
-**Die Kinder sehen nicht den Ballonflug und sollen auf die Hecke klicken**
+### Während Familiarisierungstrials: 
+*Die Kinder sehen, wie der Ballon hinter eine (niedrige) Hecke fliegt und sollen auf die Hecke klicken.*
 
-"Das hast du super gemacht! Jetzt spielen wir weiter.
-Da sind wieder der Ballon und das Tier. 
-Die Hecke wächst jetzt schon aus dem Boden und verdeckt den Ballon.
-Der Ballon fällt wieder nach unten auf den Boden.
-Diesmal kannst du das nicht sehen, weil ja die Hecke schon da ist.
-Aber die Tiere sehen es!
-Dann schrumpft die Hecke ein bisschen.
-Du musst wieder den Ballon finden.
-Denk dran - die Tiere helfen dir. Sie schauen immer den Ballon an.
-Klicke auf die Hecke - wo der Ballon ist."
+"Klasse, das war super! 
+Jetzt spielen wir weiter. 
+Siehst du wieder das Tier und den Ballon da? 
+Der Ballon fällt wieder runter. 
+Diesmal fällt er hinter eine Hecke. 
+Du musst ihn wieder finden. 
+Das Tier hilft dir und schaut den Ballon an. 
+
+Wo ist der Ballon? Drücke auf die Hecke - wo der Ballon ist."
+
+---
+### Während Testtrials:
+*Die Kinder sehen nicht den Ballonflug und sollen auf die Hecke klicken.*
+
+"Klasse, das hast du toll gemacht! 
+Nun spielen wir weiter. 
+Da sind wieder der Ballon, das Tier und die Hecke. 
+Die Hecke wächst jetzt hoch. 
+
+Der Ballon ist nun hinter der Hecke. 
+Du kannst das nicht sehen - das Tier aber! 
+Jetzt fällt der Ballon auf den Boden und du musst ihn finden. 
+Denk dran - das Tier schaut immer den Ballon an. 
+
+Dann schrumpft die Hecke. Drücke auf die Hecke - wo der Ballon ist."
+
+--- 
+
+### Verabschiedung
+"Die Tiere sind schon ganz glücklich vom Spielen! 
+Vielen Dank für deine Hilfe! 
+Bis zum nächsten Mal und liebe Grüße vom Schwein, Affen und Schaf"
+
 
 ---
 
 ## PC Kisten Version
 
 ### Willkommen
-
-"Willkommen zu unserem Ballon-Spiel!
+"Hallo! Wir spielen jetzt das Ballon-Spiel! 
 Siehst du die Tiere auf dem Bild da? 
 Wir möchten gleich zusammen mit den Tieren mit einem Ballon spielen. 
 Was genau passiert, erklären wir dir jetzt ganz in Ruhe."
 
-### Während der Eingewöhnung:
-**Die Kinder sehen alles und sollen direkt auf den Ballon klicken.**
+### Während touch training:
+*Die Kinder sehen alles und sollen direkt auf den Ballon klicken.*
 
-"Schau mal, da steht ein Tier im Fenster.
+"Schau mal, da steht ein Tier im Fenster. 
 Und siehst du den Ballon da? 
 Der Ballon fällt immer runter und landet auf dem Boden. 
-Deine Aufgabe ist es, den Ballon zu finden. 
-Die Tiere helfen Dir und schauen immer den Ballon an.
-Wo ist der Ballon? Klicke auf den Ballon!" 
+Und du musst ihn dann finden. 
+Das Tier hilft Dir und schaut immer den Ballon an. 
 
-### Während des ersten Familiarisierungstrials: 
-**Die Kinder sehen, wie der Ballon in die Kiste fällt, dann fährt die Hecke hoch und die Kinder sollen auf die Hecke klicken**
+Wo ist der Ballon? Drück auf den Ballon!"  
 
-"Klasse, du hast den Ballon gefunden!
-Siehst du wieder das Tier und den Ballon auf dem Bild?
-Der Ballon fällt wieder nach unten. 
+### Während Familiarisierungstrials: 
+*Die Kinder sehen, wie der Ballon in die Kiste fällt und sollen auf die Kiste klicken.*
+
+"Klasse, das war super! 
+Jetzt spielen wir weiter. 
+Siehst du wieder das Tier und den Ballon da? 
+Der Ballon fällt wieder runter. 
 Diesmal fällt er in eine Kiste. 
-Deine Aufgabe ist es wieder, den Ballon zu finden.
-Die Tiere helfen dir und schauen dorthin, wo der Ballon ist.
-Wo ist der Ballon? Klicke auf die Kiste mit dem Ballon."
+Du musst ihn wieder finden. 
+Das Tier hilft dir und schaut den Ballon an. 
 
-### Vor den Testtrials:
-**Die Kinder sehen nicht den Ballonflug und sollen auf eine Kiste klicken**
-
-"Das hast du super gemacht! Jetzt spielen wir weiter.
-Da sind wieder der Ballon, die Kisten und das Tier. 
-Diesmal wächst eine Hecke aus dem Boden. 
-Die Hecke verdeckt den Ballon und die Kisten.
-Der Ballon fällt wieder nach unten in eine Kiste.
-Diesmal kannst du das nicht sehen, weil ja die Hecke da ist.
-Aber die Tiere sehen es!
-Dann schrumpft die Hecke und du kannst wieder die Kisten sehen.
-Deine Aufgabe ist es, den Ballon finden.
-Denk dran - die Tiere helfen dir. Sie schauen immer den Ballon an.
-Klicke auf die Kiste mit dem Ballon."
+Wo ist der Ballon? Drücke auf die Kiste mit dem Ballon."
 
 ---
+### Während Testtrials:
+*Die Kinder sehen nicht den Ballonflug und sollen auf eine Kiste klicken.*
 
-## Für Tablet & PC Version: Verabschiedung
-"Die Tiere sind schon ganz müde und glücklich vom Spielen!
-Vielen Dank für deine Hilfe!
-Bis zum nächsten Mal und liebe Grüße
-vom Schwein, Affen und Schaf"
+"Klasse , das hast du toll gemacht! 
+Nun spielen wir weiter. 
+Da sind wieder der Ballon, das Tier und die Kisten. 
+Jetzt wächst eine Hecke hoch. 
+
+Der Ballon ist nun hinter der Hecke. 
+Du kannst das nicht sehen - das Tier aber! 
+Jetzt fällt der Ballon in eine Kiste und du musst ihn finden. 
+Denk dran - das Tier schaut immer den Ballon an. 
+
+Dann schrumpft die Hecke. Drücke auf die Kiste mit dem Ballon."
+
+--- 
+
+### Verabschiedung
+"Die Tiere sind schon ganz glücklich vom Spielen! 
+Vielen Dank für deine Hilfe! 
+Bis zum nächsten Mal und liebe Grüße vom Schwein, Affen und Schaf"
