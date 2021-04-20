@@ -361,9 +361,9 @@ const handleTargetClick = async function tmp(event) {
 
   // just for safety: upload data to server already
   // if participants passed touch+fam training and at least 4 test trials
-  if (exp.trials.count >= exp.trials.touchNr + exp.trials.famNr + 4) {
-    devmode ? console.log('download data for safety') : downloadData(exp.responseLog, exp.subjData.subjID);
-  }
+  // if (exp.trials.count >= exp.trials.touchNr + exp.trials.famNr + 4) {
+  //   devmode ? console.log('download data for safety') : downloadData(exp.responseLog, exp.subjData.subjID);
+  // }
 
   // so that we don't rush into next trial
   await pause(500);
