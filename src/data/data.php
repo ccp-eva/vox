@@ -3,6 +3,6 @@
   $data = $jsonString["data"];
   $fname = $jsonString["fname"];
   $time = date("Y-m-d-H-i-s");
-  file_put_contents('gafo-en-' . $fname . '-' . $time . '.json', $data, true);
+  file_put_contents('gafo-prolific-' . $fname . '-' . $time . '.json', $data, true);
   echo '{ "success": true }';
 ?>

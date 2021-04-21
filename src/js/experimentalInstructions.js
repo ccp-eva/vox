@@ -3,7 +3,7 @@ import instructionsFamHedgeImageSrc from 'url:../images/fam-hedge.png';
 import instructionsTestHedgeImageSrc from 'url:../images/test-hedge.png';
 import familyImageSrc from 'url:../images/familypic.png';
 
-export default (exp) => {
+export default () => {
   const txt = {};
   txt.welcomeHeading = document.createElement('div');
   txt.welcomeParagraph = document.createElement('div');
@@ -91,7 +91,9 @@ export default (exp) => {
    You can listen to a short goodbye message by clicking on the speaker button.
    Thank you very much for participating in our online study! <br> <br>
    Best regards, <br>
-   your research team from the Max Planck Institute
+   your research team from the Max Planck Institute <br> <br> <br>
+
+   <strong> Please click on the blue button to get redirected to the Prolific website! </strong>
    </p>`;
 
   // add instruction pictures

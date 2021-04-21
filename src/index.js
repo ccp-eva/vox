@@ -46,11 +46,12 @@ exp.subjData = {};
 const url = new URL(window.location.href);
 
 // use id parameter’s value if available else use 'testID'
-exp.subjData.subjID = url.searchParams.get('id') || 'testID';
+exp.subjData.subjID = url.searchParams.get('id') || url.searchParams.get('PROLIFIC_PID') || 'testID';
 
 // just for developing: turn off fullscreen mode
 const devmode = false;
 exp.subjData.touchScreen = checkForTouchscreen();
+if (devmode) console.log(exp.subjData.subjID);
 
 // ---------------------------------------------------------------------------------------------------------------------
 // TRIAL SPECIFICATIONS
@@ -85,7 +86,7 @@ foreignObjects.forEach((elem) => {
   elem.replaceWith(obj);
 });
 
-const txt = experimentalInstructions(exp);
+const txt = experimentalInstructions();
 
 // ---------------------------------------------------------------------------------------------------------------------
 // SAVE VIEWBOX VALUES
@@ -122,9 +123,17 @@ animAudioSrcs.forEach((src) => {
 const textslide = document.getElementById('textslide');
 const textslideButton = document.getElementById('textslide-button');
 const textslideButtonText = document.getElementById('textslide-button-text');
+const textslideButtonShape = document.getElementById('textslide-button-shape');
+let textslideButtonLength = 300; // as default
+textslideButtonText.innerHTML = 'continue';
+
 const experimentslide = document.getElementById('experimentslide');
 const experimentslideButton = document.getElementById('experimentslide-button');
 const experimentslideButtonText = document.getElementById('experimentslide-button-text');
+const experimentslideButtonShape = document.getElementById('experimentslide-button-shape');
+let experimentslideButtonLength = 300; // as default
+experimentslideButtonText.innerHTML = 'let\'s go';
+
 const clickBubble = document.getElementById('click-bubble');
 const clickableArea = document.getElementById('clickable-area');
 const speaker = document.getElementById('speaker');
@@ -196,7 +205,7 @@ exp.elemSpecs.targets = {
 // ---------------------------------------------------------------------------------------------------------------------
 // create arrays with agents, targets, positions etc. for all the trials
 randomizeTrials(exp, agentsSingle, targetsSingle);
-console.log('exp object', exp);
+if (devmode) console.log('exp object', exp);
 
 // gsap timeline that will save our animation specifications
 let timeline = null;
@@ -227,6 +236,10 @@ const handleWelcomeClick = (event) => {
   document.getElementById('foreign-object-center-right').replaceChild(txt.instructionsTouchImage, txt.familyImage);
 
   textslideButtonText.innerHTML = 'let\'s go';
+  textslideButtonLength = textslideButtonText.getComputedTextLength() + 50;
+  textslideButtonShape.setAttribute('width', `${textslideButtonLength}`);
+  textslideButtonShape.setAttribute('x', `${1920 / 2 - textslideButtonLength / 2}`);
+
   if (devmode) {
     showSlide([speaker], []);
   } else {
@@ -263,16 +276,17 @@ const handleGoodbyeClick = (event) => {
   // disable fullscreen mode
   if (!devmode) closeFullscreen();
 
-  showSlide([],
-    [textslide, speaker, textslideButton]);
+  window.location.replace('https://app.prolific.co/submissions/complete?cc=5369A212');
 };
 // ---------------------------------------------------------------------------------------------------------------------
 // RUNS WHEN "los geht's" BUTTON IS CLICKED
 // ---------------------------------------------------------------------------------------------------------------------
 const handleExperimentslideButtonClick = async function tmp(event) {
   event.preventDefault();
-  console.log('');
-  console.log('trial: ', exp.trials.count);
+  if (devmode) {
+    console.log('');
+    console.log('trial: ', exp.trials.count);
+  }
 
   // hide blurr canvas and button
   showSlide([], [experimentslideButton, document.getElementById('cover-blurr')]);
@@ -357,7 +371,7 @@ const handleTargetClick = async function tmp(event) {
 
   // function to save all relevant information
   logResponse(event, exp);
-  console.log('responseLog: ', exp.responseLog[exp.trials.count]);
+  if (devmode) console.log('responseLog: ', exp.responseLog[exp.trials.count]);
 
   // just for safety: upload data to server already
   // if participants passed touch+fam training and at least 4 test trials
@@ -439,7 +453,10 @@ const handleTargetClick = async function tmp(event) {
 
       textslideButton.addEventListener('click', handleGoodbyeClick, { capture: false, once: true });
 
-      textslideButtonText.innerHTML = 'goodbye';
+      textslideButtonText.innerHTML = 'back to Prolific';
+      textslideButtonLength = textslideButtonText.getComputedTextLength() + 50;
+      textslideButtonShape.setAttribute('width', `${textslideButtonLength}`);
+      textslideButtonShape.setAttribute('x', `${1920 / 2 - textslideButtonLength / 2}`);
 
       showSlide([textslide, speaker, textslideButton],
         [experimentslide,
@@ -523,8 +540,13 @@ let noTargetClickWithin5sec = () => {
 document.getElementById('foreign-object-heading').appendChild(txt.welcomeHeading);
 document.getElementById('foreign-object-center-left').appendChild(txt.welcomeParagraph);
 document.getElementById('foreign-object-center-right').appendChild(txt.familyImage);
-textslideButtonText.innerHTML = 'continue';
-experimentslideButtonText.innerHTML = 'let\'s go';
+textslideButtonLength = textslideButtonText.getComputedTextLength() + 50;
+textslideButtonShape.setAttribute('width', `${textslideButtonLength}`);
+textslideButtonShape.setAttribute('x', `${1920 / 2 - textslideButtonLength / 2}`);
+
+experimentslideButtonLength = experimentslideButtonText.getComputedTextLength() + 50;
+experimentslideButtonShape.setAttribute('width', `${experimentslideButtonLength}`);
+experimentslideButtonShape.setAttribute('x', `${1920 / 2 - experimentslideButtonLength / 2}`);
 
 showSlide([textslide],
   // first hide buttons, participants can only start once they listened to the instructions
