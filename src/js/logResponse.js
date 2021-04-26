@@ -174,11 +174,11 @@ export default (event, exp) => {
 
       // save the center X coord of the box that was clicked
       exp.responseLog[exp.trials.count].clickedBoxCenterX = exp.responseLog[exp.trials.count][`boxes${exp.trials.boxesNr[exp.trials.count]}${clickedBox}CenterX`];
-      exp.responseLog[exp.trials.count].boxesNr = exp.trials.boxesNr[exp.trials.count];
     }
   }
 
   // log all important trial infos
+  exp.responseLog[exp.trials.count].boxesNr = exp.trials.boxesNr[exp.trials.count];
   exp.responseLog[exp.trials.count].subjID = exp.subjData.subjID;
   exp.responseLog[exp.trials.count].touchScreen = exp.subjData.touchScreen;
   exp.responseLog[exp.trials.count].trialNr = exp.trials.count + 1;
