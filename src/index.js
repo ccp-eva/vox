@@ -15,6 +15,8 @@ import touch1Src from 'url:./sounds/touch-1.mp3';
 import famHedge1Src from 'url:./sounds/fam-hedge-1.mp3';
 import testHedge1Src from 'url:./sounds/test-hedge-1.mp3';
 import testHedge2Src from 'url:./sounds/test-hedge-2.mp3';
+import blinkSrc from 'url:./sounds/blink.mp3';
+import balloonLandsSrc from 'url:./sounds/balloon-lands.mp3';
 
 // import self-written functions
 import logResponse from './js/logResponse';
@@ -107,7 +109,7 @@ exp.elemSpecs = {
 // SAVE DURATION OF AUDIO FILES
 // ---------------------------------------------------------------------------------------------------------------------
 exp.elemSpecs.animAudioDur = {};
-const animAudioSrcs = [touch1Src, famHedge1Src, testHedge1Src, testHedge2Src];
+const animAudioSrcs = [touch1Src, famHedge1Src, testHedge1Src, testHedge2Src, blinkSrc, balloonLandsSrc];
 
 animAudioSrcs.forEach((src) => {
   const audioTmp = new Audio();

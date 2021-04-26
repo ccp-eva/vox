@@ -4,6 +4,8 @@ import touch1Src from 'url:../sounds/touch-1.mp3';
 import famHedge1Src from 'url:../sounds/fam-hedge-1.mp3';
 import testHedge1Src from 'url:../sounds/test-hedge-1.mp3';
 import testHedge2Src from 'url:../sounds/test-hedge-2.mp3';
+import blinkSrc from 'url:../sounds/blink.mp3';
+import balloonLandsSrc from 'url:../sounds/balloon-lands.mp3';
 
 // ---------------------------------------------------------------------------------------------------------------------
 // FUNCTION FOR ANIMATING BALLOON, EYES, HEDGE
@@ -81,6 +83,14 @@ export default (exp) => {
     exp.soundEffect.src = testHedge2Src;
     exp.soundEffect.play();
   };
+  const playBlink = () => {
+    exp.soundEffect.src = blinkSrc;
+    exp.soundEffect.play();
+  };
+  const playBalloonLands = () => {
+    exp.soundEffect.src = balloonLandsSrc;
+    exp.soundEffect.play();
+  };
   // -------------------------------------------------------------------------------------------------------------------
   // define animation depending on trial type
   // -------------------------------------------------------------------------------------------------------------------
@@ -92,6 +102,8 @@ export default (exp) => {
         timeline.eventCallback('onStart', playTouch1);
         attentionGetter.delay(exp.elemSpecs.animAudioDur[touch1Src] + delay);
       }
+      attentionGetter.eventCallback('onStart', playBlink);
+      ballonToGround.eventCallback('onComplete', playBalloonLands);
       attentionGetter.play();
       ballonToGround.play();
       timeline
@@ -109,7 +121,8 @@ export default (exp) => {
         timeline.eventCallback('onStart', playFamHedge1);
         attentionGetter.delay(exp.elemSpecs.animAudioDur[famHedge1Src] + delay);
       }
-
+      attentionGetter.eventCallback('onStart', playBlink);
+      ballonToGround.eventCallback('onComplete', playBalloonLands);
       attentionGetter.play();
       ballonToGround.play();
 
@@ -141,7 +154,8 @@ export default (exp) => {
         hedgeUp.eventCallback('onComplete', playTestHedge2);
         attentionGetter.delay(exp.elemSpecs.animAudioDur[testHedge2Src] + delay);
       }
-
+      attentionGetter.eventCallback('onStart', playBlink);
+      ballonToGround.eventCallback('onComplete', playBalloonLands);
       hedgeUp.play();
       attentionGetter.play();
       ballonToGround.play();
