@@ -14,7 +14,7 @@
     "copydata": "rsync -a src/data dist/",
     "build": "npm run cleanlocal && npm run copydata && parcel build ./src/index.html --public-url='./'",
     "deploy": "npm run build && npm run cleanremote && rsync -vrP dist/ $npm_config_deploy_user@$npm_config_deploy_path",
-    "fetchdata": "rsync -vraP $npm_config_deploy_user@$npm_config_deploy_data_path src/data/"
+    "fetchdata": "rsync -vraP $npm_config_deploy_user@$npm_config_deploy_data_path src/data-en/"
   },
   "keywords": [
     "vectorized",
