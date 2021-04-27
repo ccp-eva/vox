@@ -108,6 +108,7 @@ export default (event, exp) => {
   exp.responseLog[exp.trials.count].clickedArea = event.currentTarget.id;
 
   // log all important trial infos
+  exp.responseLog[exp.trials.count].boxesNr = 0;
   exp.responseLog[exp.trials.count].subjID = exp.subjData.subjID;
   exp.responseLog[exp.trials.count].touchScreen = exp.subjData.touchScreen;
   exp.responseLog[exp.trials.count].trialNr = exp.trials.count + 1;
