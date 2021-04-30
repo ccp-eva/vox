@@ -3,6 +3,9 @@
 
 # data (hide all json files)
 src/data/*.json
+src/data-de/*.json
+src/data-en/*.json
+src/data-prolific/*.json
 
 # Stuff From gitignore.io (use the Edit link to edit this)
 # Created by https://www.toptal.com/developers/gitignore/api/node,macos,linux,vscode,windows,sublimetext
