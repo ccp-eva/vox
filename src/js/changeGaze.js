@@ -9,6 +9,7 @@ import testBox1Src from 'url:../sounds/test-box-1.mp3';
 import testBox2Src from 'url:../sounds/test-box-2.mp3';
 import blinkSrc from 'url:../sounds/blink.mp3';
 import balloonLandsSrc from 'url:../sounds/balloon-lands.mp3';
+import playFullAudio from './playFullAudio';
 
 // ---------------------------------------------------------------------------------------------------------------------
 // FUNCTION FOR ANIMATING BALLOON, EYES, HEDGE
@@ -40,6 +41,11 @@ export default (exp) => {
       opacity: 0.75,
       duration: 0.3,
       transformOrigin: '50% 50%',
+      onStart: async function onStart() {
+        await playFullAudio(exp.soundEffect, blinkSrc);
+        // already set source for balloon landing here, so that sound is already preloaded
+        exp.soundEffect.src = balloonLandsSrc;
+      },
     }, '<')
     .set([exp.agents[exp.trials.count], pupilLeft, pupilRight, irisLeft, irisRight], {
       scale: 1,
@@ -65,6 +71,7 @@ export default (exp) => {
       ease: 'none',
       x: exp.elemSpecs.eyes[currentAgent].right.centerFinal.x,
       y: exp.elemSpecs.eyes[currentAgent].right.centerFinal.y,
+      onComplete() { exp.soundEffect.play(); },
     }, '<');
 
   const ballonIntoBox = gsap.timeline({ paused: true });
@@ -91,47 +98,16 @@ export default (exp) => {
       duration: exp.responseLog[exp.trials.count].durationAnimationBalloonBoxFinal,
       ease: 'none',
       y: exp.elemSpecs.targets.centerFinal.y,
+      onComplete() { exp.soundEffect.play(); },
     }, `-=${exp.responseLog[exp.trials.count].durationAnimationBalloonBoxFinal}`);
 
   // -------------------------------------------------------------------------------------------------------------------
-  // ADD VOICE INSTRUCTIONS
+  // function for setting audio source and playing sound
   // -------------------------------------------------------------------------------------------------------------------
-  const playTouch1 = () => {
-    exp.soundEffect.src = touch1Src;
+  function playSound(src) {
+    exp.soundEffect.src = src;
     exp.soundEffect.play();
-  };
-  const playFamHedge1 = () => {
-    exp.soundEffect.src = famHedge1Src;
-    exp.soundEffect.play();
-  };
-  const playTestHedge1 = () => {
-    exp.soundEffect.src = testHedge1Src;
-    exp.soundEffect.play();
-  };
-  const playTestHedge2 = () => {
-    exp.soundEffect.src = testHedge2Src;
-    exp.soundEffect.play();
-  };
-  const playFamBox1 = () => {
-    exp.soundEffect.src = famBox1Src;
-    exp.soundEffect.play();
-  };
-  const playTestBox1 = () => {
-    exp.soundEffect.src = testBox1Src;
-    exp.soundEffect.play();
-  };
-  const playTestBox2 = () => {
-    exp.soundEffect.src = testBox2Src;
-    exp.soundEffect.play();
-  };
-  const playBlink = () => {
-    exp.soundEffect.src = blinkSrc;
-    exp.soundEffect.play();
-  };
-  const playBalloonLands = () => {
-    exp.soundEffect.src = balloonLandsSrc;
-    exp.soundEffect.play();
-  };
+  }
   // -------------------------------------------------------------------------------------------------------------------
   // define animation depending on trial type
   // -------------------------------------------------------------------------------------------------------------------
@@ -140,11 +116,9 @@ export default (exp) => {
     case exp.trials.type[exp.trials.count] === 'touch':
       // for instructions voice over
       if (exp.trials.voiceover[exp.trials.count]) {
-        timeline.eventCallback('onStart', playTouch1);
+        timeline.eventCallback('onStart', playSound, [touch1Src]);
         attentionGetter.delay(exp.elemSpecs.animAudioDur[touch1Src] + delay);
       }
-      attentionGetter.eventCallback('onStart', playBlink);
-      ballonToGround.eventCallback('onComplete', playBalloonLands);
       attentionGetter.play();
       ballonToGround.play();
       timeline
@@ -159,11 +133,9 @@ export default (exp) => {
       });
 
       if (exp.trials.voiceover[exp.trials.count]) {
-        timeline.eventCallback('onStart', playFamHedge1);
+        timeline.eventCallback('onStart', playSound, [famHedge1Src]);
         attentionGetter.delay(exp.elemSpecs.animAudioDur[famHedge1Src] + delay);
       }
-      attentionGetter.eventCallback('onStart', playBlink);
-      ballonToGround.eventCallback('onComplete', playBalloonLands);
       attentionGetter.play();
       ballonToGround.play();
 
@@ -190,13 +162,11 @@ export default (exp) => {
       });
 
       if (exp.trials.voiceover[exp.trials.count]) {
-        timeline.eventCallback('onStart', playTestHedge1);
+        timeline.eventCallback('onStart', playSound, [testHedge1Src]);
         hedgeUp.delay(exp.elemSpecs.animAudioDur[testHedge1Src] + delay);
-        hedgeUp.eventCallback('onComplete', playTestHedge2);
+        hedgeUp.eventCallback('onComplete', playSound, [testHedge2Src]);
         attentionGetter.delay(exp.elemSpecs.animAudioDur[testHedge2Src] + delay);
       }
-      attentionGetter.eventCallback('onStart', playBlink);
-      ballonToGround.eventCallback('onComplete', playBalloonLands);
       hedgeUp.play();
       attentionGetter.play();
       ballonToGround.play();
@@ -212,11 +182,9 @@ export default (exp) => {
     // for PC box version fam trials
     case exp.trials.boxesNr[exp.trials.count] > 0 && exp.trials.type[exp.trials.count] === 'fam':
       if (exp.trials.voiceover[exp.trials.count]) {
-        timeline.eventCallback('onStart', playFamBox1);
+        timeline.eventCallback('onStart', playSound, [famBox1Src]);
         attentionGetter.delay(exp.elemSpecs.animAudioDur[famBox1Src] + delay);
       }
-      attentionGetter.eventCallback('onStart', playBlink);
-      ballonIntoBox.eventCallback('onComplete', playBalloonLands);
       attentionGetter.play();
       ballonIntoBox.play();
       timeline
@@ -241,14 +209,11 @@ export default (exp) => {
       });
 
       if (exp.trials.voiceover[exp.trials.count]) {
-        timeline.eventCallback('onStart', playTestBox1);
+        timeline.eventCallback('onStart', playSound, [testBox1Src]);
         hedgeWholeWayUp.delay(exp.elemSpecs.animAudioDur[testBox1Src] + delay);
-        hedgeWholeWayUp.eventCallback('onComplete', playTestBox2);
+        hedgeWholeWayUp.eventCallback('onComplete', playSound, [testBox2Src]);
         attentionGetter.delay(exp.elemSpecs.animAudioDur[testBox2Src] + delay);
       }
-
-      attentionGetter.eventCallback('onStart', playBlink);
-      ballonIntoBox.eventCallback('onComplete', playBalloonLands);
       hedgeWholeWayUp.play();
       attentionGetter.play();
       ballonIntoBox.play();

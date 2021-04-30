@@ -20,8 +20,6 @@ import testHedge2Src from 'url:./sounds/test-hedge-2.mp3';
 import famBox1Src from 'url:./sounds/fam-box-1.mp3';
 import testBox1Src from 'url:./sounds/test-box-1.mp3';
 import testBox2Src from 'url:./sounds/test-box-2.mp3';
-import blinkSrc from 'url:./sounds/blink.mp3';
-import balloonLandsSrc from 'url:./sounds/balloon-lands.mp3';
 
 // import self-written functions
 import logResponse from './js/logResponse';
@@ -119,7 +117,7 @@ exp.elemSpecs = {
 // ---------------------------------------------------------------------------------------------------------------------
 exp.elemSpecs.animAudioDur = {};
 const animAudioSrcs = [
-  touch1Src, famHedge1Src, testHedge1Src, testHedge2Src, famBox1Src, testBox1Src, testBox2Src, blinkSrc, balloonLandsSrc,
+  touch1Src, famHedge1Src, testHedge1Src, testHedge2Src, famBox1Src, testBox1Src, testBox2Src,
 ];
 
 animAudioSrcs.forEach((src) => {
@@ -228,7 +226,7 @@ exp.elemSpecs.targets = {
 // ---------------------------------------------------------------------------------------------------------------------
 // create arrays with agents, targets, positions etc. for all the trials
 randomizeTrials(exp, agentsSingle, targetsSingle);
-console.log('exp object', exp);
+if (devmode) console.log('exp object', exp);
 
 // gsap timeline that will save our animation specifications
 let timeline = null;
@@ -303,8 +301,8 @@ const handleGoodbyeClick = (event) => {
 // ---------------------------------------------------------------------------------------------------------------------
 const handleExperimentslideButtonClick = async function tmp(event) {
   event.preventDefault();
-  console.log('');
-  console.log('trial: ', exp.trials.count);
+  if (devmode) console.log('');
+  if (devmode) console.log('trial: ', exp.trials.count);
 
   // hide blurr canvas and button
   showSlide([], [experimentslideButton, document.getElementById('cover-blurr')]);
@@ -411,7 +409,7 @@ const handleTargetClick = async function tmp(event) {
 
   // function to save all relevant information
   logResponse(event, exp);
-  console.log('responseLog: ', exp.responseLog[exp.trials.count]);
+  if (devmode) console.log('responseLog: ', exp.responseLog[exp.trials.count]);
 
   // just for safety: upload data to server already
   // if participants passed touch+fam training and at least 4 test trials
