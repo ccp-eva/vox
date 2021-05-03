@@ -124,14 +124,12 @@ const textslide = document.getElementById('textslide');
 const textslideButton = document.getElementById('textslide-button');
 const textslideButtonText = document.getElementById('textslide-button-text');
 const textslideButtonShape = document.getElementById('textslide-button-shape');
-let textslideButtonLength = 300; // as default
 textslideButtonText.innerHTML = 'continue';
 
 const experimentslide = document.getElementById('experimentslide');
 const experimentslideButton = document.getElementById('experimentslide-button');
 const experimentslideButtonText = document.getElementById('experimentslide-button-text');
 const experimentslideButtonShape = document.getElementById('experimentslide-button-shape');
-let experimentslideButtonLength = 300; // as default
 experimentslideButtonText.innerHTML = 'let\'s go';
 
 const clickBubble = document.getElementById('click-bubble');
@@ -236,9 +234,9 @@ const handleWelcomeClick = (event) => {
   document.getElementById('foreign-object-center-right').replaceChild(txt.instructionsTouchImage, txt.familyImage);
 
   textslideButtonText.innerHTML = 'let\'s go';
-  textslideButtonLength = textslideButtonText.getComputedTextLength() + 50;
-  textslideButtonShape.setAttribute('width', `${textslideButtonLength}`);
-  textslideButtonShape.setAttribute('x', `${1920 / 2 - textslideButtonLength / 2}`);
+  // textslideButtonLength = textslideButtonText.getComputedTextLength() + 50;
+  // textslideButtonShape.setAttribute('width', `${textslideButtonLength}`);
+  // textslideButtonShape.setAttribute('x', `${1920 / 2 - textslideButtonLength / 2}`);
 
   if (devmode) {
     showSlide([speaker], []);
@@ -276,7 +274,7 @@ const handleGoodbyeClick = (event) => {
   // disable fullscreen mode
   if (!devmode) closeFullscreen();
 
-  window.location.replace('https://app.prolific.co/submissions/complete?cc=5369A212');
+  window.location.replace('https://app.prolific.co/submissions/complete?cc=7FC7827A');
 };
 // ---------------------------------------------------------------------------------------------------------------------
 // RUNS WHEN "los geht's" BUTTON IS CLICKED
@@ -540,13 +538,13 @@ let noTargetClickWithin5sec = () => {
 document.getElementById('foreign-object-heading').appendChild(txt.welcomeHeading);
 document.getElementById('foreign-object-center-left').appendChild(txt.welcomeParagraph);
 document.getElementById('foreign-object-center-right').appendChild(txt.familyImage);
-textslideButtonLength = textslideButtonText.getComputedTextLength() + 50;
-textslideButtonShape.setAttribute('width', `${textslideButtonLength}`);
-textslideButtonShape.setAttribute('x', `${1920 / 2 - textslideButtonLength / 2}`);
+// textslideButtonLength = textslideButtonText.getComputedTextLength() + 50;
+// textslideButtonShape.setAttribute('width', `${textslideButtonLength}`);
+// textslideButtonShape.setAttribute('x', `${1920 / 2 - textslideButtonLength / 2}`);
 
-experimentslideButtonLength = experimentslideButtonText.getComputedTextLength() + 50;
-experimentslideButtonShape.setAttribute('width', `${experimentslideButtonLength}`);
-experimentslideButtonShape.setAttribute('x', `${1920 / 2 - experimentslideButtonLength / 2}`);
+// experimentslideButtonLength = experimentslideButtonText.getComputedTextLength() + 50;
+// experimentslideButtonShape.setAttribute('width', `${experimentslideButtonLength}`);
+// experimentslideButtonShape.setAttribute('x', `${1920 / 2 - experimentslideButtonLength / 2}`);
 
 showSlide([textslide],
   // first hide buttons, participants can only start once they listened to the instructions
