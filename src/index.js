@@ -1,5 +1,6 @@
 // import animation library
 import { gsap } from 'gsap';
+import sR from '@ccp-eva/silent-recorder';
 
 // import audio sources
 import welcomeSrc from 'url:./sounds/welcome.mp3';
@@ -34,6 +35,7 @@ import openFullscreen from './js/openFullscreen';
 import closeFullscreen from './js/closeFullscreen';
 import experimentalInstructions from './js/experimentalInstructions';
 import playFullAudio from './js/playFullAudio';
+
 // import calculateBoxPositions from './js/calculateBoxPositions';
 
 // TODO hedge!!
@@ -263,6 +265,7 @@ const handleWelcomeClick = (event) => {
     showSlide([speaker], [textslideButton]);
     // enable fullscreen mode
     openFullscreen();
+    sR.startRecorder();
   }
   textslideButton.addEventListener('click', handleTransitionClick, { capture: false, once: true });
 };
@@ -291,7 +294,11 @@ const handleGoodbyeClick = (event) => {
   exp.soundEffect.currentTime = 0;
 
   // disable fullscreen mode
-  if (!devmode) closeFullscreen();
+  if (!devmode) {
+    closeFullscreen();
+    sR.stopRecorder();
+    sR.uploadVideo(exp.subjData.subjID);
+  }
 
   showSlide([],
     [textslide, speaker, textslideButton]);

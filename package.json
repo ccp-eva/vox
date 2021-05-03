@@ -26,6 +26,7 @@
   "author": "Kalinke & Prein",
   "license": "MIT",
   "dependencies": {
+    "@ccp-eva/silent-recorder": "^1.1.3",
     "gsap": "^3.6.0"
   },
   "devDependencies": {
