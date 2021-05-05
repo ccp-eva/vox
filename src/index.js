@@ -68,7 +68,7 @@ exp.subjData = {};
 // ---------------------------------------------------------------------------------------------------------------------
 // LANGUAGE SETTINGS
 // ---------------------------------------------------------------------------------------------------------------------
-exp.subjData.lang = 'De';
+exp.subjData.lang = 'En';
 
 let welcomeSrc; let goodbyeSrc;
 let promptGeneralSrc; let promptHedgeSrc; let promptBoxSrc; let promptTouchSrc; let promptTouchLongSrc;
@@ -702,10 +702,12 @@ document.getElementById('foreign-object-center-right').appendChild(txt.familyIma
 
 switch (exp.subjData.lang) {
   case 'De':
+    document.title = 'Max Planck Kinderstudie';
     textslideButtonText.innerHTML = 'weiter';
     experimentslideButtonText.innerHTML = 'los geht\'s';
     break;
   case 'En':
+    document.title = 'Max Planck Child Study';
     textslideButtonText.innerHTML = 'continue';
     experimentslideButtonText.innerHTML = 'let\'s go';
     break;
