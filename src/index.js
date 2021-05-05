@@ -65,10 +65,13 @@ import playFullAudio from './js/playFullAudio';
 const exp = {};
 exp.subjData = {};
 
+// get url object
+const url = new URL(window.location.href);
+
 // ---------------------------------------------------------------------------------------------------------------------
 // LANGUAGE SETTINGS
 // ---------------------------------------------------------------------------------------------------------------------
-exp.subjData.lang = 'En';
+exp.subjData.lang = url.searchParams.get('lang') || 'En';
 
 let welcomeSrc; let goodbyeSrc;
 let promptGeneralSrc; let promptHedgeSrc; let promptBoxSrc; let promptTouchSrc; let promptTouchLongSrc;
@@ -120,9 +123,6 @@ switch (exp.subjData.lang) {
 // ---------------------------------------------------------------------------------------------------------------------
 // PARTICIPANT ID & TOUCH
 // ---------------------------------------------------------------------------------------------------------------------
-// get url object
-const url = new URL(window.location.href);
-
 // use id parameter’s value if available else use 'testID'
 exp.subjData.subjID = url.searchParams.get('id') || 'testID';
 
