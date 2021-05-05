@@ -1,14 +1,25 @@
 /* eslint-disable no-case-declarations */
 import { gsap } from 'gsap';
-import touch1Src from 'url:../sounds/de/touch-1.mp3';
-import famHedge1Src from 'url:../sounds/de/fam-hedge-1.mp3';
-import testHedge1Src from 'url:../sounds/de/test-hedge-1.mp3';
-import testHedge2Src from 'url:../sounds/de/test-hedge-2.mp3';
-import famBox1Src from 'url:../sounds/de/fam-box-1.mp3';
-import testBox1Src from 'url:../sounds/de/test-box-1.mp3';
-import testBox2Src from 'url:../sounds/de/test-box-2.mp3';
+import touch1SrcDe from 'url:../sounds/de/touch-1.mp3';
+import famHedge1SrcDe from 'url:../sounds/de/fam-hedge-1.mp3';
+import testHedge1SrcDe from 'url:../sounds/de/test-hedge-1.mp3';
+import testHedge2SrcDe from 'url:../sounds/de/test-hedge-2.mp3';
+import famBox1SrcDe from 'url:../sounds/de/fam-box-1.mp3';
+import testBox1SrcDe from 'url:../sounds/de/test-box-1.mp3';
+import testBox2SrcDe from 'url:../sounds/de/test-box-2.mp3';
+
+import touch1SrcEn from 'url:../sounds/en/touch-1.mp3';
+import famHedge1SrcEn from 'url:../sounds/en/fam-hedge-1.mp3';
+import testHedge1SrcEn from 'url:../sounds/en/test-hedge-1.mp3';
+import testHedge2SrcEn from 'url:../sounds/en/test-hedge-2.mp3';
+import famBox1SrcEn from 'url:../sounds/en/fam-box-1.mp3';
+import testBox1SrcEn from 'url:../sounds/en/test-box-1.mp3';
+import testBox2SrcEn from 'url:../sounds/en/test-box-2.mp3';
+
+// language independent
 import blinkSrc from 'url:../sounds/de/blink.mp3';
 import balloonLandsSrc from 'url:../sounds/de/balloon-lands.mp3';
+
 import playFullAudio from './playFullAudio';
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -17,6 +28,33 @@ import playFullAudio from './playFullAudio';
 // that means that anything outside of that has no effect!!
 // ---------------------------------------------------------------------------------------------------------------------
 export default (exp) => {
+  let touch1Src;
+  let famHedge1Src; let testHedge1Src; let testHedge2Src;
+  let famBox1Src; let testBox1Src; let testBox2Src;
+
+  switch (exp.subjData.lang) {
+    case 'De':
+      touch1Src = touch1SrcDe;
+      famHedge1Src = famHedge1SrcDe;
+      testHedge1Src = testHedge1SrcDe;
+      testHedge2Src = testHedge2SrcDe;
+      famBox1Src = famBox1SrcDe;
+      testBox1Src = testBox1SrcDe;
+      testBox2Src = testBox2SrcDe;
+      break;
+    case 'En':
+      touch1Src = touch1SrcEn;
+      famHedge1Src = famHedge1SrcEn;
+      testHedge1Src = testHedge1SrcEn;
+      testHedge2Src = testHedge2SrcEn;
+      famBox1Src = famBox1SrcEn;
+      testBox1Src = testBox1SrcEn;
+      testBox2Src = testBox2SrcEn;
+      break;
+    default:
+      console.log('error in importing sounds');
+  }
+
   // get relevant elements
   const currentAgent = `${exp.agents[exp.trials.count].getAttribute('id')}`;
   const pupilLeft = document.getElementById(`${currentAgent}-pupil-left`);
@@ -108,6 +146,7 @@ export default (exp) => {
     exp.soundEffect.src = src;
     exp.soundEffect.play();
   }
+
   // -------------------------------------------------------------------------------------------------------------------
   // define animation depending on trial type
   // -------------------------------------------------------------------------------------------------------------------

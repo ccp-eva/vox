@@ -66,29 +66,15 @@ const exp = {};
 exp.subjData = {};
 
 // ---------------------------------------------------------------------------------------------------------------------
-
-// const soundSrcs = {};
-// const languages = ['De', 'En'];
-// languages.forEach((lang) => {
-//   console.log(welcomeSrcDe);
-//   const tmp = `welcomeSrc${lang}`;
-//   console.log(tmp);
-//   console.log(eval(tmp));
-
-//   soundSrcs[lang] = {
-//     // welcome: eval(`welcomeSrc${lang}`),
-//     welcome: `welcomeSrc${lang}`,
-//     goodbye: `goodbyeSrc${lang}`,
-//   };
-// });
-
+// LANGUAGE SETTINGS
+// ---------------------------------------------------------------------------------------------------------------------
 exp.subjData.lang = 'De';
-// console.log(soundSrcs[userLang]);
-// console.log(soundSrcs[userLang].welcome);
 
-let welcomeSrc; let goodbyeSrc; let touch1Src; let promptGeneralSrc; let promptHedgeSrc; let promptBoxSrc;
-let promptTouchSrc; let promptTouchLongSrc; let testHedge3Src; let testBox3Src; let famHedge1Src;
-let testHedge1Src; let testHedge2Src; let famBox1Src; let testBox1Src; let testBox2Src;
+let welcomeSrc; let goodbyeSrc;
+let promptGeneralSrc; let promptHedgeSrc; let promptBoxSrc; let promptTouchSrc; let promptTouchLongSrc;
+let touch1Src;
+let famHedge1Src; let testHedge1Src; let testHedge2Src; let testHedge3Src;
+let famBox1Src; let testBox1Src; let testBox2Src; let testBox3Src;
 
 switch (exp.subjData.lang) {
   case 'De':
@@ -100,14 +86,14 @@ switch (exp.subjData.lang) {
     promptTouchSrc = promptTouchSrcDe;
     promptTouchLongSrc = promptTouchLongSrcDe;
     touch1Src = touch1SrcDe;
-    testHedge3Src = testHedge3SrcDe;
-    testBox3Src = testBox3SrcDe;
     famHedge1Src = famHedge1SrcDe;
     testHedge1Src = testHedge1SrcDe;
     testHedge2Src = testHedge2SrcDe;
+    testHedge3Src = testHedge3SrcDe;
     famBox1Src = famBox1SrcDe;
     testBox1Src = testBox1SrcDe;
     testBox2Src = testBox2SrcDe;
+    testBox3Src = testBox3SrcDe;
     break;
   case 'En':
     welcomeSrc = welcomeSrcEn;
@@ -118,14 +104,14 @@ switch (exp.subjData.lang) {
     promptTouchSrc = promptTouchSrcEn;
     promptTouchLongSrc = promptTouchLongSrcEn;
     touch1Src = touch1SrcEn;
-    testHedge3Src = testHedge3SrcEn;
-    testBox3Src = testBox3SrcEn;
     famHedge1Src = famHedge1SrcEn;
     testHedge1Src = testHedge1SrcEn;
     testHedge2Src = testHedge2SrcEn;
+    testHedge3Src = testHedge3SrcEn;
     famBox1Src = famBox1SrcEn;
     testBox1Src = testBox1SrcEn;
     testBox2Src = testBox2SrcEn;
+    testBox3Src = testBox3SrcEn;
     break;
   default:
     console.log('error in importing sounds');
@@ -155,7 +141,7 @@ exp.trials.totalNr = exp.trials.touchNr + exp.trials.famNr + exp.trials.testNr;
 // this variable stores in which trial we currently are!
 exp.trials.count = 0;
 // NOTE: make sure, that the number of voice over fits to the nr of touch training, fam and test trials!!
-exp.trials.voiceoverNr = devmode ? 0 : 1;
+exp.trials.voiceoverNr = devmode ? 1 : 1;
 // constant number of boxes for PC version
 exp.trials.boxVersion = 5;
 
@@ -220,6 +206,8 @@ const textslideButton = document.getElementById('textslide-button');
 const textslideButtonText = document.getElementById('textslide-button-text');
 const experimentslide = document.getElementById('experimentslide');
 const experimentslideButton = document.getElementById('experimentslide-button');
+const experimentslideButtonText = document.getElementById('experimentslide-button-text');
+
 const clickBubble = document.getElementById('click-bubble');
 const clickableArea = document.getElementById('clickable-area');
 const speaker = document.getElementById('speaker');
@@ -340,7 +328,17 @@ const handleWelcomeClick = (event) => {
   document.getElementById('foreign-object-center-left').replaceChild(txt.instructionsTouchParagraph, txt.welcomeParagraph);
   document.getElementById('foreign-object-center-right').replaceChild(txt.instructionsTouchImage, txt.familyImage);
 
-  textslideButtonText.innerHTML = 'los geht\'s';
+  switch (exp.subjData.lang) {
+    case 'De':
+      textslideButtonText.innerHTML = 'los geht\'s';
+      break;
+    case 'En':
+      textslideButtonText.innerHTML = 'let\'s go';
+      break;
+    default:
+      console.log('error in setting textslideButtonText');
+  }
+
   if (devmode) {
     showSlide([speaker], []);
   } else {
@@ -594,7 +592,16 @@ const handleTargetClick = async function tmp(event) {
 
       textslideButton.addEventListener('click', handleGoodbyeClick, { capture: false, once: true });
 
-      textslideButtonText.innerHTML = 'tschüss';
+      switch (exp.subjData.lang) {
+        case 'De':
+          textslideButtonText.innerHTML = 'tschüss!';
+          break;
+        case 'En':
+          textslideButtonText.innerHTML = 'goodbye!';
+          break;
+        default:
+          console.log('error in setting textslideButtonText');
+      }
 
       showSlide([textslide, speaker, textslideButton],
         [experimentslide,
@@ -692,7 +699,19 @@ let noTargetClickWithin5sec = () => {
 document.getElementById('foreign-object-heading').appendChild(txt.welcomeHeading);
 document.getElementById('foreign-object-center-left').appendChild(txt.welcomeParagraph);
 document.getElementById('foreign-object-center-right').appendChild(txt.familyImage);
-textslideButtonText.innerHTML = 'weiter';
+
+switch (exp.subjData.lang) {
+  case 'De':
+    textslideButtonText.innerHTML = 'weiter';
+    experimentslideButtonText.innerHTML = 'los geht\'s';
+    break;
+  case 'En':
+    textslideButtonText.innerHTML = 'continue';
+    experimentslideButtonText.innerHTML = 'let\'s go';
+    break;
+  default:
+    console.log('error in setting textslideButtonText');
+}
 
 showSlide([textslide],
   // first hide buttons, participants can only start once they listened to the instructions
