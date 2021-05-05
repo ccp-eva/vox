@@ -2,25 +2,42 @@
 import { gsap } from 'gsap';
 import sR from '@ccp-eva/silent-recorder';
 
-// import audio sources
-import welcomeSrc from 'url:./sounds/welcome.mp3';
-import goodbyeSrc from 'url:./sounds/goodbye.mp3';
-import promptGeneralSrc from 'url:./sounds/prompt-general.mp3';
-import promptHedgeSrc from 'url:./sounds/prompt-hedge.mp3';
-import promptBoxSrc from 'url:./sounds/prompt-box.mp3';
-import promptTouchSrc from 'url:./sounds/prompt-touch.mp3';
-import promptTouchLongSrc from 'url:./sounds/prompt-touch-long.mp3';
-import testHedge3Src from 'url:./sounds/test-hedge-3.mp3';
-import testBox3Src from 'url:./sounds/test-box-3.mp3';
+import welcomeSrcDe from 'url:./sounds/de/welcome.mp3';
+import goodbyeSrcDe from 'url:./sounds/de/goodbye.mp3';
+import promptGeneralSrcDe from 'url:./sounds/de/prompt-general.mp3';
+import promptHedgeSrcDe from 'url:./sounds/de/prompt-hedge.mp3';
+import promptBoxSrcDe from 'url:./sounds/de/prompt-box.mp3';
+import promptTouchSrcDe from 'url:./sounds/de/prompt-touch.mp3';
+import promptTouchLongSrcDe from 'url:./sounds/de/prompt-touch-long.mp3';
+import testHedge3SrcDe from 'url:./sounds/de/test-hedge-3.mp3';
+import testBox3SrcDe from 'url:./sounds/de/test-box-3.mp3';
+
+import welcomeSrcEn from 'url:./sounds/en/welcome.mp3';
+import goodbyeSrcEn from 'url:./sounds/en/goodbye.mp3';
+import promptGeneralSrcEn from 'url:./sounds/en/prompt-general.mp3';
+import promptHedgeSrcEn from 'url:./sounds/en/prompt-hedge.mp3';
+import promptBoxSrcEn from 'url:./sounds/en/prompt-box.mp3';
+import promptTouchSrcEn from 'url:./sounds/en/prompt-touch.mp3';
+import promptTouchLongSrcEn from 'url:./sounds/en/prompt-touch-long.mp3';
+import testHedge3SrcEn from 'url:./sounds/en/test-hedge-3.mp3';
+import testBox3SrcEn from 'url:./sounds/en/test-box-3.mp3';
 
 // these, we need in our animation function. here, we'll calculate duration
-import touch1Src from 'url:./sounds/touch-1.mp3';
-import famHedge1Src from 'url:./sounds/fam-hedge-1.mp3';
-import testHedge1Src from 'url:./sounds/test-hedge-1.mp3';
-import testHedge2Src from 'url:./sounds/test-hedge-2.mp3';
-import famBox1Src from 'url:./sounds/fam-box-1.mp3';
-import testBox1Src from 'url:./sounds/test-box-1.mp3';
-import testBox2Src from 'url:./sounds/test-box-2.mp3';
+import touch1SrcDe from 'url:./sounds/de/touch-1.mp3';
+import famHedge1SrcDe from 'url:./sounds/de/fam-hedge-1.mp3';
+import testHedge1SrcDe from 'url:./sounds/de/test-hedge-1.mp3';
+import testHedge2SrcDe from 'url:./sounds/de/test-hedge-2.mp3';
+import famBox1SrcDe from 'url:./sounds/de/fam-box-1.mp3';
+import testBox1SrcDe from 'url:./sounds/de/test-box-1.mp3';
+import testBox2SrcDe from 'url:./sounds/de/test-box-2.mp3';
+
+import touch1SrcEn from 'url:./sounds/en/touch-1.mp3';
+import famHedge1SrcEn from 'url:./sounds/en/fam-hedge-1.mp3';
+import testHedge1SrcEn from 'url:./sounds/en/test-hedge-1.mp3';
+import testHedge2SrcEn from 'url:./sounds/en/test-hedge-2.mp3';
+import famBox1SrcEn from 'url:./sounds/en/fam-box-1.mp3';
+import testBox1SrcEn from 'url:./sounds/en/test-box-1.mp3';
+import testBox2SrcEn from 'url:./sounds/en/test-box-2.mp3';
 
 // import self-written functions
 import logResponse from './js/logResponse';
@@ -46,12 +63,77 @@ import playFullAudio from './js/playFullAudio';
 // NOTE: we do manipulate this object in our functions!
 // ---------------------------------------------------------------------------------------------------------------------
 const exp = {};
+exp.subjData = {};
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+// const soundSrcs = {};
+// const languages = ['De', 'En'];
+// languages.forEach((lang) => {
+//   console.log(welcomeSrcDe);
+//   const tmp = `welcomeSrc${lang}`;
+//   console.log(tmp);
+//   console.log(eval(tmp));
+
+//   soundSrcs[lang] = {
+//     // welcome: eval(`welcomeSrc${lang}`),
+//     welcome: `welcomeSrc${lang}`,
+//     goodbye: `goodbyeSrc${lang}`,
+//   };
+// });
+
+exp.subjData.lang = 'De';
+// console.log(soundSrcs[userLang]);
+// console.log(soundSrcs[userLang].welcome);
+
+let welcomeSrc; let goodbyeSrc; let touch1Src; let promptGeneralSrc; let promptHedgeSrc; let promptBoxSrc;
+let promptTouchSrc; let promptTouchLongSrc; let testHedge3Src; let testBox3Src; let famHedge1Src;
+let testHedge1Src; let testHedge2Src; let famBox1Src; let testBox1Src; let testBox2Src;
+
+switch (exp.subjData.lang) {
+  case 'De':
+    welcomeSrc = welcomeSrcDe;
+    goodbyeSrc = goodbyeSrcDe;
+    promptGeneralSrc = promptGeneralSrcDe;
+    promptHedgeSrc = promptHedgeSrcDe;
+    promptBoxSrc = promptBoxSrcDe;
+    promptTouchSrc = promptTouchSrcDe;
+    promptTouchLongSrc = promptTouchLongSrcDe;
+    touch1Src = touch1SrcDe;
+    testHedge3Src = testHedge3SrcDe;
+    testBox3Src = testBox3SrcDe;
+    famHedge1Src = famHedge1SrcDe;
+    testHedge1Src = testHedge1SrcDe;
+    testHedge2Src = testHedge2SrcDe;
+    famBox1Src = famBox1SrcDe;
+    testBox1Src = testBox1SrcDe;
+    testBox2Src = testBox2SrcDe;
+    break;
+  case 'En':
+    welcomeSrc = welcomeSrcEn;
+    goodbyeSrc = goodbyeSrcEn;
+    promptGeneralSrc = promptGeneralSrcEn;
+    promptHedgeSrc = promptHedgeSrcEn;
+    promptBoxSrc = promptBoxSrcEn;
+    promptTouchSrc = promptTouchSrcEn;
+    promptTouchLongSrc = promptTouchLongSrcEn;
+    touch1Src = touch1SrcEn;
+    testHedge3Src = testHedge3SrcEn;
+    testBox3Src = testBox3SrcEn;
+    famHedge1Src = famHedge1SrcEn;
+    testHedge1Src = testHedge1SrcEn;
+    testHedge2Src = testHedge2SrcEn;
+    famBox1Src = famBox1SrcEn;
+    testBox1Src = testBox1SrcEn;
+    testBox2Src = testBox2SrcEn;
+    break;
+  default:
+    console.log('error in importing sounds');
+}
 
 // ---------------------------------------------------------------------------------------------------------------------
 // PARTICIPANT ID & TOUCH
 // ---------------------------------------------------------------------------------------------------------------------
-exp.subjData = {};
-
 // get url object
 const url = new URL(window.location.href);
 
@@ -59,7 +141,7 @@ const url = new URL(window.location.href);
 exp.subjData.subjID = url.searchParams.get('id') || 'testID';
 
 // just for developing: turn off fullscreen mode
-const devmode = false;
+const devmode = true;
 exp.subjData.touchScreen = checkForTouchscreen();
 
 // ---------------------------------------------------------------------------------------------------------------------

@@ -1,14 +1,14 @@
 /* eslint-disable no-case-declarations */
 import { gsap } from 'gsap';
-import touch1Src from 'url:../sounds/touch-1.mp3';
-import famHedge1Src from 'url:../sounds/fam-hedge-1.mp3';
-import testHedge1Src from 'url:../sounds/test-hedge-1.mp3';
-import testHedge2Src from 'url:../sounds/test-hedge-2.mp3';
-import famBox1Src from 'url:../sounds/fam-box-1.mp3';
-import testBox1Src from 'url:../sounds/test-box-1.mp3';
-import testBox2Src from 'url:../sounds/test-box-2.mp3';
-import blinkSrc from 'url:../sounds/blink.mp3';
-import balloonLandsSrc from 'url:../sounds/balloon-lands.mp3';
+import touch1Src from 'url:../sounds/de/touch-1.mp3';
+import famHedge1Src from 'url:../sounds/de/fam-hedge-1.mp3';
+import testHedge1Src from 'url:../sounds/de/test-hedge-1.mp3';
+import testHedge2Src from 'url:../sounds/de/test-hedge-2.mp3';
+import famBox1Src from 'url:../sounds/de/fam-box-1.mp3';
+import testBox1Src from 'url:../sounds/de/test-box-1.mp3';
+import testBox2Src from 'url:../sounds/de/test-box-2.mp3';
+import blinkSrc from 'url:../sounds/de/blink.mp3';
+import balloonLandsSrc from 'url:../sounds/de/balloon-lands.mp3';
 import playFullAudio from './playFullAudio';
 
 // ---------------------------------------------------------------------------------------------------------------------

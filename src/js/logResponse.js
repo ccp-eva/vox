@@ -1,5 +1,5 @@
 import { gsap } from 'gsap';
-import positiveFeedbackSrc from 'url:../sounds/positive-feedback.mp3';
+import positiveFeedbackSrc from 'url:../sounds/de/positive-feedback.mp3';
 
 // ---------------------------------------------------------------------------------------------------------------------
 // FUNCTION FOR LOGGING ALL RELEVANT TRIAL INFOS
