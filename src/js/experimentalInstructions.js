@@ -38,7 +38,7 @@ export default (exp) => {
   txt.familyImage.src = familyImageSrc;
 
   switch (exp.subjData.lang) {
-    case 'De':
+    case 'de':
       // headings
       txt.welcomeHeading.innerHTML = '<h1> Willkommen zu unserer Online-Kinderstudie! </h1>';
       txt.instructionsTouchHeading.innerHTML = '<h1> Gleich geht es los... </h1>';
@@ -119,7 +119,7 @@ export default (exp) => {
         </p>`;
       break;
 
-    case 'En':
+    case 'en':
       // headings
       txt.welcomeHeading.innerHTML = '<h1> Welcome to our online child study! </h1>';
       txt.instructionsTouchHeading.innerHTML = '<h1> Before we start... </h1>';

@@ -33,7 +33,7 @@ export default (exp) => {
   let famBox1Src; let testBox1Src; let testBox2Src;
 
   switch (exp.subjData.lang) {
-    case 'De':
+    case 'de':
       touch1Src = touch1SrcDe;
       famHedge1Src = famHedge1SrcDe;
       testHedge1Src = testHedge1SrcDe;
@@ -42,7 +42,7 @@ export default (exp) => {
       testBox1Src = testBox1SrcDe;
       testBox2Src = testBox2SrcDe;
       break;
-    case 'En':
+    case 'en':
       touch1Src = touch1SrcEn;
       famHedge1Src = famHedge1SrcEn;
       testHedge1Src = testHedge1SrcEn;

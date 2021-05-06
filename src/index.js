@@ -1,6 +1,6 @@
 // import animation library
 import { gsap } from 'gsap';
-import sR from '@ccp-eva/silent-recorder';
+// import sR from '@ccp-eva/silent-recorder';
 
 import welcomeSrcDe from 'url:./sounds/de/welcome.mp3';
 import goodbyeSrcDe from 'url:./sounds/de/goodbye.mp3';
@@ -52,6 +52,7 @@ import openFullscreen from './js/openFullscreen';
 import closeFullscreen from './js/closeFullscreen';
 import experimentalInstructions from './js/experimentalInstructions';
 import playFullAudio from './js/playFullAudio';
+import getBrowserLang from './js/getBrowserLang';
 
 // import calculateBoxPositions from './js/calculateBoxPositions';
 
@@ -71,7 +72,8 @@ const url = new URL(window.location.href);
 // ---------------------------------------------------------------------------------------------------------------------
 // LANGUAGE SETTINGS
 // ---------------------------------------------------------------------------------------------------------------------
-exp.subjData.lang = url.searchParams.get('lang') || 'En';
+// exp.subjData.lang = url.searchParams.get('lang') || 'en';
+exp.subjData.lang = getBrowserLang();
 
 let welcomeSrc; let goodbyeSrc;
 let promptGeneralSrc; let promptHedgeSrc; let promptBoxSrc; let promptTouchSrc; let promptTouchLongSrc;
@@ -80,7 +82,7 @@ let famHedge1Src; let testHedge1Src; let testHedge2Src; let testHedge3Src;
 let famBox1Src; let testBox1Src; let testBox2Src; let testBox3Src;
 
 switch (exp.subjData.lang) {
-  case 'De':
+  case 'de':
     welcomeSrc = welcomeSrcDe;
     goodbyeSrc = goodbyeSrcDe;
     promptGeneralSrc = promptGeneralSrcDe;
@@ -98,7 +100,7 @@ switch (exp.subjData.lang) {
     testBox2Src = testBox2SrcDe;
     testBox3Src = testBox3SrcDe;
     break;
-  case 'En':
+  case 'en':
     welcomeSrc = welcomeSrcEn;
     goodbyeSrc = goodbyeSrcEn;
     promptGeneralSrc = promptGeneralSrcEn;
@@ -329,10 +331,10 @@ const handleWelcomeClick = (event) => {
   document.getElementById('foreign-object-center-right').replaceChild(txt.instructionsTouchImage, txt.familyImage);
 
   switch (exp.subjData.lang) {
-    case 'De':
+    case 'de':
       textslideButtonText.innerHTML = 'los geht\'s';
       break;
-    case 'En':
+    case 'en':
       textslideButtonText.innerHTML = 'let\'s go';
       break;
     default:
@@ -593,10 +595,10 @@ const handleTargetClick = async function tmp(event) {
       textslideButton.addEventListener('click', handleGoodbyeClick, { capture: false, once: true });
 
       switch (exp.subjData.lang) {
-        case 'De':
+        case 'de':
           textslideButtonText.innerHTML = 'tschüss!';
           break;
-        case 'En':
+        case 'en':
           textslideButtonText.innerHTML = 'goodbye!';
           break;
         default:
@@ -701,12 +703,12 @@ document.getElementById('foreign-object-center-left').appendChild(txt.welcomePar
 document.getElementById('foreign-object-center-right').appendChild(txt.familyImage);
 
 switch (exp.subjData.lang) {
-  case 'De':
+  case 'de':
     document.title = 'Max Planck Kinderstudie';
     textslideButtonText.innerHTML = 'weiter';
     experimentslideButtonText.innerHTML = 'los geht\'s';
     break;
-  case 'En':
+  case 'en':
     document.title = 'Max Planck Child Study';
     textslideButtonText.innerHTML = 'continue';
     experimentslideButtonText.innerHTML = 'let\'s go';
