@@ -129,7 +129,7 @@ switch (exp.subjData.lang) {
 exp.subjData.subjID = url.searchParams.get('id') || 'testID';
 
 // just for developing: turn off fullscreen mode
-const devmode = true;
+const devmode = false;
 exp.subjData.touchScreen = checkForTouchscreen();
 
 // ---------------------------------------------------------------------------------------------------------------------
