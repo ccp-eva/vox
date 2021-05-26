@@ -158,26 +158,20 @@ agentsChar.forEach((agent) => {
     radius: document.getElementById(`${agent}-eyeline-left`).getAttribute('r'),
     left: {
       center: {
-        x: document.getElementById(`${agent}-pupil-left`).getAttribute('cx'),
-        y: document.getElementById(`${agent}-pupil-left`).getAttribute('cy'),
-      },
-      bbox: {
-        x: document.getElementById(`${agent}-pupil-left`).getBBox().x, // same as cx - r
-        y: document.getElementById(`${agent}-pupil-left`).getBBox().y, // same as cy - r
+        x: document.getElementById(`${agent}-eyeline-left`).getAttribute('cx'),
+        y: document.getElementById(`${agent}-eyeline-left`).getAttribute('cy'),
       },
     },
     right: {
       center: {
-        x: document.getElementById(`${agent}-pupil-right`).getAttribute('cx'),
-        y: document.getElementById(`${agent}-pupil-right`).getAttribute('cy'),
-      },
-      bbox: {
-        x: document.getElementById(`${agent}-pupil-right`).getBBox().x, // same as cx - r
-        y: document.getElementById(`${agent}-pupil-right`).getBBox().y, // same as cy - r
+        x: document.getElementById(`${agent}-eyeline-right`).getAttribute('cx'),
+        y: document.getElementById(`${agent}-eyeline-right`).getAttribute('cy'),
       },
     },
   };
 });
+
+console.log('eyes', exp.elemSpecs.eyes);
 
 // calculate some positions of the targets
 exp.elemSpecs.targets = {
