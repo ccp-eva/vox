@@ -274,7 +274,7 @@ const handleGoodbyeClick = (event) => {
   // disable fullscreen mode
   if (!devmode) closeFullscreen();
 
-  window.location.replace('https://app.prolific.co/submissions/complete?cc=7FC7827A');
+  window.location.replace('https://app.prolific.co/submissions/complete?cc=5E523705');
 };
 // ---------------------------------------------------------------------------------------------------------------------
 // RUNS WHEN "los geht's" BUTTON IS CLICKED
