@@ -6,7 +6,10 @@ import instructionsTestHedgeImageSrc from 'url:../images/test-hedge.png';
 import familyImageSrc from 'url:../images/familypic.png';
 
 export default (exp) => {
+  const experimentslideButtonText = document.getElementById('experimentslide-button-text');
+  const textslideButtonText = document.getElementById('textslide-button-text');
   const txt = {};
+
   txt.welcomeHeading = document.createElement('div');
   txt.welcomeParagraph = document.createElement('div');
   txt.welcomeImage = document.createElement('img');
@@ -39,6 +42,11 @@ export default (exp) => {
 
   switch (exp.subjData.lang) {
     case 'de':
+      document.title = 'Max Planck Kinderstudie';
+      textslideButtonText.innerHTML = 'weiter';
+      experimentslideButtonText.innerHTML = 'los geht\'s';
+      txt.landscapemode = 'Bitte benutzen Sie Ihr Gerät im Querformat!';
+
       // headings
       txt.welcomeHeading.innerHTML = '<h1> Willkommen zu unserer Online-Kinderstudie! </h1>';
       txt.instructionsTouchHeading.innerHTML = '<h1> Gleich geht es los... </h1>';
@@ -120,6 +128,11 @@ export default (exp) => {
       break;
 
     case 'en':
+      document.title = 'Max Planck Child Study';
+      textslideButtonText.innerHTML = 'continue';
+      experimentslideButtonText.innerHTML = 'let\'s go';
+      txt.landscapemode = 'Please use your device in landscape mode!';
+
       // headings
       txt.welcomeHeading.innerHTML = '<h1> Welcome to our online child study! </h1>';
       txt.instructionsTouchHeading.innerHTML = '<h1> Before we start... </h1>';

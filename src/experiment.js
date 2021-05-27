@@ -208,7 +208,6 @@ const textslideButton = document.getElementById('textslide-button');
 const textslideButtonText = document.getElementById('textslide-button-text');
 const experimentslide = document.getElementById('experimentslide');
 const experimentslideButton = document.getElementById('experimentslide-button');
-const experimentslideButtonText = document.getElementById('experimentslide-button-text');
 
 const clickBubble = document.getElementById('click-bubble');
 const clickableArea = document.getElementById('clickable-area');
@@ -702,21 +701,6 @@ document.getElementById('foreign-object-heading').appendChild(txt.welcomeHeading
 document.getElementById('foreign-object-center-left').appendChild(txt.welcomeParagraph);
 document.getElementById('foreign-object-center-right').appendChild(txt.familyImage);
 
-switch (exp.subjData.lang) {
-  case 'de':
-    document.title = 'Max Planck Kinderstudie';
-    textslideButtonText.innerHTML = 'weiter';
-    experimentslideButtonText.innerHTML = 'los geht\'s';
-    break;
-  case 'en':
-    document.title = 'Max Planck Child Study';
-    textslideButtonText.innerHTML = 'continue';
-    experimentslideButtonText.innerHTML = 'let\'s go';
-    break;
-  default:
-    console.log('error in setting textslideButtonText');
-}
-
 showSlide([textslide],
   // first hide buttons, participants can only start once they listened to the instructions
   [experimentslide, speaker, clickableArea]);
@@ -729,14 +713,14 @@ speaker.addEventListener('click', handleSpeakerClick, { capture: false, once: fa
 // initially check device orientation
 if (window.innerHeight > window.innerWidth) {
   // eslint-disable-next-line no-alert
-  alert('Bitte benutzen Sie Ihr Gerät im Querformat!');
+  alert(`${txt.landscapemode}`);
 }
 
 // detect device orientation changes and alert, if portrait mode is used instead of landscape
 window.addEventListener('orientationchange', () => {
   const afterOrientationChange = () => {
     // eslint-disable-next-line no-alert
-    if (window.innerHeight > window.innerWidth) alert('Bitte benutzen Sie Ihr Gerät im Querformat!');
+    if (window.innerHeight > window.innerWidth) alert(`${txt.landscapemode}`);
   };
   // the orientationchange event is triggered before the rotation is complete.
   // therefore, await resize and then evaluate innerHeight & innerWidth
