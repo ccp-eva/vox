@@ -35,16 +35,11 @@ export default (exp) => {
   });
 
   // depending on trial type, show or hide hedge and boxes
-  switch (true) {
-    case exp.trials.type[exp.trials.count] === 'touch':
-      showSlide([], [hedge]);
-      break;
-    // for tablet hedge version
-    case exp.trials.type[exp.trials.count] !== 'touch':
-      showSlide([hedge], []);
-      break;
-    default:
-      console.error('Error in showing hedge');
+  if (exp.trials.type[exp.trials.count] === 'touch') {
+    showSlide([], [hedge]);
+  // for tablet hedge version
+  } else if (exp.trials.type[exp.trials.count] !== 'touch') {
+    showSlide([hedge], []);
   }
 
   // calculate how far the balloon will fly

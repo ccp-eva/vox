@@ -2,33 +2,33 @@
 import { gsap } from 'gsap';
 
 // import audio sources
-import welcomeSrc from 'url:./sounds/welcome.mp3';
-import goodbyeSrc from 'url:./sounds/goodbye.mp3';
-import promptGeneralSrc from 'url:./sounds/prompt-general.mp3';
-import promptHedgeSrc from 'url:./sounds/prompt-hedge.mp3';
-import promptTouchSrc from 'url:./sounds/prompt-touch.mp3';
-import promptTouchLongSrc from 'url:./sounds/prompt-touch-long.mp3';
-import testHedge3Src from 'url:./sounds/test-hedge-3.mp3';
+import welcomeSrc from 'url:../sounds/welcome.mp3';
+import goodbyeSrc from 'url:../sounds/goodbye.mp3';
+import promptGeneralSrc from 'url:../sounds/prompt-general.mp3';
+import promptHedgeSrc from 'url:../sounds/prompt-hedge.mp3';
+import promptTouchSrc from 'url:../sounds/prompt-touch.mp3';
+import promptTouchLongSrc from 'url:../sounds/prompt-touch-long.mp3';
+import testHedge3Src from 'url:../sounds/test-hedge-3.mp3';
 
 // these, we need in our animation function. here, we'll calculate duration
-import touch1Src from 'url:./sounds/touch-1.mp3';
-import famHedge1Src from 'url:./sounds/fam-hedge-1.mp3';
-import testHedge1Src from 'url:./sounds/test-hedge-1.mp3';
-import testHedge2Src from 'url:./sounds/test-hedge-2.mp3';
+import touch1Src from 'url:../sounds/touch-1.mp3';
+import famHedge1Src from 'url:../sounds/fam-hedge-1.mp3';
+import testHedge1Src from 'url:../sounds/test-hedge-1.mp3';
+import testHedge2Src from 'url:../sounds/test-hedge-2.mp3';
 
 // import self-written functions
-import logResponse from './js/logResponse';
-import prepareTrial from './js/prepareTrial';
-import changeGaze from './js/changeGaze';
-import pause from './js/pause';
-import randomizeTrials from './js/randomizeTrials';
-import downloadData from './js/downloadData';
-import checkForTouchscreen from './js/checkForTouchscreen';
-import showSlide from './js/showSlide';
-import openFullscreen from './js/openFullscreen';
-import closeFullscreen from './js/closeFullscreen';
-import experimentalInstructions from './js/experimentalInstructions';
-import playFullAudio from './js/playFullAudio';
+import logResponse from './logResponse';
+import prepareTrial from './prepareTrial';
+import changeGaze from './changeGaze';
+import pause from './pause';
+import randomizeTrials from './randomizeTrials';
+import downloadData from './downloadData';
+import checkForTouchscreen from './checkForTouchscreen';
+import showSlide from './showSlide';
+import openFullscreen from './openFullscreen';
+import closeFullscreen from './closeFullscreen';
+import experimentalInstructions from './experimentalInstructions';
+import playFullAudio from './playFullAudio';
 
 // ---------------------------------------------------------------------------------------------------------------------
 // EXP OBJECT
@@ -171,8 +171,6 @@ agentsChar.forEach((agent) => {
   };
 });
 
-console.log('eyes', exp.elemSpecs.eyes);
-
 // calculate some positions of the targets
 exp.elemSpecs.targets = {
   center: {
@@ -268,7 +266,7 @@ const handleGoodbyeClick = (event) => {
   // disable fullscreen mode
   if (!devmode) closeFullscreen();
 
-  window.location.replace('https://app.prolific.co/submissions/complete?cc=5E523705');
+  window.location.replace('https://app.prolific.co/submissions/complete?cc=1889DA16');
 };
 // ---------------------------------------------------------------------------------------------------------------------
 // RUNS WHEN "los geht's" BUTTON IS CLICKED
@@ -290,30 +288,22 @@ const handleExperimentslideButtonClick = async function tmp(event) {
   await timeline.play();
   await pause(200);
 
-  switch (true) {
-    // for any trial without voiceover
-    case !exp.trials.voiceover[exp.trials.count]:
-      exp.soundEffect.src = promptGeneralSrc;
-      exp.soundEffect.play();
-      break;
+  // for any trial without voiceover
+  if (!exp.trials.voiceover[exp.trials.count]) {
+    exp.soundEffect.src = promptGeneralSrc;
+    exp.soundEffect.play();
 
-    // for touch trials with voiceover
-    case exp.trials.type[exp.trials.count] === 'touch':
-      await playFullAudio(exp.soundEffect, promptTouchLongSrc);
-      break;
+  // for touch trials with voiceover
+  } else if (exp.trials.type[exp.trials.count] === 'touch') {
+    await playFullAudio(exp.soundEffect, promptTouchLongSrc);
 
-    // for tablet hedge version fam trials with voiceover
-    case exp.trials.type[exp.trials.count] === 'fam':
-      await playFullAudio(exp.soundEffect, promptHedgeSrc);
-      break;
+  // for tablet hedge version fam trials with voiceover
+  } else if (exp.trials.type[exp.trials.count] === 'fam') {
+    await playFullAudio(exp.soundEffect, promptHedgeSrc);
 
-    // for tablet hedge version test trials with voiceover
-    case exp.trials.type[exp.trials.count] === 'test':
-      await playFullAudio(exp.soundEffect, testHedge3Src);
-      break;
-
-    default:
-      console.error('Error in playing audio prompts');
+  // for tablet hedge version test trials with voiceover
+  } else if (exp.trials.type[exp.trials.count] === 'test') {
+    await playFullAudio(exp.soundEffect, testHedge3Src);
   }
 
   // save current time to calculate response time later
@@ -327,17 +317,12 @@ const handleExperimentslideButtonClick = async function tmp(event) {
   // remove event listener that checks whether participants clicked too early
   exp.elemSpecs.outerSVG.ID.removeEventListener('click', handleEarlyClick, false);
 
-  switch (true) {
-    case exp.trials.type[exp.trials.count] === 'touch':
-      clickableArea.setAttribute('pointer-events', 'all');
-      clickableArea.addEventListener('click', handleTargetClick, { capture: false, once: true });
-      break;
-    case exp.trials.type[exp.trials.count] !== 'touch':
-      clickableArea.setAttribute('pointer-events', 'none');
-      hedge.addEventListener('click', handleTargetClick, { capture: false, once: true });
-      break;
-    default:
-      console.error('Error in setting event listeners');
+  if (exp.trials.type[exp.trials.count] === 'touch') {
+    clickableArea.setAttribute('pointer-events', 'all');
+    clickableArea.addEventListener('click', handleTargetClick, { capture: false, once: true });
+  } else if (exp.trials.type[exp.trials.count] !== 'touch') {
+    clickableArea.setAttribute('pointer-events', 'none');
+    hedge.addEventListener('click', handleTargetClick, { capture: false, once: true });
   }
   exp.elemSpecs.outerSVG.ID.addEventListener('click', handleWrongAreaClick, false);
 };
@@ -378,88 +363,74 @@ const handleTargetClick = async function tmp(event) {
   exp.trials.count += 1;
 
   // then depending on trialcount, decide what happens next...
-  switch (true) {
-    // for touching trials
-    case exp.trials.count < exp.trials.touchNr:
-      prepareTrial(exp);
-      timeline = gsap.timeline({ paused: true });
-      timeline.add(changeGaze(exp));
-      exp.responseLog[exp.trials.count].durationAnimationComplete = timeline.duration();
-      break;
+  // for touching trials
+  if (exp.trials.count < exp.trials.touchNr) {
+    prepareTrial(exp);
+    timeline = gsap.timeline({ paused: true });
+    timeline.add(changeGaze(exp));
+    exp.responseLog[exp.trials.count].durationAnimationComplete = timeline.duration();
 
-    // for transition from touching into familiarization
-    case exp.trials.count === exp.trials.touchNr:
-      document.getElementById('foreign-object-heading').replaceChild(txt.instructionsFamHeading, txt.instructionsTouchHeading);
-      document.getElementById('foreign-object-center-left').replaceChild(txt.instructionsFamParagraph, txt.instructionsTouchParagraph);
-      document.getElementById('foreign-object-center-right').replaceChild(txt.instructionsFamImage, txt.instructionsTouchImage);
+  // for transition from touching into familiarization
+  } else if (exp.trials.count === exp.trials.touchNr) {
+    document.getElementById('foreign-object-heading').replaceChild(txt.instructionsFamHeading, txt.instructionsTouchHeading);
+    document.getElementById('foreign-object-center-left').replaceChild(txt.instructionsFamParagraph, txt.instructionsTouchParagraph);
+    document.getElementById('foreign-object-center-right').replaceChild(txt.instructionsFamImage, txt.instructionsTouchImage);
 
-      textslideButton.addEventListener('click', handleTransitionClick, { capture: false, once: true });
+    textslideButton.addEventListener('click', handleTransitionClick, { capture: false, once: true });
 
-      showSlide([textslide, textslideButton],
-        [experimentslide,
-          hedge, pig, monkey, sheep,
-          balloonBlue, balloonRed, balloonYellow, balloonGreen, speaker]);
+    showSlide([textslide, textslideButton],
+      [experimentslide,
+        hedge, pig, monkey, sheep,
+        balloonBlue, balloonRed, balloonYellow, balloonGreen, speaker]);
 
-      break;
+  // for familiarization trials
+  } else if (exp.trials.count < exp.trials.touchNr + exp.trials.famNr) {
+    prepareTrial(exp);
+    timeline = gsap.timeline({ paused: true });
+    timeline.add(changeGaze(exp));
+    exp.responseLog[exp.trials.count].durationAnimationComplete = timeline.duration();
 
-    // for familiarization trials
-    case exp.trials.count < exp.trials.touchNr + exp.trials.famNr:
-      prepareTrial(exp);
-      timeline = gsap.timeline({ paused: true });
-      timeline.add(changeGaze(exp));
-      exp.responseLog[exp.trials.count].durationAnimationComplete = timeline.duration();
-      break;
+  // for transition from familiarization to test trials
+  } else if (exp.trials.count === exp.trials.touchNr + exp.trials.famNr) {
+    document.getElementById('foreign-object-heading').replaceChild(txt.instructionsTestHeading, txt.instructionsFamHeading);
+    document.getElementById('foreign-object-center-left').replaceChild(txt.instructionsTestParagraph, txt.instructionsFamParagraph);
+    document.getElementById('foreign-object-center-right').replaceChild(txt.instructionsTestImage, txt.instructionsFamImage);
 
-    // for transition from familiarization to test trials
-    case exp.trials.count === exp.trials.touchNr + exp.trials.famNr:
-      document.getElementById('foreign-object-heading').replaceChild(txt.instructionsTestHeading, txt.instructionsFamHeading);
-      document.getElementById('foreign-object-center-left').replaceChild(txt.instructionsTestParagraph, txt.instructionsFamParagraph);
-      document.getElementById('foreign-object-center-right').replaceChild(txt.instructionsTestImage, txt.instructionsFamImage);
+    textslideButton.addEventListener('click', handleTransitionClick, { capture: false, once: true });
 
-      textslideButton.addEventListener('click', handleTransitionClick, { capture: false, once: true });
+    showSlide([textslide, textslideButton],
+      [experimentslide,
+        hedge, pig, monkey, sheep,
+        balloonBlue, balloonRed, balloonYellow, balloonGreen, speaker]);
 
-      showSlide([textslide, textslideButton],
-        [experimentslide,
-          hedge, pig, monkey, sheep,
-          balloonBlue, balloonRed, balloonYellow, balloonGreen, speaker]);
+  // for test trials
+  } else if (exp.trials.count < exp.trials.totalNr) {
+    prepareTrial(exp);
+    timeline = gsap.timeline({ paused: true });
+    timeline.add(changeGaze(exp));
+    exp.responseLog[exp.trials.count].durationAnimationComplete = timeline.duration();
 
-      break;
+  // for goodbye after test trials
+  } else if (exp.trials.count === exp.trials.totalNr) {
+    // save data, upload to server
+    // when participants complete experiment, this is the one and only responseLog we need
+    devmode ? console.log('download data at the end') : downloadData(exp.responseLog, exp.subjData.subjID);
 
-    // for test trials
-    case exp.trials.count < exp.trials.totalNr:
-      prepareTrial(exp);
-      timeline = gsap.timeline({ paused: true });
-      timeline.add(changeGaze(exp));
-      exp.responseLog[exp.trials.count].durationAnimationComplete = timeline.duration();
-      break;
+    document.getElementById('foreign-object-heading').replaceChild(txt.goodbyeHeading, txt.instructionsTestHeading);
+    document.getElementById('foreign-object-center-left').replaceChild(txt.goodbyeParagraph, txt.instructionsTestParagraph);
+    document.getElementById('foreign-object-center-right').replaceChild(txt.familyImage, txt.instructionsTestImage);
 
-    // for goodbye after test trials
-    case exp.trials.count === exp.trials.totalNr:
-      // save data, upload to server
-      // when participants complete experiment, this is the one and only responseLog we need
-      devmode ? console.log('download data at the end') : downloadData(exp.responseLog, exp.subjData.subjID);
+    textslideButton.addEventListener('click', handleGoodbyeClick, { capture: false, once: true });
 
-      document.getElementById('foreign-object-heading').replaceChild(txt.goodbyeHeading, txt.instructionsTestHeading);
-      document.getElementById('foreign-object-center-left').replaceChild(txt.goodbyeParagraph, txt.instructionsTestParagraph);
-      document.getElementById('foreign-object-center-right').replaceChild(txt.familyImage, txt.instructionsTestImage);
+    textslideButtonText.innerHTML = 'back to Prolific';
+    textslideButtonLength = textslideButtonText.getComputedTextLength() + 50;
+    textslideButtonShape.setAttribute('width', `${textslideButtonLength}`);
+    textslideButtonShape.setAttribute('x', `${1920 / 2 - textslideButtonLength / 2}`);
 
-      textslideButton.addEventListener('click', handleGoodbyeClick, { capture: false, once: true });
-
-      textslideButtonText.innerHTML = 'back to Prolific';
-      textslideButtonLength = textslideButtonText.getComputedTextLength() + 50;
-      textslideButtonShape.setAttribute('width', `${textslideButtonLength}`);
-      textslideButtonShape.setAttribute('x', `${1920 / 2 - textslideButtonLength / 2}`);
-
-      showSlide([textslide, speaker, textslideButton],
-        [experimentslide,
-          hedge, pig, monkey, sheep,
-          balloonBlue, balloonRed, balloonYellow, balloonGreen]);
-
-      break;
-
-    // error handling
-    default:
-      console.error('Error in specifying next trial');
+    showSlide([textslide, speaker, textslideButton],
+      [experimentslide,
+        hedge, pig, monkey, sheep,
+        balloonBlue, balloonRed, balloonYellow, balloonGreen]);
   }
 };
 // ---------------------------------------------------------------------------------------------------------------------
@@ -487,22 +458,16 @@ const handleWrongAreaClick = (event) => {
 
 const handleSpeakerClick = async function tmp(event) {
   event.preventDefault();
-  switch (true) {
-    // welcome
-    case exp.trials.count === 0:
-      // play instructions audio, only show button once audio is finished playing
-      showSlide([], [textslideButton]);
-      await playFullAudio(exp.soundEffect, welcomeSrc);
-      showSlide([textslideButton], []);
-      break;
+  // welcome
+  if (exp.trials.count === 0) {
+    // play instructions audio, only show button once audio is finished playing
+    showSlide([], [textslideButton]);
+    await playFullAudio(exp.soundEffect, welcomeSrc);
+    showSlide([textslideButton], []);
 
     // goodbye
-    case exp.trials.count === exp.trials.totalNr:
-      await playFullAudio(exp.soundEffect, goodbyeSrc);
-      break;
-
-    default:
-      console.error('Error in playing instructions');
+  } else if (exp.trials.count === exp.trials.totalNr) {
+    await playFullAudio(exp.soundEffect, goodbyeSrc);
   }
 };
 
@@ -510,19 +475,12 @@ const handleSpeakerClick = async function tmp(event) {
 // RUNS WHEN PARTICIPANT HASN'T CLICKED WITHIN CERTAIN AMOUNT OF TIME
 // ---------------------------------------------------------------------------------------------------------------------
 let noTargetClickWithin5sec = () => {
-  switch (true) {
-    case exp.trials.type[exp.trials.count] === 'touch':
-      exp.soundEffect.src = promptTouchSrc;
-      exp.soundEffect.play();
-      break;
-
-    case exp.trials.type[exp.trials.count] !== 'touch':
-      exp.soundEffect.src = promptHedgeSrc;
-      exp.soundEffect.play();
-      break;
-
-    default:
-      console.error('Error in playing audio prompt');
+  if (exp.trials.type[exp.trials.count] === 'touch') {
+    exp.soundEffect.src = promptTouchSrc;
+    exp.soundEffect.play();
+  } else if (exp.trials.type[exp.trials.count] !== 'touch') {
+    exp.soundEffect.src = promptHedgeSrc;
+    exp.soundEffect.play();
   }
 };
 // ---------------------------------------------------------------------------------------------------------------------

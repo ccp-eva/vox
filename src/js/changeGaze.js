@@ -82,76 +82,69 @@ export default (exp) => {
   // -------------------------------------------------------------------------------------------------------------------
   // define animation depending on trial type
   // -------------------------------------------------------------------------------------------------------------------
-  switch (true) {
-    // for touch training trials
-    case exp.trials.type[exp.trials.count] === 'touch':
-      // for instructions voice over
-      if (exp.trials.voiceover[exp.trials.count]) {
-        timeline.eventCallback('onStart', playSound, [touch1Src]);
-        attentionGetter.delay(exp.elemSpecs.animAudioDur[touch1Src] + delay);
-      }
-      attentionGetter.play();
-      ballonToGround.play();
-      timeline
-        .add(attentionGetter, `+=${delay}`)
-        .add(ballonToGround, `+=${delay}`);
-      break;
+  // for touch training trials
+  if (exp.trials.type[exp.trials.count] === 'touch') {
+    // for instructions voice over
+    if (exp.trials.voiceover[exp.trials.count]) {
+      timeline.eventCallback('onStart', playSound, [touch1Src]);
+      attentionGetter.delay(exp.elemSpecs.animAudioDur[touch1Src] + delay);
+    }
+    attentionGetter.play();
+    ballonToGround.play();
+    timeline
+      .add(attentionGetter, `+=${delay}`)
+      .add(ballonToGround, `+=${delay}`);
 
-    // for tablet hedge version fam trials
-    case exp.trials.type[exp.trials.count] === 'fam':
-      const hedgeSetHalfWay = gsap.set(hedge, {
-        y: hedge.getBBox().height - exp.targets[exp.trials.count].getBBox().height - 75,
-      });
+  // for tablet hedge version fam trials
+  } else if (exp.trials.type[exp.trials.count] === 'fam') {
+    const hedgeSetHalfWay = gsap.set(hedge, {
+      y: hedge.getBBox().height - exp.targets[exp.trials.count].getBBox().height - 75,
+    });
 
-      if (exp.trials.voiceover[exp.trials.count]) {
-        timeline.eventCallback('onStart', playSound, [famHedge1Src]);
-        attentionGetter.delay(exp.elemSpecs.animAudioDur[famHedge1Src] + delay);
-      }
-      attentionGetter.play();
-      ballonToGround.play();
+    if (exp.trials.voiceover[exp.trials.count]) {
+      timeline.eventCallback('onStart', playSound, [famHedge1Src]);
+      attentionGetter.delay(exp.elemSpecs.animAudioDur[famHedge1Src] + delay);
+    }
+    attentionGetter.play();
+    ballonToGround.play();
 
-      timeline
-        .add(hedgeSetHalfWay)
-        .add(attentionGetter, `+=${delay}`)
-        .add(ballonToGround, `+=${delay}`);
-      break;
+    timeline
+      .add(hedgeSetHalfWay)
+      .add(attentionGetter, `+=${delay}`)
+      .add(ballonToGround, `+=${delay}`);
 
-    // for tablet hedge version test trials
-    case exp.trials.type[exp.trials.count] === 'test':
-      const hedgeHalfDown = gsap.to(hedge, {
-        y: hedge.getBBox().height - exp.targets[exp.trials.count].getBBox().height - 75,
-        duration: hedgeDuration,
-        ease: 'none',
-      });
+  // for tablet hedge version test trials
+  } else if (exp.trials.type[exp.trials.count] === 'test') {
+    const hedgeHalfDown = gsap.to(hedge, {
+      y: hedge.getBBox().height - exp.targets[exp.trials.count].getBBox().height - 75,
+      duration: hedgeDuration,
+      ease: 'none',
+    });
 
-      const hedgeUp = gsap.fromTo(hedge, {
-        y: hedge.getBBox().height - exp.targets[exp.trials.count].getBBox().height - 75,
-      }, {
-        y: 0,
-        duration: hedgeDuration,
-        ease: 'none',
-      });
+    const hedgeUp = gsap.fromTo(hedge, {
+      y: hedge.getBBox().height - exp.targets[exp.trials.count].getBBox().height - 75,
+    }, {
+      y: 0,
+      duration: hedgeDuration,
+      ease: 'none',
+    });
 
-      if (exp.trials.voiceover[exp.trials.count]) {
-        timeline.eventCallback('onStart', playSound, [testHedge1Src]);
-        hedgeUp.delay(exp.elemSpecs.animAudioDur[testHedge1Src] + delay);
-        hedgeUp.eventCallback('onComplete', playSound, [testHedge2Src]);
-        attentionGetter.delay(exp.elemSpecs.animAudioDur[testHedge2Src] + delay);
-      }
-      hedgeUp.play();
-      attentionGetter.play();
-      ballonToGround.play();
-      hedgeHalfDown.play();
+    if (exp.trials.voiceover[exp.trials.count]) {
+      timeline.eventCallback('onStart', playSound, [testHedge1Src]);
+      hedgeUp.delay(exp.elemSpecs.animAudioDur[testHedge1Src] + delay);
+      hedgeUp.eventCallback('onComplete', playSound, [testHedge2Src]);
+      attentionGetter.delay(exp.elemSpecs.animAudioDur[testHedge2Src] + delay);
+    }
+    hedgeUp.play();
+    attentionGetter.play();
+    ballonToGround.play();
+    hedgeHalfDown.play();
 
-      timeline
-        .add(hedgeUp, `+=${delay}`)
-        .add(attentionGetter, `+=${delay}`)
-        .add(ballonToGround, `+=${delay}`)
-        .add(hedgeHalfDown, `+=${delay}`);
-      break;
-
-    default:
-      console.error('Error in defining animation');
+    timeline
+      .add(hedgeUp, `+=${delay}`)
+      .add(attentionGetter, `+=${delay}`)
+      .add(ballonToGround, `+=${delay}`)
+      .add(hedgeHalfDown, `+=${delay}`);
   }
 
   timeline.play();
