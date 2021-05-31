@@ -129,7 +129,7 @@ switch (exp.subjData.lang) {
 exp.subjData.subjID = url.searchParams.get('id') || 'testID';
 
 // just for developing: turn off fullscreen mode
-const devmode = false;
+const devmode = true;
 exp.subjData.touchScreen = checkForTouchscreen();
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -143,7 +143,7 @@ exp.trials.totalNr = exp.trials.touchNr + exp.trials.famNr + exp.trials.testNr;
 // this variable stores in which trial we currently are!
 exp.trials.count = 0;
 // NOTE: make sure, that the number of voice over fits to the nr of touch training, fam and test trials!!
-exp.trials.voiceoverNr = devmode ? 1 : 1;
+exp.trials.voiceoverNr = devmode ? 0 : 1;
 // constant number of boxes for PC version
 exp.trials.boxVersion = 5;
 
@@ -381,8 +381,7 @@ const handleGoodbyeClick = (event) => {
     sR.uploadVideo(exp.subjData.subjID);
   }
 
-  showSlide([],
-    [textslide, speaker, textslideButton]);
+  window.location.href = 'https://ccp-odc.eva.mpg.de/gafo-en/goodbye.html';
 };
 // ---------------------------------------------------------------------------------------------------------------------
 // RUNS WHEN "los geht's" BUTTON IS CLICKED
