@@ -46,7 +46,11 @@ exp.subjData = {};
 const url = new URL(window.location.href);
 
 // use id parameter’s value if available else use 'testID'
-exp.subjData.subjID = url.searchParams.get('id') || url.searchParams.get('PROLIFIC_PID') || 'testID';
+exp.subjData.subjID = url.searchParams.get('PROLIFIC_PID') || 'testID';
+
+// simplified extended ISO format (ISO 8601),YYYY-MM-DDTHH:mm:ss.sssZ
+// timezone is always zero UTC offset, as denoted by the suffix "Z".
+exp.subjData.consentTimestamp = new Date(parseInt(url.searchParams.get('time'))).toISOString();
 
 // just for developing: turn off fullscreen mode
 const devmode = false;
@@ -423,7 +427,7 @@ const handleTargetClick = async function tmp(event) {
     textslideButton.addEventListener('click', handleGoodbyeClick, { capture: false, once: true });
 
     textslideButtonText.innerHTML = 'back to Prolific';
-    textslideButtonLength = textslideButtonText.getComputedTextLength() + 50;
+    const textslideButtonLength = textslideButtonText.getComputedTextLength() + 50;
     textslideButtonShape.setAttribute('width', `${textslideButtonLength}`);
     textslideButtonShape.setAttribute('x', `${1920 / 2 - textslideButtonLength / 2}`);
 
