@@ -1,0 +1,29 @@
+{
+  "name": "minimal-webpack-dev-server-setup",
+  "version": "1.0.1",
+  "private": true,
+  "description": "",
+  "main": "src/index.js",
+  "scripts": {
+    "start": "webpack serve",
+    "build": "NODE_ENV=production webpack",
+    "deploy": "rsync -avuh --delete dist/ $npm_config_user@$npm_config_server:$npm_config_path"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "MIT",
+  "devDependencies": {
+    "copy-webpack-plugin": "^11.0.0",
+    "css-loader": "^6.7.1",
+    "html-webpack-plugin": "^5.5.0",
+    "mini-css-extract-plugin": "^2.6.0",
+    "postcss": "^8.4.14",
+    "postcss-loader": "^7.0.0",
+    "postcss-preset-env": "^7.6.0",
+    "sass": "^1.52.1",
+    "sass-loader": "^13.0.0",
+    "webpack": "^5.72.1",
+    "webpack-cli": "^4.9.2",
+    "webpack-dev-server": "^4.9.0"
+  }
+}
